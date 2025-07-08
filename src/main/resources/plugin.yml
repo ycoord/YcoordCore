@@ -1,0 +1,4 @@
+name: YcoordCore
+version: '1.0-SNAPSHOT'
+main: ru.ycoord.YcoordCore
+api-version: '1.18'
