@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlaceholderManager extends PlaceholderExpansion {
-    private HashMap<String, IPlaceholderAPI> papis = new HashMap<>();
+    private final HashMap<String, IPlaceholderAPI> papis = new HashMap<>();
 
     @Override
     public @NotNull String getIdentifier() {
