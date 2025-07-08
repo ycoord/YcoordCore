@@ -10,12 +10,17 @@ import ru.ycoord.balance.IBalance;
 import ru.ycoord.balance.MoneyBalance;
 import ru.ycoord.color.Color;
 import org.black_ixx.playerpoints.PlayerPoints;
+import ru.ycoord.placeholder.IPlaceholderAPI;
+import ru.ycoord.placeholder.PlaceholderDummy;
+import ru.ycoord.placeholder.PlaceholderManager;
 
+import java.util.EventListener;
 import java.util.logging.Logger;
 
-public class YcoordPlugin extends JavaPlugin {
+public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance moneyBalance = null;
     protected IBalance donateBalance = null;
+    protected PlaceholderManager placeholderManager = null;
 
     boolean requirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
@@ -44,7 +49,6 @@ public class YcoordPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
         {
             if (!requirePlugin(this, "PlayerPoints"))
                 return;
@@ -65,8 +69,22 @@ public class YcoordPlugin extends JavaPlugin {
         {
             if (!requirePlugin(this, "PlaceholderAPI"))
                 return;
+
+            placeholderManager = new PlaceholderManager();
+            placeholderManager.register();
+
+            IPlaceholderAPI placeholder = getPlaceholderAPI();
+            if (placeholder != null) {
+                placeholderManager.registerPlaceholder(placeholder);
+            }
         }
+    }
 
-
+    @Override
+    public void onDisable() {
+        placeholderManager.unregister();
+    }
+    public IPlaceholderAPI getPlaceholderAPI() {
+        return new PlaceholderDummy();
     }
 }
