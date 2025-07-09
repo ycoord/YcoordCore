@@ -106,7 +106,18 @@ messages:
         name: ENTITY_VILLAGER_NO
 
 
-
+  no-block:
+    - "Вы не смотрите на блок"
+  block-data:
+    - "Значение блока: %value%"
+  block-set-data:
+    - "Вы установили значение для блока: %key% - %value%"
+  player-set-data:
+    - "Вы установили значение для игрока: %key% - %value%"
+  player-get-data:
+    - "Значение игрока: %value%"
+  no-key:
+    - "Такого ключа нет"
   default-message:
     - Message with default sound %some%
   sound-placeholder-particle-command-hover:

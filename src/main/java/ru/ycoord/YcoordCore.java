@@ -1,22 +1,23 @@
 package ru.ycoord;
 
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.Bukkit;
+import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.examples.commands.CoreCommand;
 import ru.ycoord.core.messages.ChatMessage;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
     private ChatMessage chatMessage;
+    private PlayerDataCache playerDataCache;
 
     public static YcoordCore getInstance() {
         return instance;
@@ -27,6 +28,10 @@ public final class YcoordCore extends YcoordPlugin {
         return chatMessage;
     }
 
+    public PlayerDataCache getPlayerDataCache() {
+        return playerDataCache;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -34,6 +39,16 @@ public final class YcoordCore extends YcoordPlugin {
 
         {
             chatMessage = new ChatMessage(this, getConfig());
+        }
+
+        try {
+            playerDataCache = new PlayerDataCache("players.db");
+
+            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
+                playerDataCache.update();
+            }, 20, 10);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -65,7 +80,7 @@ public final class YcoordCore extends YcoordPlugin {
     public void registerCommand(JavaPlugin plugin, Command command) {
         Handler handler = new Handler(command);
         PluginCommand cmd = plugin.getCommand(command.getName());
-        if(cmd == null)
+        if (cmd == null)
             return;
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
