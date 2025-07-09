@@ -1,4 +1,4 @@
-package ru.ycoord.sound;
+package ru.ycoord.core.sound;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -6,8 +6,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import static org.bukkit.SoundCategory.AMBIENT;
 
 public class SoundInfo {
     private final Sound sound;

@@ -1,4 +1,4 @@
-package ru.ycoord.placeholder;
+package ru.ycoord.core.placeholder;
 
 import org.bukkit.entity.Player;
 

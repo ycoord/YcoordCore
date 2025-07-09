@@ -5,17 +5,20 @@ import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.ycoord.balance.DonateBalance;
-import ru.ycoord.balance.IBalance;
-import ru.ycoord.balance.MoneyBalance;
-import ru.ycoord.color.Color;
+import ru.ycoord.core.balance.DonateBalance;
+import ru.ycoord.core.balance.IBalance;
+import ru.ycoord.core.balance.MoneyBalance;
+import ru.ycoord.core.color.Color;
 import org.black_ixx.playerpoints.PlayerPoints;
-import ru.ycoord.messages.ChatMessage;
-import ru.ycoord.placeholder.IPlaceholderAPI;
-import ru.ycoord.placeholder.PlaceholderDummy;
-import ru.ycoord.placeholder.PlaceholderManager;
+import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.messages.ChatMessage;
+import ru.ycoord.core.placeholder.IPlaceholderAPI;
+import ru.ycoord.core.placeholder.PlaceholderDummy;
+import ru.ycoord.core.placeholder.PlaceholderManager;
+import ru.ycoord.examples.commands.CoreCommand;
 
 import java.util.EventListener;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class YcoordPlugin extends JavaPlugin implements EventListener {
@@ -81,10 +84,22 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                 placeholderManager.registerPlaceholder(placeholder);
             }
         }
+
+        {
+            List<Command> roots = getRootCommands();
+            if (roots != null) {
+                for (Command root : roots)
+                    YcoordCore.getInstance().registerCommand(this, root);
+            }
+        }
     }
 
     public final ChatMessage getCoreChatMessage(){
         return YcoordCore.getInstance().getChatMessage();
+    }
+
+    public List<Command> getRootCommands() {
+        return null;
     }
 
     @Override

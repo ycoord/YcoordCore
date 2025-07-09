@@ -1,4 +1,4 @@
-package ru.ycoord.balance;
+package ru.ycoord.core.balance;
 
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.entity.Player;

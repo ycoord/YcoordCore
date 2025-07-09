@@ -1,4 +1,4 @@
-package ru.ycoord.balance;
+package ru.ycoord.core.balance;
 
 import org.bukkit.entity.Player;
 

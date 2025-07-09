@@ -1,4 +1,4 @@
-package ru.ycoord.color;
+package ru.ycoord.core.color;
 
 public class Color {
     public static final String RESET = "\033[0m";  // Text Reset

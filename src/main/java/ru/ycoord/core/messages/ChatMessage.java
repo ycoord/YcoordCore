@@ -1,4 +1,4 @@
-package ru.ycoord.messages;
+package ru.ycoord.core.messages;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -7,8 +7,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.ycoord.YcoordCore;
-import ru.ycoord.parcticle.ParticlesInfo;
-import ru.ycoord.sound.SoundInfo;
+import ru.ycoord.core.parcticle.ParticlesInfo;
+import ru.ycoord.core.sound.SoundInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,19 +41,12 @@ public class ChatMessage extends MessageBase {
 
         assert messages != null;
 
-
+        boolean hasSound = false;
         for (Object message : messages) {
             if (message instanceof String stringMessage) {
                 player.getPlayer().sendMessage(translateColor(stringMessage, messagePlaceholders));
-
-                if(useDefaultSound)
-                {
-                    defaultSound.play(player);
-                }
-
             } else {
                 if (message instanceof HashMap<?, ?> map) {
-                    boolean hasSound = false;
                     for (Map.Entry<?, ?> entry : map.entrySet()) {
                         if (entry.getValue() instanceof HashMap<?, ?> valueMap) {
                             if (!valueMap.containsKey("type")) {
@@ -129,16 +122,12 @@ public class ChatMessage extends MessageBase {
                         }
 
                     }
-
-                    if(!hasSound && useDefaultSound)
-                    {
-                        defaultSound.play(player);
-                    }
                 }
             }
-
         }
-
+        if (!hasSound && useDefaultSound) {
+            defaultSound.play(player);
+        }
     }
 
     @Override

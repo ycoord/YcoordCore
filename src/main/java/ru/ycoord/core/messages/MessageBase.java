@@ -1,4 +1,4 @@
-package ru.ycoord.messages;
+package ru.ycoord.core.messages;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
-import ru.ycoord.sound.SoundInfo;
+import ru.ycoord.core.sound.SoundInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -1,11 +1,10 @@
-package ru.ycoord.parcticle;
+package ru.ycoord.core.parcticle;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class ParticlesInfo {
     private final int count;

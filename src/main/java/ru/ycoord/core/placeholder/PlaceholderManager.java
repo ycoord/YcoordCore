@@ -1,4 +1,4 @@
-package ru.ycoord.placeholder;
+package ru.ycoord.core.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;

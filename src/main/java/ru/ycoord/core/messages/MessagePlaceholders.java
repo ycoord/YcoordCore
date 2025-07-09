@@ -1,4 +1,4 @@
-package ru.ycoord.messages;
+package ru.ycoord.core.messages;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
