@@ -10,6 +10,7 @@ import ru.ycoord.balance.IBalance;
 import ru.ycoord.balance.MoneyBalance;
 import ru.ycoord.color.Color;
 import org.black_ixx.playerpoints.PlayerPoints;
+import ru.ycoord.messages.ChatMessage;
 import ru.ycoord.placeholder.IPlaceholderAPI;
 import ru.ycoord.placeholder.PlaceholderDummy;
 import ru.ycoord.placeholder.PlaceholderManager;
@@ -49,6 +50,8 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+
         {
             if (!requirePlugin(this, "PlayerPoints"))
                 return;
@@ -78,6 +81,10 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                 placeholderManager.registerPlaceholder(placeholder);
             }
         }
+    }
+
+    public final ChatMessage getCoreChatMessage(){
+        return YcoordCore.getInstance().getChatMessage();
     }
 
     @Override

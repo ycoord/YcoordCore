@@ -7,3 +7,6 @@ depend:
   - PlaceholderAPI
   - Vault
   - PlayerPoints
+commands:
+  ycoordcore:
+    description: Core commands

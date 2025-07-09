@@ -1,0 +1,52 @@
+messages-settings:
+  sound:
+    use-default: true
+    default-sound:
+      name: ENTITY_EXPERIENCE_ORB_PICKUP
+      category: AMBIENT
+      pitch: 1
+      volume: 0.5
+
+messages:
+  default-message:
+    - Message with default sound %some%
+  sound-placeholder-particle-command-hover:
+    - Message with sound. Executor %executor%, %some%
+    - sound-key:
+        type: SOUND
+        name: ENTITY_VILLAGER_NO
+        category: AMBIENT
+        pitch: 1
+        volume: 1
+    - particle-key:
+        type: PARTICLE
+        name: EXPLOSION_NORMAL
+        count: 100
+        offset:
+          x: 1
+          y: 1
+          z: 0
+    - component-key:
+        type: COMPONENT
+        parts:
+          1:
+            text: Simple text
+          2:
+            text: Command1
+            hover: Command1 Description, executor %executor%
+            commands:
+            - /command1
+          3:
+            text: " Command2"
+            hover: Command2 Description, executor %executor%
+            commands:
+            - /command1
+            - /command2
+          4:
+            text: " Open Url"
+            hover: opens google.com
+            open: https://www.google.com/
+          5:
+            text: " Copy"
+            hover: copy data to clipboard
+            copy: Hello world!
