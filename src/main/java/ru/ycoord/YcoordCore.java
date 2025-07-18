@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.persistance.PlayerDataCache;
+import ru.ycoord.core.placeholder.CorePlaceholders;
+import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.examples.commands.CoreCommand;
 import ru.ycoord.core.messages.ChatMessage;
 
@@ -55,6 +57,11 @@ public final class YcoordCore extends YcoordPlugin {
     @Override
     public List<Command> getRootCommands() {
         return List.of(new CoreCommand());
+    }
+
+    @Override
+    public IPlaceholderAPI getPlaceholderAPI() {
+        return new CorePlaceholders();
     }
 
     static class Handler implements CommandExecutor, TabCompleter {
