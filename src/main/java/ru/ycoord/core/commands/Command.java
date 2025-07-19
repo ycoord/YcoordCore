@@ -4,7 +4,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.requirements.Requirement;
+import ru.ycoord.core.commands.requirements.SubcommandRequirement;
+import ru.ycoord.core.messages.MessageBase;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Command {
@@ -17,8 +20,12 @@ public abstract class Command {
     private CommandSender sender;
     private List<Object> params;
 
+    protected MessageBase messageBase;
+    public Command() {
+        this.messageBase = YcoordCore.getInstance().getChatMessage();
+    }
 
-    public List<Requirement> getRequirements(CommandSender sender){
+    public List<Requirement> getRequirements(CommandSender sender) {
         return List.of();
     }
 
@@ -142,9 +149,10 @@ public abstract class Command {
         return args.get(argCounter);
     }
 
-    protected void throwNotEnough(){
+    protected void throwNotEnough() {
         throw new IllegalArgumentException("недостаточно аргументов");
     }
+
     protected boolean executeNext(Command command, List<Object> params) {
         return command.execute(sender, args.subList(argCounter, args.size()), params);
     }
@@ -213,7 +221,9 @@ public abstract class Command {
         return completionCounter;
     }
 
-    public int getArgCounter(){
+    public int getArgCounter() {
         return argCounter;
     }
+
+    public abstract String getDescription(CommandSender sender);
 }

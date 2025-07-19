@@ -44,4 +44,12 @@ public class OnlinePlayerRequirement extends Requirement {
             messageBase.sendMessageId(player, "messages.online-player-error");
         }
     }
+
+    @Override
+    public void sendDescription(CommandSender sender) {
+        if (sender instanceof Player player)
+        {
+            messageBase.sendMessageId(player, "messages.online-description");
+        }
+    }
 }

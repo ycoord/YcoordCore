@@ -29,6 +29,14 @@ public class FloatRequirement extends Requirement {
     }
 
     @Override
+    public void sendDescription(CommandSender sender) {
+        if (sender instanceof Player player)
+        {
+            messageBase.sendMessageId(player, "messages.float-description");
+        }
+    }
+
+    @Override
     public Object validate(CommandSender sender, String param) {
         try {
             return Float.parseFloat(param);

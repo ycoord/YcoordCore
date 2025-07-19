@@ -30,4 +30,12 @@ public class StringRequirement extends Requirement {
             messageBase.sendMessageId(player, "messages.string-error");
         }
     }
+
+    @Override
+    public void sendDescription(CommandSender sender) {
+        if (sender instanceof Player player)
+        {
+            messageBase.sendMessageId(player, "messages.string-description");
+        }
+    }
 }

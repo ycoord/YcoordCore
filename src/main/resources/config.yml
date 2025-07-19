@@ -160,3 +160,40 @@ messages:
             text: " Copy"
             hover: copy data to clipboard
             copy: Hello world!
+
+
+  help-item-info:
+    - "> %command% - %description%"
+  string-description:
+    - "строка"
+  integer-description:
+    - "целое число"
+  float-description:
+    - "вещественное число"
+  online-description:
+    - "онлайн игрок"
+  offline-description:
+    - "игрок"
+  example-command-description:
+    - "примеры ядра"
+  example-message-command-description:
+    - "примеры сообщений"
+  example-message-simple-command-description:
+    - "простое сообщение"
+  example-message-complex-command-description:
+    - "сложное сообщение"
+  example-nbt-command-description:
+    - "примеры извлечения и установки nbt тегов для сущностей и блоков"
+  example-get-nbt-command-description:
+    - "извлечение значения"
+  example-get-nbt-block-command-description:
+    - "извлечение значения из блока"
+  example-get-nbt-player-command-description:
+    - "извлечение значения из игрока"
+
+  example-set-nbt-command-description:
+    - "извлечение значения"
+  example-set-nbt-block-command-description:
+    - "извлечение значения из блока"
+  example-set-nbt-player-command-description:
+    - "извлечение значения из игрока"

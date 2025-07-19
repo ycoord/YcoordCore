@@ -1,10 +1,12 @@
 package ru.ycoord.core.commands.requirements;
 
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.messages.MessageBase;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class Requirement {
@@ -60,4 +62,6 @@ public abstract class Requirement {
     public boolean isOptional() {
         return false;
     }
+
+    public abstract void sendDescription(CommandSender sender);
 }

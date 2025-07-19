@@ -38,4 +38,12 @@ public class IntegerRequirement extends Requirement {
             messageBase.sendMessageId(player, "messages.integer-error");
         }
     }
+
+    @Override
+    public void sendDescription(CommandSender sender) {
+        if (sender instanceof Player player)
+        {
+            messageBase.sendMessageId(player, "messages.integer-description");
+        }
+    }
 }

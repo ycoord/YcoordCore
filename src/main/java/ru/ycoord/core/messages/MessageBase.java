@@ -20,25 +20,24 @@ public abstract class MessageBase {
     protected ConfigurationSection messagesSection;
     protected boolean useDefaultSound = false;
     protected SoundInfo defaultSound;
+
     public MessageBase(YcoordCore core, ConfigurationSection messagesSection) {
         this.messagesSection = messagesSection;
 
         ConfigurationSection config = core.getConfig();
         ConfigurationSection messagesSettings = config.getConfigurationSection("messages-settings");
-        if(messagesSettings == null)
+        if (messagesSettings == null)
             return;
 
         ConfigurationSection soundSettings = messagesSettings.getConfigurationSection("sound");
-        if(soundSettings == null)
+        if (soundSettings == null)
             return;
 
 
-
         this.useDefaultSound = soundSettings.getBoolean("use-default", true);
-        if(this.useDefaultSound)
-        {
+        if (this.useDefaultSound) {
             ConfigurationSection defaultSoundSection = soundSettings.getConfigurationSection("default-sound");
-            if(defaultSoundSection == null)
+            if (defaultSoundSection == null)
                 this.useDefaultSound = false;
             else
                 this.defaultSound = new SoundInfo(defaultSoundSection);
@@ -68,20 +67,30 @@ public abstract class MessageBase {
         return PlaceholderAPI.setPlaceholders(messagePlaceholders.getPlayer(), value);
     }
 
-    public void sendMessageId(OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders)
-    {
+    public void sendMessageId(OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
         @NotNull List<String> messages = getSection().getStringList(id);
-        if(messages.isEmpty())
-        {
+        if (messages.isEmpty()) {
             messages = List.of(def);
         }
 
 
-        for(String message: messages)
-        {
-            message = translateColor(message, messagePlaceholders);
-            displayMessage(player, message);
+        for (String message : messages) {
+            displayMessage(player, makeMessage(message, messagePlaceholders));
         }
+    }
+
+    public String makeMessage(String message, MessagePlaceholders messagePlaceholders) {
+        return translateColor(message, messagePlaceholders);
+    }
+
+    public String makeMessageId(String messageId, MessagePlaceholders messagePlaceholders) {
+        List<String> messages = getSection().getStringList(messageId);
+        String message = null;
+        if (messages.isEmpty())
+            message = getSection().getString(messageId);
+        else
+            message =  messages.get(0);
+        return translateColor(message, messagePlaceholders);
     }
 
 

@@ -32,4 +32,12 @@ public class PlayerRequirement extends Requirement {
             messageBase.sendMessageId(player, "messages.player-error");
         }
     }
+
+    @Override
+    public void sendDescription(CommandSender sender) {
+        if (sender instanceof Player player)
+        {
+            messageBase.sendMessageId(player, "messages.offline-description");
+        }
+    }
 }

@@ -3,17 +3,20 @@ package ru.ycoord.core.commands.requirements;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.commands.HelpCommand;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class SubcommandRequirement extends Requirement {
 
-    private final List<Command> subcommands;
+    private final List<Command> subcommands = new LinkedList<Command>();
 
     public SubcommandRequirement(Command command, List<Command> subcommands) {
         super(command);
-        this.subcommands = subcommands;
+        this.subcommands.add(new HelpCommand(command));
+        this.subcommands.addAll(subcommands);
     }
 
     @Override
@@ -73,6 +76,18 @@ public class SubcommandRequirement extends Requirement {
 
             messageBase.sendMessageId(player, "messages.subcommand-error", placeholders);
 
+        }
+    }
+
+    @Override
+    public void sendDescription(CommandSender sender) {
+        if(sender instanceof Player player) {
+            for (Command c : subcommands) {
+                MessagePlaceholders placeholders = new MessagePlaceholders(player);
+                placeholders.put("%command%", c.getName());
+                placeholders.put("%description%", c.getDescription(sender));
+                messageBase.sendMessageId(player, "messages.help-item-info", placeholders);
+            }
         }
     }
 }
