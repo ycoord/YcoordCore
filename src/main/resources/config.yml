@@ -22,6 +22,10 @@ default-float-completion:
   - 10000.0
   - 100000.0
 
+nick-completion:
+  - <ник>
+
+
 messages:
   not-float:
     - "&cⓧ &c&lСистема &8»&f Не является вещественным числом!"
@@ -197,3 +201,5 @@ messages:
     - "извлечение значения из блока"
   example-set-nbt-player-command-description:
     - "извлечение значения из игрока"
+  example-head-description:
+    - "получение головы игрока"

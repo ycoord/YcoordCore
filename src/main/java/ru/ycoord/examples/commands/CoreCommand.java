@@ -1,5 +1,6 @@
 package ru.ycoord.examples.commands;
 
+import jdk.jshell.execution.Util;
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -17,6 +18,7 @@ import ru.ycoord.core.commands.requirements.SubcommandRequirement;
 import ru.ycoord.core.messages.MapMessages;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.nbt.NbtExtension;
+import ru.ycoord.core.utils.Utils;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ public class CoreCommand extends AdminCommand {
 
                 @Override
                 public String getDescription(CommandSender sender) {
-                    if(sender instanceof Player player) {
+                    if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
                         return messageBase.makeMessageId("messages.example-message-simple-command-description", placeholders);
                     }
@@ -90,7 +92,7 @@ public class CoreCommand extends AdminCommand {
 
                 @Override
                 public String getDescription(CommandSender sender) {
-                    if(sender instanceof Player player) {
+                    if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
                         return messageBase.makeMessageId("messages.example-message-complex-command-description", placeholders);
                     }
@@ -113,7 +115,7 @@ public class CoreCommand extends AdminCommand {
 
             @Override
             public String getDescription(CommandSender sender) {
-                if(sender instanceof Player player) {
+                if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
                     return messageBase.makeMessageId("messages.example-message-command-description", placeholders);
                 }
@@ -122,7 +124,7 @@ public class CoreCommand extends AdminCommand {
         }
 
         static class ExampleNbtCommand extends AdminCommand {
-            class GetNbtCommand extends AdminCommand {
+            static class GetNbtCommand extends AdminCommand {
                 class BlockCommand extends AdminCommand {
                     @Override
                     public List<Requirement> getRequirements(CommandSender sender) {
@@ -160,7 +162,7 @@ public class CoreCommand extends AdminCommand {
 
                     @Override
                     public String getDescription(CommandSender sender) {
-                        if(sender instanceof Player player) {
+                        if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
                             return messageBase.makeMessageId("messages.example-get-nbt-block-command-description", placeholders);
                         }
@@ -205,7 +207,7 @@ public class CoreCommand extends AdminCommand {
 
                     @Override
                     public String getDescription(CommandSender sender) {
-                        if(sender instanceof Player player) {
+                        if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
                             return messageBase.makeMessageId("messages.example-get-nbt-player-command-description", placeholders);
                         }
@@ -220,7 +222,7 @@ public class CoreCommand extends AdminCommand {
 
                 @Override
                 public String getDescription(CommandSender sender) {
-                    if(sender instanceof Player player) {
+                    if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
                         return messageBase.makeMessageId("messages.example-nbt-command-description", placeholders);
                     }
@@ -236,9 +238,9 @@ public class CoreCommand extends AdminCommand {
                 }
             }
 
-            class SetNbtCommand extends AdminCommand {
+            static class SetNbtCommand extends AdminCommand {
 
-                class BlockCommand extends AdminCommand {
+                static class BlockCommand extends AdminCommand {
                     @Override
                     public List<Requirement> getRequirements(CommandSender sender) {
                         return List.of(new StringRequirement(this), new StringRequirement(this));
@@ -278,7 +280,7 @@ public class CoreCommand extends AdminCommand {
 
                     @Override
                     public String getDescription(CommandSender sender) {
-                        if(sender instanceof Player player) {
+                        if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
                             return messageBase.makeMessageId("messages.example-set-nbt-block-command-description", placeholders);
                         }
@@ -286,7 +288,7 @@ public class CoreCommand extends AdminCommand {
                     }
                 }
 
-                class PlayerCommand extends AdminCommand {
+                static class PlayerCommand extends AdminCommand {
                     @Override
                     public List<Requirement> getRequirements(CommandSender sender) {
                         return List.of(
@@ -324,7 +326,7 @@ public class CoreCommand extends AdminCommand {
 
                     @Override
                     public String getDescription(CommandSender sender) {
-                        if(sender instanceof Player player) {
+                        if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
                             return messageBase.makeMessageId("messages.example-set-nbt-player-command-description", placeholders);
                         }
@@ -340,7 +342,7 @@ public class CoreCommand extends AdminCommand {
 
                 @Override
                 public String getDescription(CommandSender sender) {
-                    if(sender instanceof Player player) {
+                    if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
                         return messageBase.makeMessageId("messages.example-set-nbt-command-description", placeholders);
                     }
@@ -371,7 +373,7 @@ public class CoreCommand extends AdminCommand {
 
             @Override
             public String getDescription(CommandSender sender) {
-                if(sender instanceof Player player) {
+                if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
                     return messageBase.makeMessageId("messages.example-nbt-command-description", placeholders);
                 }
@@ -379,11 +381,50 @@ public class CoreCommand extends AdminCommand {
             }
         }
 
+        static class ExamplePlayerHead extends AdminCommand {
+
+            @Override
+            public String getName() {
+                return "head";
+            }
+
+            @Override
+            public List<Requirement> getRequirements(CommandSender sender) {
+                return List.of(new StringRequirement(this, "nick-completion"));
+            }
+
+            @Override
+            public String getDescription(CommandSender sender) {
+                if (sender instanceof Player player) {
+                    MessagePlaceholders placeholders = new MessagePlaceholders(player);
+                    return messageBase.makeMessageId("messages.example-head-description", placeholders);
+                }
+                return "";
+            }
+
+            @Override
+            public boolean execute(CommandSender sender, List<String> args, List<Object> params) {
+                if (!super.execute(sender, args, params))
+                    return false;
+
+                String name = getParam();
+                if (sender instanceof Player player) {
+                    Utils.createPlayerHeadAsync(name).thenAccept(head -> {
+                        Bukkit.getScheduler().runTask(YcoordCore.getInstance(), () -> {
+                            player.getInventory().addItem(head);
+                        });
+                    });
+                }
+                return true;
+            }
+        }
+
         @Override
         public List<Requirement> getRequirements(CommandSender sender) {
             return List.of(new SubcommandRequirement(this, List.of(
                     new ExampleMessageCommand(),
-                    new ExampleNbtCommand()
+                    new ExampleNbtCommand(),
+                    new ExamplePlayerHead()
             )));
         }
 
@@ -394,7 +435,7 @@ public class CoreCommand extends AdminCommand {
 
         @Override
         public String getDescription(CommandSender sender) {
-            if(sender instanceof Player player) {
+            if (sender instanceof Player player) {
                 MessagePlaceholders placeholders = new MessagePlaceholders(player);
                 return messageBase.makeMessageId("messages.example-command-description", placeholders);
             }
