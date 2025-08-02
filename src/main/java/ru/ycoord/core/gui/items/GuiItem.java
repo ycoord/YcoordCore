@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class GuiItem {
-    private final ConfigurationSection section;
+    protected final ConfigurationSection section;
     private SoundInfo sound = null;
     private List<String> consoleCommands = new LinkedList<>();
     private List<String> playerCommands = new LinkedList<>();
@@ -34,7 +34,8 @@ public class GuiItem {
     private String playerPermission = "*";
     private String consoleNoPermission = null;
     private String playerNoPermission = null;
-    private final long current = System.currentTimeMillis();
+    protected final long current = System.currentTimeMillis();
+
     public GuiItem(ConfigurationSection section) {
         this.section = section;
         this.lore = section.getStringList("lore");
@@ -84,12 +85,9 @@ public class GuiItem {
         return new LinkedList<>();
     }
 
-    public String getType() {
-        return "ITEM";
-    }
-
     public void apply(OfflinePlayer clicker, ItemStack stack, MessagePlaceholders placeholders) {
-
+        if (clicker.getPlayer() != null)
+            placeholders.put("%player%", clicker.getPlayer().getName());
         List<String> loreBefore = getLoreBefore(clicker);
 
         List<String> loreAfter = getLoreAfter(clicker);
@@ -111,10 +109,13 @@ public class GuiItem {
         String name = section.getString("name", "имя");
         meta.displayName(Component.text(MessageBase.translateColor(name, placeholders)));
 
+        List<Component> components = new LinkedList<>();
         for (String loreItem : resultLore) {
             meta.lore(new LinkedList<>());
-            Objects.requireNonNull(meta.lore()).add(Component.text(MessageBase.translateColor(loreItem, placeholders)));
+            components.add(Component.text(MessageBase.translateColor(loreItem, placeholders)));
         }
+
+        meta.lore(components);
 
         meta.setCustomModelData(999);
         stack.setItemMeta(meta);
@@ -134,8 +135,7 @@ public class GuiItem {
     }
 
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
-        ItemStack stack = null;
-
+        ItemStack stack;
 
         String texture = section.getString("texture", null);
         if (texture != null && !texture.isEmpty()) {

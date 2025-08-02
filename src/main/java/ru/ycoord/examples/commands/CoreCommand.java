@@ -445,7 +445,7 @@ public class CoreCommand extends AdminCommand {
                     return false;
 
                 if (sender instanceof Player player) {
-                    GuiBase base = new GuiBase(YcoordCore.getInstance().getConfig().getConfigurationSection("gui"));
+                    GuiExample base = new GuiExample(YcoordCore.getInstance().getConfig().getConfigurationSection("gui"));
                     base.open(player);
                 }
 

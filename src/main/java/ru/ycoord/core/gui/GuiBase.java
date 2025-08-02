@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.items.GuiItem;
+import ru.ycoord.core.gui.items.GuiViewerHeadItem;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
@@ -24,7 +25,7 @@ import java.util.Set;
 public class GuiBase implements InventoryHolder {
     private ConfigurationSection section;
     private Inventory inventory = null;
-    private HashMap<Integer, GuiItemCharacter> items = new  HashMap<Integer, GuiItemCharacter>();
+    private HashMap<Integer, GuiItemCharacter> items = new HashMap<Integer, GuiItemCharacter>();
 
     public GuiBase(ConfigurationSection section) {
         this.section = section;
@@ -51,9 +52,9 @@ public class GuiBase implements InventoryHolder {
 
     public void update(long elapsed, Player player) {
         for (GuiItemCharacter item : this.items.values()) {
-                if(item.item != null)
-                    item.item.update(this, elapsed, player);
-            }
+            if (item.item != null)
+                item.item.update(this, elapsed, player);
+        }
     }
 
     protected static class GuiItemCharacter {
@@ -116,23 +117,36 @@ public class GuiBase implements InventoryHolder {
                     if (!symbol.equalsIgnoreCase(stringC))
                         continue;
 
+                    String type = itemSection.getString("type", null);
+                    if (type == null)
+                        continue;
+
                     found = true;
-                    guiElements.put(slotIndex, new GuiItemCharacter(new GuiItem(itemSection), c));
+                    guiElements.put(slotIndex, new GuiItemCharacter(makeItem(player, type, itemSection), c));
                 }
 
                 if (!found) {
                     GuiItem item = YcoordCore.getInstance().getGuiManager().getGlobalItem(stringC);
                     if (item == null)
                         continue;
-                    guiElements.put(slotIndex, new GuiItemCharacter(
-                            item,
-                            c
-                    ));
+                    guiElements.put(slotIndex, new GuiItemCharacter(item, c));
                 }
             }
         }
         return guiElements;
     }
+
+    public GuiItem makeItem(OfflinePlayer player, String type, ConfigurationSection section) {
+        Player onlinePlayer = player.getPlayer();
+        if (onlinePlayer != null) {
+            if (type.equalsIgnoreCase("VIEWER_HEAD")) {
+                return new GuiViewerHeadItem(onlinePlayer.getName(), section);
+            }
+        }
+
+        return new GuiItem(section);
+    }
+
 
     public void handleClick(Player clicker, InventoryClickEvent e) {
         int slot = e.getSlot();
