@@ -242,7 +242,6 @@ gui:
     viewer:
       symbol: 'H'
       type: VIEWER_HEAD
-      texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTk0OWExOGNiNTJjMjkzZmU3ZGU3YmExMDE0NjcxMzQwZWQ3ZmY4ZTVkNzA1YjJkNjBiZjg0ZDUzMTQ4ZTA0In19fQ=="
       name: "&6&l▶ &fРадиус &6%player%"
       lore:
         - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"
