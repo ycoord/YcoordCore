@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.CorePlaceholders;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
@@ -15,11 +16,13 @@ import ru.ycoord.core.messages.ChatMessage;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
     private ChatMessage chatMessage;
     private PlayerDataCache playerDataCache;
+    private GuiManager guiManager;
 
     public static YcoordCore getInstance() {
         return instance;
@@ -32,6 +35,10 @@ public final class YcoordCore extends YcoordPlugin {
 
     public PlayerDataCache getPlayerDataCache() {
         return playerDataCache;
+    }
+
+    public GuiManager getGuiManager() {
+        return guiManager;
     }
 
     @Override
@@ -50,6 +57,18 @@ public final class YcoordCore extends YcoordPlugin {
                 playerDataCache.update();
             }, 20, 10);
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        guiManager = new GuiManager();
+        guiManager.addGlobalItem(Objects.requireNonNull(getConfig().getConfigurationSection("items.filler")));
+        long currentTime = System.currentTimeMillis();
+        this.getServer().getPluginManager().registerEvents(guiManager, this);
+        try {
+            Bukkit.getServer().getScheduler().runTaskTimer(this, () -> {
+                guiManager.update(System.currentTimeMillis() - currentTime);
+            }, 20, 10);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

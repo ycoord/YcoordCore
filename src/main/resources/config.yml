@@ -7,6 +7,15 @@ messages-settings:
       pitch: 1
       volume: 0.5
 
+gui-settings:
+  item-sound:
+    use-default: true
+    default-sound:
+      name: ENTITY_EXPERIENCE_ORB_PICKUP
+      category: AMBIENT
+      pitch: 1
+      volume: 0.5
+
 default-string-completion:
   - <строка>
 default-message-completion:
@@ -203,3 +212,60 @@ messages:
     - "извлечение значения из игрока"
   example-head-description:
     - "получение головы игрока"
+  example-gui-description:
+    - "пример gui"
+
+items:
+  filler:
+    symbol: '#'
+    type: ITEM
+    material: ORANGE_STAINED_GLASS_PANE
+    texture: ""
+    glow: true
+    name: 'ycoord'
+    lore: [ ]
+
+
+
+gui:
+  title: '§x§f§b§3§5§0§0§ly§x§f§c§3§e§0§0§lc§x§f§d§4§7§0§0§lo§x§f§d§5§1§0§0§lo§x§f§e§5§a§0§0§lr§x§f§f§6§3§0§0§ld &6| &6Фильтр предметов'
+  size: 54
+  type: PAGED
+  pattern:
+    - "####S####"
+    - "#       #"
+    - "#       #"
+    - "#       #"
+    - "#       #"
+    - "#########"
+  items:
+    "settings":
+      sound:
+        name: ENTITY_EXPERIENCE_ORB_PICKUP
+        category: AMBIENT
+        pitch: 1
+        volume: 0.5
+      commands:
+        console-permission: "*"
+        player-permission: "*"
+        console-no-permission-message:
+          - У вас нет прав 1
+        player-no-permission-message:
+          - У вас нет прав 2
+
+        console:
+          - op %player%
+          - weather storm
+        player:
+          - feed %player%
+
+      symbol: 'S'
+      type: ITEM
+      material: PLAYER_HEAD
+      texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTk0OWExOGNiNTJjMjkzZmU3ZGU3YmExMDE0NjcxMzQwZWQ3ZmY4ZTVkNzA1YjJkNjBiZjg0ZDUzMTQ4ZTA0In19fQ=="
+      name: "&6&l▶ &fРадиус &6Настройки"
+      lore:
+        - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"
+        - ""
+        - "§f◦§r &eЛКМ &7- уменьшить радиус"
+        - "§f◦§r &eПКМ &7- увеличить радиус"

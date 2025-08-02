@@ -7,6 +7,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.AdminCommand;
@@ -15,6 +17,8 @@ import ru.ycoord.core.commands.requirements.PlayerRequirement;
 import ru.ycoord.core.commands.requirements.Requirement;
 import ru.ycoord.core.commands.requirements.StringRequirement;
 import ru.ycoord.core.commands.requirements.SubcommandRequirement;
+import ru.ycoord.core.gui.GuiBase;
+import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.MapMessages;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.nbt.NbtExtension;
@@ -419,12 +423,43 @@ public class CoreCommand extends AdminCommand {
             }
         }
 
+        static class ExampleGui extends AdminCommand {
+
+            @Override
+            public String getName() {
+                return "gui";
+            }
+
+            @Override
+            public String getDescription(CommandSender sender) {
+                if (sender instanceof Player player) {
+                    MessagePlaceholders placeholders = new MessagePlaceholders(player);
+                    return messageBase.makeMessageId("messages.example-gui-description", placeholders);
+                }
+                return "";
+            }
+
+            @Override
+            public boolean execute(CommandSender sender, List<String> args, List<Object> params) {
+                if (!super.execute(sender, args, params))
+                    return false;
+
+                if (sender instanceof Player player) {
+                    GuiBase base = new GuiBase(YcoordCore.getInstance().getConfig().getConfigurationSection("gui"));
+                    base.open(player);
+                }
+
+                return true;
+            }
+        }
+
         @Override
         public List<Requirement> getRequirements(CommandSender sender) {
             return List.of(new SubcommandRequirement(this, List.of(
                     new ExampleMessageCommand(),
                     new ExampleNbtCommand(),
-                    new ExamplePlayerHead()
+                    new ExamplePlayerHead(),
+                    new ExampleGui()
             )));
         }
 

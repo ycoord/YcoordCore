@@ -19,7 +19,6 @@ public class ChatMessage extends MessageBase {
         super(core, messagesSection);
     }
 
-
     @Override
     public void sendMessageId(OfflinePlayer player, String messageId, String def, MessagePlaceholders messagePlaceholders) {
         if (player == null)
