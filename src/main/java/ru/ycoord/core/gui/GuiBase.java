@@ -9,9 +9,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
+import ru.ycoord.core.gui.animation.*;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
 import ru.ycoord.core.messages.MessageBase;
@@ -23,12 +23,35 @@ import java.util.Objects;
 import java.util.Set;
 
 public class GuiBase implements InventoryHolder {
-    private ConfigurationSection section;
+    private final ConfigurationSection section;
     private Inventory inventory = null;
     private HashMap<Integer, GuiItemCharacter> items = new HashMap<Integer, GuiItemCharacter>();
+    private Animation animation = null;
 
     public GuiBase(ConfigurationSection section) {
         this.section = section;
+
+        ConfigurationSection animationSection = section.getConfigurationSection("animation");
+        if (animationSection != null) {
+            String type = animationSection.getString("type");
+            if (type != null) {
+                if (type.equalsIgnoreCase("CORNER")) {
+                    animation = new CornerAnimation(animationSection);
+                } else if (type.equalsIgnoreCase("DIAGONAL")) {
+                    animation = new DiagonalAnimation(animationSection);
+                } else if (type.equalsIgnoreCase("HORIZONTAL")) {
+                    animation = new HorizontalAnimation(animationSection);
+                } else if (type.equalsIgnoreCase("VERTICAL")) {
+                    animation = new VerticalAnimation(animationSection);
+                } else if (type.equalsIgnoreCase("SPIRAL")) {
+                    animation = new SpiralAnimation(animationSection);
+                } else if (type.equalsIgnoreCase("STEP")) {
+                    animation = new StepByStep(animationSection);
+                } else {
+                    animation = new NoAnimation(animationSection);
+                }
+            }
+        }
     }
 
     @Override
@@ -57,7 +80,7 @@ public class GuiBase implements InventoryHolder {
         }
     }
 
-    protected static class GuiItemCharacter {
+    public static class GuiItemCharacter {
         public GuiItem item;
         public Character character;
 
@@ -71,14 +94,8 @@ public class GuiBase implements InventoryHolder {
         inventory.clear();
         MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
 
-        for (Integer slot : guiElements.keySet()) {
-            if (guiElements.get(slot).item == null)
-                continue;
-            ItemStack i = guiElements.get(slot).item.buildItem(player, this, slot, messagePlaceholders);
-            if (i == null)
-                continue;
-            inventory.setItem(slot, i);
-        }
+        if (player.getPlayer() != null)
+            animation.animate(this, inventory, player.getPlayer(), guiElements, messagePlaceholders);
 
     }
 
