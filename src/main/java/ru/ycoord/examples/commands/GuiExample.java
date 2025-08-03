@@ -12,8 +12,8 @@ public class GuiExample extends GuiBase {
     }
 
     @Override
-    public GuiItem makeItem(OfflinePlayer player, String type, ConfigurationSection section) {
+    public GuiItem makeItem(int priority, OfflinePlayer player, String type, ConfigurationSection section) {
 
-        return super.makeItem(player, type, section);
+        return super.makeItem(priority, player, type, section);
     }
 }

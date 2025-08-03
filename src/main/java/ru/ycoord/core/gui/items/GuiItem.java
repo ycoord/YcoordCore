@@ -40,10 +40,12 @@ public class GuiItem {
     private String playerPermission = "*";
     private String consoleNoPermission = null;
     private String playerNoPermission = null;
+    private int priority;
     protected final long current = System.currentTimeMillis();
 
-    public GuiItem(ConfigurationSection section) {
+    public GuiItem(int priority, ConfigurationSection section) {
         this.section = section;
+        this.priority = priority;
         this.lore = section.getStringList("lore");
         ConfigurationSection soundSection = section.getConfigurationSection("sound");
 
@@ -150,7 +152,7 @@ public class GuiItem {
             Utils.createPlayerHeadBase64Async(texture).thenAccept(item -> {
                 Bukkit.getScheduler().runTask(YcoordCore.getInstance(), () -> {
                     apply(clicker, item, placeholders);
-                    base.getInventory().setItem(slot, item);
+                    base.setSlotItemReady(slot, this, item);
                 });
             });
             stack = new ItemStack(Material.PLAYER_HEAD);
@@ -190,9 +192,12 @@ public class GuiItem {
     public boolean handleClick(GuiBase gui, InventoryClickEvent event) {
         Inventory inventory = gui.getInventory();
         ItemStack itemStack = inventory.getItem(event.getSlot());
-        if(itemStack == null || itemStack.getType() == Material.AIR)
+        if (itemStack == null || itemStack.getType() == Material.AIR)
             return false;
         if (event.getWhoClicked() instanceof Player clicker) {
+            if (!checkCondition(clicker)) {
+                return false;
+            }
             if (!checkCooldown(clicker))
                 return false;
             playSound(clicker);
@@ -231,17 +236,30 @@ public class GuiItem {
     }
 
     public void update(GuiBase guiBase, int slot, long elapsed, Player player) {
+       handleCondition(guiBase, slot, player);
+    }
+
+    private void handleCondition(GuiBase guiBase, int slot, Player player){
         boolean condition = checkCondition(player);
-        Inventory inventory = guiBase.getInventory();
-        ItemStack itemStack = inventory.getItem(slot);
         MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
 
-        if (itemStack == null || itemStack.getType() == Material.AIR) {
-            if (condition) {
-                inventory.setItem(slot, buildItem(player, guiBase, slot, messagePlaceholders));
+        HashMap<Integer, GuiItem> slots = guiBase.getSlots();
+
+        if (!slots.containsKey(slot)) {
+            return;
+        }
+        if (!condition)
+            return;
+        GuiItem itemInSlot =  slots.get(slot);
+
+        boolean otherCondition = itemInSlot.checkCondition(player);
+        if(!otherCondition) {
+            guiBase.setSlotItem(slot, this, player, messagePlaceholders);
+        }
+        else {
+            if(priority > itemInSlot.priority) {
+                guiBase.setSlotItem(slot, this, player, messagePlaceholders);
             }
-        } else if (!condition) {
-            inventory.setItem(slot, null);
         }
     }
 

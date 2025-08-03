@@ -33,7 +33,7 @@ public abstract class Animation {
             try {
                 String material = backgroundSection.getString("material", "BLACK_STAINED_GLASS_PANE");
                 this.backgroundMaterial = Material.valueOf(material);
-            }catch (Exception ignored){
+            } catch (Exception ignored) {
 
             }
         }
@@ -47,7 +47,7 @@ public abstract class Animation {
         }
     }
 
-    public void animate(GuiBase base, Inventory inventory, Player player, HashMap<Integer, GuiBase.GuiItemCharacter> guiElements, MessagePlaceholders messagePlaceholders) {
+    public void animate(GuiBase base, Inventory inventory, Player player, HashMap<Integer, List<GuiBase.GuiItemCharacter>> guiElements, MessagePlaceholders messagePlaceholders) {
         if (background) {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack item = new ItemStack(backgroundMaterial);
@@ -60,19 +60,20 @@ public abstract class Animation {
         List<List<Integer>> data = makeFrames(9, inventory.getSize() / 9);
 
         //CompletableFuture.runAsync(() -> {
-            for (List<Integer> slots : data) {
-                for (Integer slot : slots) {
-                    if (!guiElements.containsKey(slot))
+        for (List<Integer> slots : data) {
+            for (Integer slot : slots) {
+                if (!guiElements.containsKey(slot))
+                    continue;
+
+                for (GuiBase.GuiItemCharacter character : guiElements.get(slot)) {
+                    if (character.item == null)
                         continue;
-                    if (guiElements.get(slot).item == null)
-                        continue;
-                    ItemStack i = guiElements.get(slot).item.buildItem(player, base, slot, messagePlaceholders);
-                    if (i == null)
-                        continue;
-                    inventory.setItem(slot, i);
+     
+                    base.setSlotItem(slot, character.item, player, messagePlaceholders);
                 }
-                sleep();
             }
+            sleep();
+        }
         //});
     }
 

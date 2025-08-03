@@ -52,7 +52,7 @@ public class GuiManager implements Listener {
     public GuiItem getGlobalItem(String symbol) {
         if (!guiElements.containsKey(symbol))
             return null;
-        return new GuiItem(guiElements.get(symbol));
+        return new GuiItem(0, guiElements.get(symbol));
     }
 
 

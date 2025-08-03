@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GuiViewerHeadItem extends GuiHeadItem {
 
-    public GuiViewerHeadItem(@NotNull String name, ConfigurationSection section) {
-        super(name, section);
+    public GuiViewerHeadItem(@NotNull String name, int priority, ConfigurationSection section) {
+        super(name, priority, section);
     }
 }

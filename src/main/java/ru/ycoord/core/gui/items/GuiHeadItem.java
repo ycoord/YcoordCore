@@ -15,8 +15,8 @@ public class GuiHeadItem extends GuiItem {
     @NotNull
     private final String name;
 
-    public GuiHeadItem(@NotNull String name, ConfigurationSection section) {
-        super(section);
+    public GuiHeadItem(@NotNull String name, int priority, ConfigurationSection section) {
+        super(priority, section);
         this.name = name;
     }
 

@@ -269,6 +269,16 @@ gui:
         - "§f◦§r &eЛКМ &7- уменьшить радиус"
         - "§f◦§r &eПКМ &7- увеличить радиус"
 
+
+
+    "empty":
+      condition: "true"
+
+      symbol: 'S'
+      type: ITEM
+      material: BARRIER
+      name: "Пустота"
+      lore: []
     "settings":
       sound:
         name: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -323,7 +333,7 @@ gui:
 
       symbol: 'S'
       type: ITEM
-      material: BARRIER
+      material: APPLE
       name: "&6&l▶ &fРадиус &6Настройки"
       lore:
         - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"
