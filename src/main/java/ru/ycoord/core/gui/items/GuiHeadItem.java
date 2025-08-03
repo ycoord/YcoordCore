@@ -22,18 +22,11 @@ public class GuiHeadItem extends GuiItem {
 
     @Override
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
-        ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
+        ItemStack head = Utils.createPlayerHead(name);
 
+        apply(clicker, head, placeholders);
+        base.getInventory().setItem(slot, head);
 
-        Utils.createPlayerHeadAsync(name).thenAccept(head -> {
-            Bukkit.getScheduler().runTask(YcoordCore.getInstance(), () -> {
-                apply(clicker, head, placeholders);
-                base.getInventory().setItem(slot, head);
-            });
-        });
-
-        apply(clicker, stack, placeholders);
-
-        return stack;
+        return head;
     }
 }

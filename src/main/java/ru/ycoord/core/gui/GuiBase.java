@@ -104,8 +104,10 @@ public class GuiBase implements InventoryHolder {
 
     public void rebuild(OfflinePlayer player) {
         inventory.clear();
-        this.items = make(player, section);
-        refresh(player, items);
+        Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
+            this.items = make(player, section);
+            refresh(player, items);
+        });
     }
 
 

@@ -59,7 +59,7 @@ public abstract class Animation {
         }
         List<List<Integer>> data = makeFrames(9, inventory.getSize() / 9);
 
-        CompletableFuture.runAsync(() -> {
+        //CompletableFuture.runAsync(() -> {
             for (List<Integer> slots : data) {
                 for (Integer slot : slots) {
                     if (!guiElements.containsKey(slot))
@@ -73,7 +73,7 @@ public abstract class Animation {
                 }
                 sleep();
             }
-        });
+        //});
     }
 
     protected List<List<Integer>> makeFrames(int w, int h) {
