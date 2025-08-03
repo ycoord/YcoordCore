@@ -232,9 +232,12 @@ gui:
   size: 54
   type: PAGED
   animation:
-    type: SPIRAL
-    center: true
-    duration: 50
+    background:
+      enabled: true
+      material: BLACK_STAINED_GLASS_PANE
+      name: ""
+    type: CORNER
+    duration: 20
 
   #animation:
   #  type: SPIRAL
@@ -245,7 +248,7 @@ gui:
   #  type: STEP
   pattern:
     - "####S####"
-    - "#########"
+    - "####H####"
     - "#########"
     - "#########"
     - "#########"
