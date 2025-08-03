@@ -77,9 +77,12 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void update(long elapsed, Player player) {
-        for (GuiItemCharacter item : this.items.values()) {
+
+        for (Integer slot : items.keySet()) {
+            GuiItemCharacter item = items.get(slot);
+
             if (item.item != null)
-                item.item.update(this, elapsed, player);
+                item.item.update(this, slot, elapsed, player);
         }
     }
 

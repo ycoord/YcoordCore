@@ -1,6 +1,8 @@
 package ru.ycoord.core.gui.items;
 
 
+import com.ezylang.evalex.Expression;
+import com.ezylang.evalex.data.EvaluationValue;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -9,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -182,8 +185,8 @@ public class GuiItem {
 
 
     public boolean handleClick(GuiBase gui, InventoryClickEvent event) {
-        if(event.getWhoClicked() instanceof Player clicker) {
-            if(!checkCooldown(clicker))
+        if (event.getWhoClicked() instanceof Player clicker) {
+            if (!checkCooldown(clicker))
                 return false;
             playSound(clicker);
             runCommands(clicker, event.getSlot());
@@ -220,7 +223,7 @@ public class GuiItem {
         }
     }
 
-    public void update(GuiBase guiBase, long elapsed, Player player) {
+    public void update(GuiBase guiBase, int slot, long elapsed, Player player) {
 
     }
 }
