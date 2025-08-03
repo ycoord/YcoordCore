@@ -36,6 +36,11 @@ nick-completion:
 
 
 messages:
+  cooldown:
+    - "&cⓧ &c&lСистема &8»&f Не так быстро!"
+    - sound-key:
+        type: SOUND
+        name: ENTITY_VILLAGER_NO
   not-float:
     - "&cⓧ &c&lСистема &8»&f Не является вещественным числом!"
     - sound-key:

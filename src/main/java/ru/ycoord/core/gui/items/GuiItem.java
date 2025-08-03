@@ -14,12 +14,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.GuiBase;
+import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.utils.Utils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -156,11 +158,38 @@ public class GuiItem {
         return stack;
     }
 
-    public void handleClick(GuiBase gui, InventoryClickEvent event) {
-        if (event.getWhoClicked() instanceof Player player) {
-            playSound(player);
-            runCommands(player, event.getSlot());
+    private boolean checkCooldown(Player clicker) {
+        HashMap<String, Long> cd = GuiManager.cooldowns;
+        {
+            long curr = System.currentTimeMillis();
+            if (!cd.containsKey(clicker.getName())) {
+                cd.put(clicker.getName(), curr);
+                return true;
+            } else {
+                Long lastClick = cd.get(clicker.getName());
+                cd.put(clicker.getName(), curr);
+                long diff = curr - lastClick;
+                if (diff >= GuiManager.cooldown) {
+                    return true;
+                }
+
+                YcoordCore.getInstance().getChatMessage().sendMessageId(clicker, "messages.cooldown", new MessagePlaceholders(clicker));
+
+            }
         }
+        return false;
+    }
+
+
+    public boolean handleClick(GuiBase gui, InventoryClickEvent event) {
+        if(event.getWhoClicked() instanceof Player clicker) {
+            if(!checkCooldown(clicker))
+                return false;
+            playSound(clicker);
+            runCommands(clicker, event.getSlot());
+        }
+
+        return true;
     }
 
     protected void playSound(Player player) {

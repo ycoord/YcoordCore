@@ -18,7 +18,8 @@ import java.util.Stack;
 public class GuiManager implements Listener {
     public HashMap<Player, Stack<GuiBase>> guis = new HashMap<>();
     private final HashMap<String, ConfigurationSection> guiElements = new HashMap<>();
-
+    public static HashMap<String, Long> cooldowns = new HashMap<>();
+    public static int cooldown = 100;
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null)
@@ -105,6 +106,7 @@ public class GuiManager implements Listener {
 
     public void onDisable() {
         guis.clear();
+        cooldowns.clear();
     }
 
     public void update(long elapsed) {
