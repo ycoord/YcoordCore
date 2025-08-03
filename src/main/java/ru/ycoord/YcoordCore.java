@@ -65,7 +65,7 @@ public final class YcoordCore extends YcoordPlugin {
         long currentTime = System.currentTimeMillis();
         this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
-            Bukkit.getServer().getScheduler().runTaskTimer(this, () -> {
+            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
                 guiManager.update(System.currentTimeMillis() - currentTime);
             }, 10, 10);
         } catch (Exception e) {

@@ -110,7 +110,6 @@ public class GuiManager implements Listener {
     }
 
     public void update(long elapsed) {
-
         for (Player player : guis.keySet()) {
             Stack<GuiBase> stack = guis.get(player);
             if (stack.empty())
