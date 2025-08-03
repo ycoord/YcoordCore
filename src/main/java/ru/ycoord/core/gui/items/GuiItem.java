@@ -3,6 +3,7 @@ package ru.ycoord.core.gui.items;
 
 import com.ezylang.evalex.Expression;
 import com.ezylang.evalex.data.EvaluationValue;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -140,6 +141,8 @@ public class GuiItem {
     }
 
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
+        if (!checkCondition(clicker.getPlayer()))
+            return null;
         ItemStack stack;
 
         String texture = section.getString("texture", null);
@@ -185,6 +188,10 @@ public class GuiItem {
 
 
     public boolean handleClick(GuiBase gui, InventoryClickEvent event) {
+        Inventory inventory = gui.getInventory();
+        ItemStack itemStack = inventory.getItem(event.getSlot());
+        if(itemStack == null || itemStack.getType() == Material.AIR)
+            return false;
         if (event.getWhoClicked() instanceof Player clicker) {
             if (!checkCooldown(clicker))
                 return false;
@@ -224,6 +231,37 @@ public class GuiItem {
     }
 
     public void update(GuiBase guiBase, int slot, long elapsed, Player player) {
+        boolean condition = checkCondition(player);
+        Inventory inventory = guiBase.getInventory();
+        ItemStack itemStack = inventory.getItem(slot);
+        MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
 
+        if (itemStack == null || itemStack.getType() == Material.AIR) {
+            if (condition) {
+                inventory.setItem(slot, buildItem(player, guiBase, slot, messagePlaceholders));
+            }
+        } else if (!condition) {
+            inventory.setItem(slot, null);
+        }
+    }
+
+    private boolean checkCondition(Player player) {
+        String conditionValue = section.getString("condition", null);
+        if (conditionValue == null) {
+            return true;
+        }
+
+        String parsed = MessageBase.translateColor(conditionValue, new MessagePlaceholders(player));
+        Expression expression = new Expression(parsed);
+        try {
+            EvaluationValue result = expression.evaluate();
+            if (!result.getBooleanValue()) {
+                return false;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+        }
+
+        return true;
     }
 }

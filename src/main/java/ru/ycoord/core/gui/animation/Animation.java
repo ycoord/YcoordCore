@@ -65,10 +65,10 @@ public abstract class Animation {
                     if (!guiElements.containsKey(slot))
                         continue;
                     if (guiElements.get(slot).item == null)
-                        return;
+                        continue;
                     ItemStack i = guiElements.get(slot).item.buildItem(player, base, slot, messagePlaceholders);
                     if (i == null)
-                        return;
+                        continue;
                     inventory.setItem(slot, i);
                 }
                 sleep();

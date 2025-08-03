@@ -288,11 +288,42 @@ gui:
           - weather storm
         player:
           - feed %player%
+      condition: "\"%luckperms_meta_test%\" == \"value\""
 
       symbol: 'S'
       type: ITEM
       material: PLAYER_HEAD
       texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTk0OWExOGNiNTJjMjkzZmU3ZGU3YmExMDE0NjcxMzQwZWQ3ZmY4ZTVkNzA1YjJkNjBiZjg0ZDUzMTQ4ZTA0In19fQ=="
+      name: "&6&l▶ &fРадиус &6Настройки"
+      lore:
+        - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"
+        - ""
+        - "§f◦§r &eЛКМ &7- уменьшить радиус"
+        - "§f◦§r &eПКМ &7- увеличить радиус"
+    "settings2":
+      sound:
+        name: ENTITY_EXPERIENCE_ORB_PICKUP
+        category: AMBIENT
+        pitch: 1
+        volume: 0.5
+      commands:
+        console-permission: "*"
+        player-permission: "*"
+        console-no-permission-message:
+          - У вас нет прав 1
+        player-no-permission-message:
+          - У вас нет прав 2
+
+        console:
+          - op %player%
+          - weather storm
+        player:
+          - feed %player%
+      condition: "\"%luckperms_meta_test%\" == \"value2\""
+
+      symbol: 'S'
+      type: ITEM
+      material: BARRIER
       name: "&6&l▶ &fРадиус &6Настройки"
       lore:
         - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"

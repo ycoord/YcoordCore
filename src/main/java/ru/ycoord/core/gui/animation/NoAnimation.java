@@ -16,17 +16,6 @@ public class NoAnimation extends Animation {
         super(section);
     }
 
-    @Override
-    public void animate(GuiBase base, Inventory inventory, Player player, HashMap<Integer, GuiBase.GuiItemCharacter> guiElements, MessagePlaceholders messagePlaceholders) {
-        for (Integer slot : guiElements.keySet()) {
-            if (guiElements.get(slot).item == null)
-                continue;
-            ItemStack i = guiElements.get(slot).item.buildItem(player, base, slot, messagePlaceholders);
-            if (i == null)
-                continue;
-            inventory.setItem(slot, i);
-        }
-    }
 
     @Override
     protected List<List<Integer>> makeFrames(int w, int h) {
