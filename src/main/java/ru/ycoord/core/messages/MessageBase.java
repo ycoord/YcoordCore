@@ -48,16 +48,6 @@ public abstract class MessageBase {
         return messagesSection;
     }
 
-    public static String convertTime(Long milli) {
-        return convertTime(milli, "HH:mm:ss dd-MM-yyyy");
-    }
-
-    public static String convertTime(Long milli, String pattern) {
-        Date currentDate = new Date(milli);
-        DateFormat df = new SimpleDateFormat(pattern);
-        return df.format(currentDate);
-    }
-
     public static String translateColor(String value, MessagePlaceholders messagePlaceholders) {
         String tran = ChatColor.translateAlternateColorCodes('&', value);
         if (messagePlaceholders == null) {

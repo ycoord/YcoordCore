@@ -15,6 +15,9 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -95,5 +98,15 @@ public class Utils {
         }
 
         return false;
+    }
+
+    public static String convertTime(Long milli) {
+        return convertTime(milli, "HH:mm:ss dd-MM-yyyy");
+    }
+
+    public static String convertTime(Long milli, String pattern) {
+        Date currentDate = new Date(milli);
+        DateFormat df = new SimpleDateFormat(pattern);
+        return df.format(currentDate);
     }
 }

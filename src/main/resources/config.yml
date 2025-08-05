@@ -77,7 +77,7 @@ messages:
         type: SOUND
         name: ENTITY_VILLAGER_NO
   no-condition:
-    - "&cⓧ &c&lСистема &8»&f У вас нет прав!"
+    - "&cⓧ &c&lСистема &8»&f Условие не выполняется"
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO
@@ -285,6 +285,7 @@ gui:
       name: "Пустота"
       lore: []
     "settings":
+      redraw: true
       left-click:
         permission: "*"
         condition: "\"%luckperms_m2eta_test%\" == \"valu4e\""
@@ -308,6 +309,7 @@ gui:
         - ""
         - "§f◦§r &eЛКМ &7- уменьшить радиус"
         - "§f◦§r &eПКМ &7- увеличить радиус"
+        - "Время на сервере %current_time%"
     "settings2":
 
       condition: "\"%luckperms_meta_test%\" == \"value2\""

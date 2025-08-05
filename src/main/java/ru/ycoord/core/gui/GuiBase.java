@@ -20,6 +20,8 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.*;
 
+import static ru.ycoord.core.utils.Utils.convertTime;
+
 public class GuiBase implements InventoryHolder {
     private final ConfigurationSection section;
     private Inventory inventory = null;
@@ -89,7 +91,7 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void getExtraPlaceholders(MessagePlaceholders placeholders) {
-
+        placeholders.put("%current_time%", convertTime(System.currentTimeMillis()));
     }
 
     public static class GuiItemCharacter {
@@ -120,7 +122,9 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void setSlotItem(int slot, GuiItem guiItem, Player player, MessagePlaceholders messagePlaceholders) {
-        ItemStack itemStack = guiItem.buildItem(player, this, slot, messagePlaceholders);
+        GuiItem itemInSlot = slots.get(slot);
+        boolean onlyUpdateMeta = (itemInSlot == guiItem) && guiItem.isRedraw();
+        ItemStack itemStack = guiItem.buildItem(player, this, slot, messagePlaceholders, onlyUpdateMeta);
         if (itemStack == null)
             return;
         slots.put(slot, guiItem);

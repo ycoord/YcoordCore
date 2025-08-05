@@ -32,13 +32,16 @@ public class GuiItem {
     protected final ConfigurationSection section;
     private SoundInfo sound = null;
     private int priority;
+    private boolean redraw = false;
     protected final long current = System.currentTimeMillis();
     private List<String> lore = new LinkedList<>();
+    private ItemStack stack;
 
     public GuiItem(int priority, ConfigurationSection section) {
         this.section = section;
         this.priority = priority;
         this.lore = section.getStringList("lore");
+        this.redraw = section.getBoolean("redraw", false);
         ConfigurationSection soundSection = section.getConfigurationSection("sound");
 
         if (soundSection != null) {
@@ -73,8 +76,6 @@ public class GuiItem {
     }
 
     public void apply(OfflinePlayer clicker, ItemStack stack, MessagePlaceholders placeholders) {
-        if (clicker.getPlayer() != null)
-            placeholders.put("%player%", clicker.getPlayer().getName());
         List<String> loreBefore = getLoreBefore(clicker);
 
         List<String> loreAfter = getLoreAfter(clicker);
@@ -121,29 +122,29 @@ public class GuiItem {
                 ItemFlag.HIDE_POTION_EFFECTS);
     }
 
-    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
+    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders, boolean onlyMeta) {
         if (!checkCondition(clicker.getPlayer()))
             return null;
         getExtraPlaceholders(placeholders, slot, base);
-        ItemStack stack;
+        if(!onlyMeta)
+        {
+            ItemStack stack;
 
-        String texture = section.getString("texture", null);
-        if (texture != null && !texture.isEmpty()) {
-            Utils.createPlayerHeadBase64Async(texture).thenAccept(item -> {
-                Bukkit.getScheduler().runTask(YcoordCore.getInstance(), () -> {
+            String texture = section.getString("texture", null);
+            if (texture != null && !texture.isEmpty()) {
+                Utils.createPlayerHeadBase64Async(texture).thenAccept(item -> {
                     apply(clicker, item, placeholders);
                     base.setSlotItemReady(slot, this, item);
                 });
-            });
-            stack = new ItemStack(Material.PLAYER_HEAD);
+                stack = new ItemStack(Material.PLAYER_HEAD);
 
-        } else {
-            stack = new ItemStack(Material.valueOf(section.getString("material", "BARRIER")));
+            } else {
+                stack = new ItemStack(Material.valueOf(section.getString("material", "BARRIER")));
+            }
+            this.stack = stack;
         }
-
-        apply(clicker, stack, placeholders);
-
-        return stack;
+        apply(clicker, this.stack, placeholders);
+        return this.stack;
     }
 
     private boolean checkCooldown(Player clicker) {
@@ -224,7 +225,7 @@ public class GuiItem {
         if (!otherCondition) {
             guiBase.setSlotItem(slot, this, player, messagePlaceholders);
         } else {
-            if (priority > itemInSlot.priority) {
+            if (priority > itemInSlot.priority || itemInSlot == this) {
                 guiBase.setSlotItem(slot, this, player, messagePlaceholders);
             }
         }
@@ -241,6 +242,10 @@ public class GuiItem {
 
     protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, GuiBase base) {
         placeholders.put("%slot%", slot);
+    }
+
+    public boolean isRedraw() {
+        return redraw;
     }
 
     static class ClickHandler {

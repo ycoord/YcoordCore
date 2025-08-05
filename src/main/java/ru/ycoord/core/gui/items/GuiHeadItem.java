@@ -21,7 +21,7 @@ public class GuiHeadItem extends GuiItem {
     }
 
     @Override
-    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
+    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders,  boolean onlyUpdateMeta) {
         ItemStack head = Utils.createPlayerHead(name);
 
         apply(clicker, head, placeholders);
