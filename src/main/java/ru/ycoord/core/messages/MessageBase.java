@@ -79,7 +79,7 @@ public abstract class MessageBase {
         }
     }
 
-    public String makeMessage(String message, MessagePlaceholders messagePlaceholders) {
+    public static String makeMessage(String message, MessagePlaceholders messagePlaceholders) {
         return translateColor(message, messagePlaceholders);
     }
 
@@ -89,7 +89,7 @@ public abstract class MessageBase {
         if (messages.isEmpty())
             message = getSection().getString(messageId);
         else
-            message =  messages.get(0);
+            message = messages.get(0);
         return translateColor(message, messagePlaceholders);
     }
 

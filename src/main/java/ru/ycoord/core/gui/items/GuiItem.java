@@ -1,9 +1,6 @@
 package ru.ycoord.core.gui.items;
 
 
-import com.ezylang.evalex.Expression;
-import com.ezylang.evalex.data.EvaluationValue;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,20 +25,15 @@ import ru.ycoord.core.utils.Utils;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GuiItem {
     protected final ConfigurationSection section;
     private SoundInfo sound = null;
-    private List<String> consoleCommands = new LinkedList<>();
-    private List<String> playerCommands = new LinkedList<>();
-    private List<String> lore = new LinkedList<>();
-    private String consolePermission = "*";
-    private String playerPermission = "*";
-    private String consoleNoPermission = null;
-    private String playerNoPermission = null;
     private int priority;
     protected final long current = System.currentTimeMillis();
+    private List<String> lore = new LinkedList<>();
 
     public GuiItem(int priority, ConfigurationSection section) {
         this.section = section;
@@ -70,19 +62,6 @@ public class GuiItem {
                 this.sound = new SoundInfo(defaultSoundSection);
             }
         }
-
-        if (section.contains("commands.player"))
-            this.playerCommands = section.getStringList("commands.player");
-        if (section.contains("commands.console"))
-            this.consoleCommands = section.getStringList("commands.console");
-        if (section.contains("commands.console-permission"))
-            this.consolePermission = section.getString("console-permission");
-        if (section.contains("commands.player-permission"))
-            this.playerPermission = section.getString("player-permission");
-        if (section.contains("commands.player-no-permission-message"))
-            this.playerNoPermission = section.getString("commands.player-no-permission-message");
-        if (section.contains("commands.console-no-permission-message"))
-            this.consoleNoPermission = section.getString("commands.console-no-permission-message");
     }
 
     protected List<String> getLoreBefore(OfflinePlayer player) {
@@ -145,6 +124,7 @@ public class GuiItem {
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders) {
         if (!checkCondition(clicker.getPlayer()))
             return null;
+        getExtraPlaceholders(placeholders, slot, base);
         ItemStack stack;
 
         String texture = section.getString("texture", null);
@@ -188,60 +168,48 @@ public class GuiItem {
         return false;
     }
 
+    private void handleClick(boolean left, Player player, MessagePlaceholders placeholders) {
+        ConfigurationSection clickSection;
+        clickSection = section.getConfigurationSection("click");
+        if (clickSection == null) {
+            if (left)
+                clickSection = section.getConfigurationSection("left-click");
+            else
+                clickSection = section.getConfigurationSection("right-click");
+            if (clickSection == null)
+                return;
+        }
+        ClickHandler clickHandler = new ClickHandler(left, player, clickSection, placeholders);
+        clickHandler.handle();
+    }
 
-    public boolean handleClick(GuiBase gui, InventoryClickEvent event) {
+    public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
         Inventory inventory = gui.getInventory();
         ItemStack itemStack = inventory.getItem(event.getSlot());
         if (itemStack == null || itemStack.getType() == Material.AIR)
             return false;
         if (event.getWhoClicked() instanceof Player clicker) {
-            if (!checkCondition(clicker)) {
-                return false;
-            }
             if (!checkCooldown(clicker))
                 return false;
-            playSound(clicker);
-            runCommands(clicker, event.getSlot());
+            getExtraPlaceholders(placeholders, event.getSlot(), gui);
+            if (event.isLeftClick()) {
+                handleClick(true, clicker, placeholders);
+            }
+
+            if (event.isRightClick()) {
+                handleClick(false, clicker, placeholders);
+            }
         }
 
         return true;
     }
 
-    protected void playSound(Player player) {
-        if (this.sound != null) {
-            this.sound.play(player);
-        }
+    public void update(GuiBase guiBase, int slot, long elapsed, Player player, MessagePlaceholders placeholders) {
+        handleCondition(guiBase, slot, player, placeholders);
     }
 
-    protected void runCommands(Player player, int slot) {
-        MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
-        messagePlaceholders.put("%slot%", slot);
-        if (playerPermission == null || player.hasPermission(playerPermission)) {
-            for (String command : playerCommands) {
-                Utils.executePlayer(player, messagePlaceholders.apply(command));
-            }
-        } else {
-            ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
-            chatMessage.sendMessageId(player, playerNoPermission, "", messagePlaceholders);
-        }
-
-        if (consolePermission == null || player.hasPermission(consolePermission)) {
-            for (String command : consoleCommands) {
-                Utils.executeConsole(player, messagePlaceholders.apply(command));
-            }
-        } else {
-            ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
-            chatMessage.sendMessageId(player, consoleNoPermission, "", messagePlaceholders);
-        }
-    }
-
-    public void update(GuiBase guiBase, int slot, long elapsed, Player player) {
-       handleCondition(guiBase, slot, player);
-    }
-
-    private void handleCondition(GuiBase guiBase, int slot, Player player){
+    private void handleCondition(GuiBase guiBase, int slot, Player player, MessagePlaceholders messagePlaceholders) {
         boolean condition = checkCondition(player);
-        MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
 
         HashMap<Integer, GuiItem> slots = guiBase.getSlots();
 
@@ -250,14 +218,13 @@ public class GuiItem {
         }
         if (!condition)
             return;
-        GuiItem itemInSlot =  slots.get(slot);
+        GuiItem itemInSlot = slots.get(slot);
 
         boolean otherCondition = itemInSlot.checkCondition(player);
-        if(!otherCondition) {
+        if (!otherCondition) {
             guiBase.setSlotItem(slot, this, player, messagePlaceholders);
-        }
-        else {
-            if(priority > itemInSlot.priority) {
+        } else {
+            if (priority > itemInSlot.priority) {
                 guiBase.setSlotItem(slot, this, player, messagePlaceholders);
             }
         }
@@ -269,17 +236,107 @@ public class GuiItem {
             return true;
         }
 
-        String parsed = MessageBase.translateColor(conditionValue, new MessagePlaceholders(player));
-        Expression expression = new Expression(parsed);
-        try {
-            EvaluationValue result = expression.evaluate();
-            if (!result.getBooleanValue()) {
-                return false;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace(System.err);
+        return Utils.checkCondition(player, conditionValue, new MessagePlaceholders(player));
+    }
+
+    protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, GuiBase base) {
+        placeholders.put("%slot%", slot);
+    }
+
+    static class ClickHandler {
+        private final boolean left;
+        private final Player player;
+        private final ConfigurationSection section;
+        private final MessagePlaceholders placeholders;
+
+        public ClickHandler(boolean left, Player player, ConfigurationSection section, MessagePlaceholders placeholders) {
+            this.left = left;
+            this.player = player;
+            this.section = section;
+            this.placeholders = placeholders;
         }
 
-        return true;
+        private ParsedTag parseTaggedLine(String line) {
+            // Убираем лишние пробелы и нормализуем
+            line = line.trim().replaceAll("\\s+", " ");
+
+            // Поддерживает: [tag] + пробелы + значение
+            Pattern pattern = Pattern.compile("^\\[(\\w+)]\\s*(.*)$");
+            Matcher matcher = pattern.matcher(line);
+
+            if (matcher.matches()) {
+                String tag = matcher.group(1);     // напр. "console"
+                String value = matcher.group(2);   // напр. "feed %player%"
+                return new ParsedTag(tag, value);
+            }
+
+            return null; // или выбросить исключение
+        }
+
+        private boolean checkPermission() {
+            String permission = section.getString("permission", null);
+            if (permission == null) {
+                return true;
+            }
+            if (player.hasPermission(permission)) {
+                return true;
+            }
+
+            String noPermissionMessageId = section.getString("no-permission-message-id");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(player, noPermissionMessageId, new MessagePlaceholders(player));
+            return false;
+        }
+
+        private boolean checkCondition() {
+            String condition = section.getString("condition", null);
+            if (condition == null) {
+                return true;
+            }
+
+            if (Utils.checkCondition(player, condition, new MessagePlaceholders(player)))
+                return true;
+
+            String noCheckMessageId = section.getString("no-condition-message-id");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(player, noCheckMessageId, new MessagePlaceholders(player));
+            return false;
+        }
+
+        public void handle() {
+            ConfigurationSection clickSettings = this.section;
+            if (clickSettings == null)
+                return;
+            if (!checkPermission())
+                return;
+            if (!checkCondition())
+                return;
+            List<String> actions = section.getStringList("actions");
+            ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
+            for (String action : actions) {
+                ParsedTag tag = parseTaggedLine(action);
+                if (tag == null)
+                    continue;
+                if (tag.tag.equalsIgnoreCase("message")) {
+                    String message = MessageBase.makeMessage(tag.value, this.placeholders);
+                    player.sendMessage(message);
+                } else if (tag.tag.equalsIgnoreCase("id")) {
+                    String message = tag.value;
+                    chatMessage.sendMessageId(player, message, placeholders);
+                } else if (tag.tag.equalsIgnoreCase("console")) {
+                    Utils.executeConsole(player, MessageBase.makeMessage(tag.value, this.placeholders));
+                } else if (tag.tag.equalsIgnoreCase("player")) {
+                    Utils.executePlayer(player, MessageBase.makeMessage(tag.value, this.placeholders));
+                }
+            }
+        }
+
+        protected static class ParsedTag {
+            public final String tag;
+            public final String value;
+
+            public ParsedTag(String tag, String value) {
+                this.tag = tag;
+                this.value = value;
+            }
+        }
     }
 }

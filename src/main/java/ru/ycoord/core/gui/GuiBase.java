@@ -2,7 +2,6 @@ package ru.ycoord.core.gui;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -11,7 +10,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.animation.*;
@@ -21,7 +19,6 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiBase implements InventoryHolder {
     private final ConfigurationSection section;
@@ -64,7 +61,10 @@ public class GuiBase implements InventoryHolder {
         int size = section.getInt("size", 54);
         String title = section.getString("title", "title");
 
-        title = MessageBase.translateColor(title, new MessagePlaceholders(player));
+        MessagePlaceholders placeholders = new MessagePlaceholders(player);
+        getExtraPlaceholders(placeholders);
+
+        title = MessageBase.translateColor(title, placeholders);
 
         inventory = Bukkit.createInventory(this, size, Component.text(title));
         rebuild(player);
@@ -75,16 +75,21 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void update(long elapsed, Player player) {
-
+        MessagePlaceholders placeholders = new MessagePlaceholders(player);
+        getExtraPlaceholders(placeholders);
         for (Integer slot : items.keySet()) {
             List<GuiItemCharacter> guiItems = items.get(slot);
 
             for (int i = 0; i < guiItems.size(); i++) {
                 GuiItemCharacter guiItem = guiItems.get(i);
                 if (guiItem.item != null)
-                    guiItem.item.update(this, slot, elapsed, player);
+                    guiItem.item.update(this, slot, elapsed, player, placeholders);
             }
         }
+    }
+
+    public void getExtraPlaceholders(MessagePlaceholders placeholders) {
+
     }
 
     public static class GuiItemCharacter {
@@ -99,10 +104,10 @@ public class GuiBase implements InventoryHolder {
 
     protected void refresh(OfflinePlayer player, HashMap<Integer, List<GuiItemCharacter>> guiElements) {
         inventory.clear();
-        MessagePlaceholders messagePlaceholders = new MessagePlaceholders(player);
-
+        MessagePlaceholders placeholders = new MessagePlaceholders(player);
+        getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null)
-            animation.animate(this, inventory, player.getPlayer(), guiElements, messagePlaceholders);
+            animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
 
     }
 
@@ -204,18 +209,14 @@ public class GuiBase implements InventoryHolder {
         GuiItem i = this.slots.get(slot);
         if (i == null)
             return;
-
-        i.handleClick(this, e);
+        if (e.getWhoClicked() instanceof Player player) {
+            MessagePlaceholders placeholders = new MessagePlaceholders(player);
+            getExtraPlaceholders(placeholders);
+            i.handleClick(this, e, placeholders);
+        }
     }
 
     public void handleClickInventory(Player clicker, InventoryClickEvent e) {
-        //int slot = e.getSlot();
-        //if (!guiElements.containsKey(slot))
-        //    return;
-        //GuiItem i = guiElements.get(slot).item;
-        //if (i == null)
-        //    return;
-        //
-        //i.handleClick(this, clicker, e);
+
     }
 }

@@ -1,5 +1,7 @@
 package ru.ycoord.core.utils;
 
+import com.ezylang.evalex.Expression;
+import com.ezylang.evalex.data.EvaluationValue;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -9,13 +11,15 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import ru.ycoord.core.messages.MessageBase;
+import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class Utils {
-    public static ItemStack createPlayerHead(String playerName){
+    public static ItemStack createPlayerHead(String playerName) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
 
@@ -26,7 +30,7 @@ public class Utils {
         return head;
     }
 
-    public static ItemStack createPlayerHead(UUID playerUUID){
+    public static ItemStack createPlayerHead(UUID playerUUID) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
 
@@ -56,14 +60,16 @@ public class Utils {
         return head;
     }
 
-    public static CompletableFuture<ItemStack> createPlayerHeadAsync(String playerName){
-        return CompletableFuture.supplyAsync(()-> Utils.createPlayerHead(playerName));
+    public static CompletableFuture<ItemStack> createPlayerHeadAsync(String playerName) {
+        return CompletableFuture.supplyAsync(() -> Utils.createPlayerHead(playerName));
     }
-    public static CompletableFuture<ItemStack> createPlayerHeadAsync(UUID uuid){
-        return CompletableFuture.supplyAsync(()-> Utils.createPlayerHead(uuid));
+
+    public static CompletableFuture<ItemStack> createPlayerHeadAsync(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> Utils.createPlayerHead(uuid));
     }
-    public static CompletableFuture<ItemStack> createPlayerHeadBase64Async(String base64){
-        return CompletableFuture.supplyAsync(()-> Utils.createPlayerHeadBase64(base64));
+
+    public static CompletableFuture<ItemStack> createPlayerHeadBase64Async(String base64) {
+        return CompletableFuture.supplyAsync(() -> Utils.createPlayerHeadBase64(base64));
     }
 
     public static void executeConsole(Player player, String command) {
@@ -78,4 +84,16 @@ public class Utils {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
+    public static boolean checkCondition(Player player, String condition, MessagePlaceholders placeholders) {
+        String parsed = MessageBase.translateColor(condition, placeholders);
+        Expression expression = new Expression(parsed);
+        try {
+            EvaluationValue result = expression.evaluate();
+            return result.getBooleanValue();
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+        }
+
+        return false;
+    }
 }

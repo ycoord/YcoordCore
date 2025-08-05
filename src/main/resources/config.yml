@@ -76,6 +76,11 @@ messages:
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO
+  no-condition:
+    - "&cⓧ &c&lСистема &8»&f У вас нет прав!"
+    - sound-key:
+        type: SOUND
+        name: ENTITY_VILLAGER_NO
   player-offline:
     - "&cⓧ &c&lСистема &8»&f Игрок &e%player%&f не в сети!"
     - sound-key:
@@ -280,24 +285,17 @@ gui:
       name: "Пустота"
       lore: []
     "settings":
-      sound:
-        name: ENTITY_EXPERIENCE_ORB_PICKUP
-        category: AMBIENT
-        pitch: 1
-        volume: 0.5
-      commands:
-        console-permission: "*"
-        player-permission: "*"
-        console-no-permission-message:
-          - У вас нет прав 1
-        player-no-permission-message:
-          - У вас нет прав 2
+      left-click:
+        permission: "*"
+        condition: "\"%luckperms_m2eta_test%\" == \"valu4e\""
+        no-permission-message-id: "messages.no-permission"
+        no-condition-message-id: "messages.no-condition"
+        actions:
+          - "[message] Hello %slot%"
+          - "[id] messages.unknown-command"
+          - "[console] feed %player%"
+          - "[player] heal %player%"
 
-        console:
-          - op %player%
-          - weather storm
-        player:
-          - feed %player%
       condition: "\"%luckperms_meta_test%\" == \"value\""
 
       symbol: 'S'
@@ -311,24 +309,7 @@ gui:
         - "§f◦§r &eЛКМ &7- уменьшить радиус"
         - "§f◦§r &eПКМ &7- увеличить радиус"
     "settings2":
-      sound:
-        name: ENTITY_EXPERIENCE_ORB_PICKUP
-        category: AMBIENT
-        pitch: 1
-        volume: 0.5
-      commands:
-        console-permission: "*"
-        player-permission: "*"
-        console-no-permission-message:
-          - У вас нет прав 1
-        player-no-permission-message:
-          - У вас нет прав 2
 
-        console:
-          - op %player%
-          - weather storm
-        player:
-          - feed %player%
       condition: "\"%luckperms_meta_test%\" == \"value2\""
 
       symbol: 'S'
