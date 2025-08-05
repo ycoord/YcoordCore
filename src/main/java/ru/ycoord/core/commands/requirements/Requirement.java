@@ -11,10 +11,9 @@ import java.util.List;
 
 public abstract class Requirement {
     protected final Command command;
-    protected final MessageBase messageBase;
+
     public Requirement(Command command) {
         this.command = command;
-        this.messageBase = YcoordCore.getInstance().getChatMessage();
     }
 
 

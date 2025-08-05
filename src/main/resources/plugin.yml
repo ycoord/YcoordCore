@@ -10,3 +10,4 @@ depend:
 commands:
   ycoordcore:
     description: Core commands
+  ycoordgui:

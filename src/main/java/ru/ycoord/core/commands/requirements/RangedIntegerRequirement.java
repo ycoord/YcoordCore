@@ -2,6 +2,7 @@ package ru.ycoord.core.commands.requirements;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
@@ -38,7 +39,7 @@ public class RangedIntegerRequirement extends IntegerRequirement {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             placeholders.put("%min%", min);
             placeholders.put("%max%", max);
-            messageBase.sendMessageId(player, "messages.no-range", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.no-range", placeholders);
         }
 
         return null;
@@ -52,7 +53,7 @@ public class RangedIntegerRequirement extends IntegerRequirement {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             placeholders.put("%min%", min);
             placeholders.put("%max%", max);
-            messageBase.sendMessageId(player, "messages.ranged-error", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.ranged-error", placeholders);
 
         }
     }

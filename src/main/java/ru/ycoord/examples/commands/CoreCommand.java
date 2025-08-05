@@ -62,7 +62,7 @@ public class CoreCommand extends AdminCommand {
                 public String getDescription(CommandSender sender) {
                     if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                        return messageBase.makeMessageId("messages.example-message-simple-command-description", placeholders);
+                        return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-message-simple-command-description", placeholders);
                     }
                     return "";
                 }
@@ -98,7 +98,7 @@ public class CoreCommand extends AdminCommand {
                 public String getDescription(CommandSender sender) {
                     if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                        return messageBase.makeMessageId("messages.example-message-complex-command-description", placeholders);
+                        return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-message-complex-command-description", placeholders);
                     }
                     return "";
                 }
@@ -121,7 +121,7 @@ public class CoreCommand extends AdminCommand {
             public String getDescription(CommandSender sender) {
                 if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                    return messageBase.makeMessageId("messages.example-message-command-description", placeholders);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-message-command-description", placeholders);
                 }
                 return "";
             }
@@ -168,7 +168,7 @@ public class CoreCommand extends AdminCommand {
                     public String getDescription(CommandSender sender) {
                         if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                            return messageBase.makeMessageId("messages.example-get-nbt-block-command-description", placeholders);
+                            return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-get-nbt-block-command-description", placeholders);
                         }
                         return "";
                     }
@@ -213,7 +213,7 @@ public class CoreCommand extends AdminCommand {
                     public String getDescription(CommandSender sender) {
                         if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                            return messageBase.makeMessageId("messages.example-get-nbt-player-command-description", placeholders);
+                            return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-get-nbt-player-command-description", placeholders);
                         }
                         return "";
                     }
@@ -228,7 +228,7 @@ public class CoreCommand extends AdminCommand {
                 public String getDescription(CommandSender sender) {
                     if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                        return messageBase.makeMessageId("messages.example-nbt-command-description", placeholders);
+                        return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-nbt-command-description", placeholders);
                     }
                     return "";
                 }
@@ -286,7 +286,7 @@ public class CoreCommand extends AdminCommand {
                     public String getDescription(CommandSender sender) {
                         if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                            return messageBase.makeMessageId("messages.example-set-nbt-block-command-description", placeholders);
+                            return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-set-nbt-block-command-description", placeholders);
                         }
                         return "";
                     }
@@ -332,7 +332,7 @@ public class CoreCommand extends AdminCommand {
                     public String getDescription(CommandSender sender) {
                         if (sender instanceof Player player) {
                             MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                            return messageBase.makeMessageId("messages.example-set-nbt-player-command-description", placeholders);
+                            return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-set-nbt-player-command-description", placeholders);
                         }
                         return "";
                     }
@@ -348,7 +348,7 @@ public class CoreCommand extends AdminCommand {
                 public String getDescription(CommandSender sender) {
                     if (sender instanceof Player player) {
                         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                        return messageBase.makeMessageId("messages.example-set-nbt-command-description", placeholders);
+                        return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-set-nbt-command-description", placeholders);
                     }
                     return "";
                 }
@@ -379,7 +379,7 @@ public class CoreCommand extends AdminCommand {
             public String getDescription(CommandSender sender) {
                 if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                    return messageBase.makeMessageId("messages.example-nbt-command-description", placeholders);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-nbt-command-description", placeholders);
                 }
                 return "";
             }
@@ -401,7 +401,7 @@ public class CoreCommand extends AdminCommand {
             public String getDescription(CommandSender sender) {
                 if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                    return messageBase.makeMessageId("messages.example-head-description", placeholders);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-head-description", placeholders);
                 }
                 return "";
             }
@@ -434,7 +434,7 @@ public class CoreCommand extends AdminCommand {
             public String getDescription(CommandSender sender) {
                 if (sender instanceof Player player) {
                     MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                    return messageBase.makeMessageId("messages.example-gui-description", placeholders);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-gui-description", placeholders);
                 }
                 return "";
             }
@@ -445,7 +445,7 @@ public class CoreCommand extends AdminCommand {
                     return false;
 
                 if (sender instanceof Player player) {
-                    GuiExample base = new GuiExample(YcoordCore.getInstance().getConfig().getConfigurationSection("gui"));
+                    GuiExample base = new GuiExample(YcoordCore.getInstance().getMenus().get("Example"));
                     base.open(player);
                 }
 
@@ -472,7 +472,7 @@ public class CoreCommand extends AdminCommand {
         public String getDescription(CommandSender sender) {
             if (sender instanceof Player player) {
                 MessagePlaceholders placeholders = new MessagePlaceholders(player);
-                return messageBase.makeMessageId("messages.example-command-description", placeholders);
+                return YcoordCore.getInstance().getChatMessage().makeMessageId("messages.example-command-description", placeholders);
             }
             return "";
         }

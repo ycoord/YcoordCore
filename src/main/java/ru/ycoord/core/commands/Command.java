@@ -20,9 +20,8 @@ public abstract class Command {
     private CommandSender sender;
     private List<Object> params;
 
-    protected MessageBase messageBase;
     public Command() {
-        this.messageBase = YcoordCore.getInstance().getChatMessage();
+
     }
 
     public List<Requirement> getRequirements(CommandSender sender) {

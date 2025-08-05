@@ -1,31 +1,38 @@
 package ru.ycoord;
 
 import net.milkbowl.vault.economy.Economy;
+import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.ycoord.core.balance.DonateBalance;
 import ru.ycoord.core.balance.IBalance;
 import ru.ycoord.core.balance.MoneyBalance;
 import ru.ycoord.core.color.Color;
-import org.black_ixx.playerpoints.PlayerPoints;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.commands.GuiCommand;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.core.placeholder.PlaceholderDummy;
 import ru.ycoord.core.placeholder.PlaceholderManager;
-import ru.ycoord.examples.commands.CoreCommand;
 
-import java.util.EventListener;
-import java.util.List;
+import java.io.File;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance moneyBalance = null;
     protected IBalance donateBalance = null;
     protected PlaceholderManager placeholderManager = null;
-
+    protected List<Command> guiCommands = new LinkedList<>();
     boolean requirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 
@@ -91,6 +98,71 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                 for (Command root : roots)
                     YcoordCore.getInstance().registerCommand(this, root);
             }
+        }
+
+        {
+            saveAllYmlFiles();
+            File dataFolder = getDataFolder().getAbsoluteFile();
+            File menusFolder = new File(dataFolder, "menus");
+            if (!menusFolder.exists())
+                menusFolder.mkdir();
+            if (menusFolder.exists()) {
+                File[] files = menusFolder.listFiles();
+                for (File file : files) {
+                    if (!file.isFile())
+                        continue;
+
+                    FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+                    loadMenu(config);
+                }
+            }
+
+
+            for (Command root : guiCommands)
+                YcoordCore.getInstance().registerCommand(this, root);
+        }
+    }
+
+    private final Map<String, ConfigurationSection> menus = new HashMap<>();
+
+    public Map<String, ConfigurationSection> getMenus() {
+        return menus;
+    }
+
+    private void loadMenu(FileConfiguration configuration) {
+        String name = configuration.getString("name", null);
+        if (name == null)
+            return;
+
+        menus.put(name, configuration);
+        ConfigurationSection section = configuration.getConfigurationSection("open-command");
+        if (section == null)
+            return;
+
+        guiCommands.add(new GuiCommand(configuration, section));
+    }
+
+    private void saveAllYmlFiles() {
+        try {
+            URL url = getClassLoader().getResource("menus");
+
+            assert url != null;
+            JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
+            JarFile jarFile = jarConnection.getJarFile();
+            Enumeration<JarEntry> entries = jarFile.entries();
+
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (name.endsWith(".yml") && !entry.isDirectory()) {
+                    if (name.equalsIgnoreCase("config.yml") || name.equalsIgnoreCase("plugin.yml"))
+                        continue;
+
+                    saveResource(name, false);
+                }
+            }
+        } catch (Exception ignored) {
+
         }
     }
 
