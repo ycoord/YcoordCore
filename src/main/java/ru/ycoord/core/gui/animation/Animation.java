@@ -52,7 +52,7 @@ public abstract class Animation {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack item = new ItemStack(backgroundMaterial);
                 ItemMeta meta = item.getItemMeta();
-                meta.displayName(Component.text(MessageBase.translateColor(backgroundName, new MessagePlaceholders(player))));
+                meta.displayName(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, backgroundName, new MessagePlaceholders(player))));
                 item.setItemMeta(meta);
                 inventory.setItem(i, item);
             }

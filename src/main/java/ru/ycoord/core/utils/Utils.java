@@ -88,7 +88,7 @@ public class Utils {
     }
 
     public static boolean checkCondition(Player player, String condition, MessagePlaceholders placeholders) {
-        String parsed = MessageBase.translateColor(condition, placeholders);
+        String parsed = MessageBase.translateColor(MessageBase.Level.NONE, condition, placeholders);
         Expression expression = new Expression(parsed);
         try {
             EvaluationValue result = expression.evaluate();

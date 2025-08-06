@@ -4,10 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.requirements.Requirement;
-import ru.ycoord.core.commands.requirements.SubcommandRequirement;
 import ru.ycoord.core.messages.MessageBase;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Command {
@@ -82,12 +80,12 @@ public abstract class Command {
 
     protected void unknownCommand(CommandSender sender) {
         if (sender instanceof Player player)
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.unknown-command", "неизвестная команда", null);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.unknown-command", "неизвестная команда", null);
     }
 
     protected void noPermission(CommandSender sender) {
         if (sender instanceof Player player)
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.no-permission", "нет прав", null);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.no-permission", "нет прав", null);
     }
 
     protected boolean unknownCommandIfCantExecute() {
@@ -105,7 +103,7 @@ public abstract class Command {
         }
 
         if (!canPlayerExecute() && (sender instanceof Player player)) {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.player-cant");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.player-cant");
 
             return false;
         }
@@ -168,7 +166,7 @@ public abstract class Command {
         if (params.size() <= paramCounter) {
             if (sender instanceof Player player) {
                 if (noParamOk)
-                    YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.need-param");
+                    YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.need-param");
             }
 
             return null;

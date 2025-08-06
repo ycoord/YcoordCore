@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.messages.MessageBase;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class FloatRequirement extends Requirement {
     public void failed(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.float-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.float-error");
         }
     }
 
@@ -32,7 +33,7 @@ public class FloatRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.float-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.float-description");
         }
     }
 
@@ -42,7 +43,7 @@ public class FloatRequirement extends Requirement {
             return Float.parseFloat(param);
         }catch (NumberFormatException ex){
             if (command.getSender() instanceof Player player) {
-                YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.not-float");
+                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.not-float");
 
             }
             return null;

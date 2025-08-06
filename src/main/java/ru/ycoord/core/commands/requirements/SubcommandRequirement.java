@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.commands.HelpCommand;
+import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.LinkedList;
@@ -57,7 +58,7 @@ public class SubcommandRequirement extends Requirement {
             placeholders.put("%command%", param);
             placeholders.put("%possible%", commandsToString(sender));
 
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.no-subcommand", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.no-subcommand", placeholders);
         }
         return null;
     }
@@ -79,7 +80,7 @@ public class SubcommandRequirement extends Requirement {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             placeholders.put("%possible%", commandsToString(sender));
 
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.subcommand-error", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.subcommand-error", placeholders);
 
         }
     }
@@ -91,7 +92,7 @@ public class SubcommandRequirement extends Requirement {
                 MessagePlaceholders placeholders = new MessagePlaceholders(player);
                 placeholders.put("%command%", c.getName());
                 placeholders.put("%description%", c.getDescription(sender));
-                YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.help-item-info", placeholders);
+                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.help-item-info", placeholders);
             }
         }
     }

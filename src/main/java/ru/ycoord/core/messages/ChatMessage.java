@@ -20,7 +20,7 @@ public class ChatMessage extends MessageBase {
     }
 
     @Override
-    public void sendMessageId(OfflinePlayer player, String messageId, String def, MessagePlaceholders messagePlaceholders) {
+    public void sendMessageId(Level level, OfflinePlayer player, String messageId, String def, MessagePlaceholders messagePlaceholders) {
         if (player == null)
             return;
         if (!player.isOnline() || player.getPlayer() == null)
@@ -33,7 +33,7 @@ public class ChatMessage extends MessageBase {
         if (!messagesSection.contains(messageId)) {
             def = messageId + "|" + String.join(", ", messagePlaceholders.keySet()).replace("%", "") + ":" + def;
 
-            player.getPlayer().sendMessage(translateColor(def, messagePlaceholders));
+            player.getPlayer().sendMessage(translateColor(level, def, messagePlaceholders));
             return;
         }
         List<?> messages = messagesSection.getList(messageId);
@@ -43,7 +43,7 @@ public class ChatMessage extends MessageBase {
         boolean hasSound = false;
         for (Object message : messages) {
             if (message instanceof String stringMessage) {
-                player.getPlayer().sendMessage(translateColor(stringMessage, messagePlaceholders));
+                player.getPlayer().sendMessage(translateColor(level, stringMessage, messagePlaceholders));
             } else {
                 if (message instanceof HashMap<?, ?> map) {
                     for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -54,7 +54,7 @@ public class ChatMessage extends MessageBase {
 
                             String type = (String) valueMap.get("type");
                             YamlConfiguration yamlConfiguration = new YamlConfiguration();
-                            yamlConfiguration.createSection("complex", (Map<?, ?>) valueMap);
+                            yamlConfiguration.createSection("complex", valueMap);
                             ConfigurationSection section = yamlConfiguration.getConfigurationSection("complex");
                             if (section == null) {
                                 continue;
@@ -82,12 +82,12 @@ public class ChatMessage extends MessageBase {
                                                 continue;
                                             }
                                             String text = (String) partsMap.get("text");
-                                            TextComponent.Builder builder = Component.text().content(translateColor(text, messagePlaceholders));
+                                            TextComponent.Builder builder = Component.text().content(translateColor(level, text, messagePlaceholders));
 
                                             if (partsMap.containsKey("hover")) {
                                                 String hover = (String) partsMap.get("hover");
-                                                hover = messagePlaceholders.apply(hover);
-                                                builder.hoverEvent(Component.text(translateColor(hover, messagePlaceholders)));
+                                                hover = messagePlaceholders.apply(Level.INFO, hover);
+                                                builder.hoverEvent(Component.text(translateColor(level, hover, messagePlaceholders)));
                                             }
 
                                             if (partsMap.containsKey("commands")) {
@@ -96,7 +96,7 @@ public class ChatMessage extends MessageBase {
                                                 for (Object c : todo) {
                                                     if (c instanceof String command) {
                                                         String r = command;
-                                                        r = messagePlaceholders.apply(r);
+                                                        r = messagePlaceholders.apply(level, r);
                                                         builder.clickEvent(ClickEvent.runCommand(r));
                                                     }
                                                 }
@@ -130,7 +130,7 @@ public class ChatMessage extends MessageBase {
     }
 
     @Override
-    public void displayMessage(OfflinePlayer player, String messages) {
+    public void displayMessage(Level level, OfflinePlayer player, String messages) {
 
     }
 }

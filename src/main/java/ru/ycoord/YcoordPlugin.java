@@ -33,6 +33,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance donateBalance = null;
     protected PlaceholderManager placeholderManager = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
+
     boolean requirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 

@@ -39,22 +39,42 @@ public class MessagePlaceholders {
         return map.get(key);
     }
 
-    public String apply(String text) {
-        for (String key : map.keySet())
-            text = text.replace(key, map.get(key));
 
+    public String apply(MessageBase.Level level, String text) {
+        MessageBase.Style style = YcoordCore.getInstance().getChatMessage().getStyle();
+        if (style != null) {
+            text = style.apply(level, text);
+        }
+
+        Map<String, String> keyValues = new HashMap<>();
+        for (String key : map.keySet())
+            keyValues.put(key, map.get(key));
 
         for (String key : YcoordCore.getInstance().getGlobalPlaceholders().keySet())
-            text = text.replace(key, YcoordCore.getInstance().getGlobalPlaceholders().get(key));
+            keyValues.put(key, YcoordCore.getInstance().getGlobalPlaceholders().get(key));
 
-        text = text.replace("%current_time%", convertTime(System.currentTimeMillis()));
+        String time = convertTime(System.currentTimeMillis());
+        keyValues.put("%current_time%", time);
+        keyValues.put("%current-time%", time);
 
         if (player != null) {
             String name = player.getName();
 
             if (name != null)
-                text = text.replace("%executor%", name);
+                keyValues.put("%executor%", name);
         }
+
+        for (String key : keyValues.keySet()) {
+
+            text = style.preparePlaceholder(text, level, key);
+        }
+
+        for (String key : keyValues.keySet()) {
+
+            text = text.replace(key, keyValues.get(key));
+        }
+
+
 
         return ChatColor.translateAlternateColorCodes('&', text);
     }

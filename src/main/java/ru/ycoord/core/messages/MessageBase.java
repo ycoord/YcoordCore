@@ -10,9 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.sound.SoundInfo;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -21,6 +18,113 @@ public abstract class MessageBase {
     protected boolean useDefaultSound = false;
     protected SoundInfo defaultSound;
 
+    public static class Style {
+        public void preparePlaceholders(Level level, String key, String value) {
+        }
+
+        public static class LevelStyle {
+            public String prefix;
+            public String placeholder;
+            public String mainColor;
+
+            public LevelStyle(ConfigurationSection section) {
+                this.prefix = section.getString("prefix", "");
+                this.placeholder = section.getString("placeholder", "");
+                this.mainColor = section.getString("color", "");
+            }
+
+            public String apply(String text) {
+                if (prefix != null && mainColor != null) {
+                    return String.format("%s%s%s", prefix, text, mainColor);
+                }
+                return text;
+            }
+
+            public String preparePlaceholder(String text, String key) {
+                StringBuilder sb = new StringBuilder(key);
+                sb.insert(1, "!");
+                String nonFormat = sb.toString();
+
+                text = text.replaceAll(key, String.format("%s%s%s", placeholder, key, mainColor));
+                text = text.replaceAll(nonFormat,key);
+
+                return text;
+            }
+        }
+
+        public LevelStyle info;
+        public LevelStyle success;
+        public LevelStyle error;
+
+        private Style(ConfigurationSection section) {
+
+            ConfigurationSection info = section.getConfigurationSection("info");
+            ConfigurationSection success = section.getConfigurationSection("success");
+            ConfigurationSection error = section.getConfigurationSection("error");
+
+            if (info != null) {
+                this.info = new LevelStyle(info);
+            }
+
+            if (success != null) {
+                this.success = new LevelStyle(success);
+            }
+
+            if (error != null) {
+                this.error = new LevelStyle(error);
+            }
+        }
+
+        public String apply(Level level, String message) {
+            switch (level) {
+                case INFO -> {
+                    return info.apply(message);
+                }
+                case SUCCESS -> {
+                    return success.apply(message);
+                }
+                case ERROR -> {
+                    return error.apply(message);
+                }
+                case NONE -> {
+                    return message;
+                }
+            }
+
+            return message;
+        }
+
+
+        public String preparePlaceholder(String text, Level level, String key) {
+
+            switch (level) {
+                case INFO -> {
+                    return info.preparePlaceholder(text, key);
+                }
+                case SUCCESS -> {
+                    return success.preparePlaceholder(text, key);
+                }
+                case ERROR -> {
+                    return error.preparePlaceholder(text, key);
+                }
+                case NONE -> {
+                    return text;
+                }
+            }
+
+            return text;
+        }
+    }
+
+    private Style style;
+
+    public Style getStyle() {
+        return style;
+    }
+
+    public enum Level {
+        INFO, SUCCESS, ERROR, NONE
+    }
     public MessageBase(YcoordCore core, ConfigurationSection messagesSection) {
         this.messagesSection = messagesSection;
 
@@ -42,22 +146,29 @@ public abstract class MessageBase {
             else
                 this.defaultSound = new SoundInfo(defaultSoundSection);
         }
+
+        ConfigurationSection mainConfig = core.getConfig();
+        ConfigurationSection style = mainConfig = mainConfig.getConfigurationSection("style");
+        if (style == null)
+            return;
+
+        this.style = new Style(style);
     }
 
     public ConfigurationSection getSection() {
         return messagesSection;
     }
 
-    public static String translateColor(String value, MessagePlaceholders messagePlaceholders) {
+    public static String translateColor(Level level, String value, MessagePlaceholders messagePlaceholders) {
         String tran = ChatColor.translateAlternateColorCodes('&', value);
         if (messagePlaceholders == null) {
             return tran;
         }
-        value = messagePlaceholders.apply(tran);
+        value = messagePlaceholders.apply(level, tran);
         return PlaceholderAPI.setPlaceholders(messagePlaceholders.getPlayer(), value);
     }
 
-    public void sendMessageId(OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
+    public void sendMessageId(Level level, OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
         @NotNull List<String> messages = getSection().getStringList(id);
         if (messages.isEmpty()) {
             messages = List.of(def);
@@ -65,44 +176,44 @@ public abstract class MessageBase {
 
 
         for (String message : messages) {
-            displayMessage(player, makeMessage(message, messagePlaceholders));
+            displayMessage(level, player, makeMessage(level, message, messagePlaceholders));
         }
     }
 
-    public static String makeMessage(String message, MessagePlaceholders messagePlaceholders) {
-        return translateColor(message, messagePlaceholders);
+    public static String makeMessage(Level level, String message, MessagePlaceholders messagePlaceholders) {
+        return translateColor(level, message, messagePlaceholders);
     }
 
-    public String makeMessageId(String messageId, MessagePlaceholders messagePlaceholders) {
+    public String makeMessageId(Level level, String messageId, MessagePlaceholders messagePlaceholders) {
         List<String> messages = getSection().getStringList(messageId);
         String message = null;
         if (messages.isEmpty())
             message = getSection().getString(messageId);
         else
             message = messages.get(0);
-        return translateColor(message, messagePlaceholders);
+        return translateColor(level, message, messagePlaceholders);
     }
 
 
-    public abstract void displayMessage(OfflinePlayer player, String messages);
+    public abstract void displayMessage(Level level, OfflinePlayer player, String messages);
 
-    public final void sendMessageId(OfflinePlayer player, String id, String def) {
-        sendMessageId(player, id, def, new MessagePlaceholders(player));
+    public final void sendMessageId(Level level, OfflinePlayer player, String id, String def) {
+        sendMessageId(level, player, id, def, new MessagePlaceholders(player));
     }
 
-    public final void sendMessageId(OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
-        sendMessageId(player, id, "", messagePlaceholders);
+    public final void sendMessageId(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
+        sendMessageId(level, player, id, "", messagePlaceholders);
     }
 
-    public final void sendMessageId(OfflinePlayer player, String id) {
-        sendMessageId(player, id, "", new MessagePlaceholders(player));
+    public final void sendMessageId(Level level, OfflinePlayer player, String id) {
+        sendMessageId(level, player, id, "", new MessagePlaceholders(player));
     }
 
-    public void broadcastAll(OfflinePlayer sender, String id, String def, MessagePlaceholders messagePlaceholders) {
-        broadcastFilter(sender, id, def, messagePlaceholders, (p) -> true);
+    public void broadcastAll(Level level, OfflinePlayer sender, String id, String def, MessagePlaceholders messagePlaceholders) {
+        broadcastFilter(level, sender, id, def, messagePlaceholders, (p) -> true);
     }
 
-    public void broadcastFilter(OfflinePlayer sender,
+    public void broadcastFilter(Level level, OfflinePlayer sender,
                                 String id,
                                 String def,
                                 MessagePlaceholders messagePlaceholders,
@@ -111,7 +222,7 @@ public abstract class MessageBase {
             if (sender != null)
                 if (sender.getUniqueId().equals(p.getUniqueId()))
                     return;
-            sendMessageId(p, id, def, messagePlaceholders);
+            sendMessageId(level, p, id, def, messagePlaceholders);
         });
     }
 }

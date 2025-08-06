@@ -61,7 +61,7 @@ items:
       no-condition-message-id: "messages.no-condition"
       actions:
         - "[message] Hello %slot%"
-        - "[id] messages.unknown-command"
+        - "[id-error] messages.unknown-command"
         - "[console] feed %player%"
         - "[player] heal %player%"
         - "[console] lp user %player% meta set test value1"
@@ -74,7 +74,7 @@ items:
       no-condition-message-id: "messages.no-condition"
       actions:
         - "[message] Hello %slot%"
-        - "[id] messages.unknown-command"
+        - "[id-error] messages.unknown-command"
         - "[console] feed %player%"
         - "[player] heal %player%"
         - "[console] lp user %player% meta set test value2"

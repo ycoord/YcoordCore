@@ -2,7 +2,6 @@ package ru.ycoord.core.gui.items;
 
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -82,25 +81,25 @@ public class GuiItem {
 
         List<String> resultLore = new LinkedList<>();
         for (String loreItem : loreBefore) {
-            resultLore.add(MessageBase.translateColor(loreItem, placeholders));
+            resultLore.add(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders));
         }
 
         for (String loreItem : lore) {
-            resultLore.add(MessageBase.translateColor(loreItem, placeholders));
+            resultLore.add(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders));
         }
 
         for (String loreItem : loreAfter) {
-            resultLore.add(MessageBase.translateColor(loreItem, placeholders));
+            resultLore.add(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders));
         }
 
         ItemMeta meta = stack.getItemMeta();
         String name = section.getString("name", "имя");
-        meta.displayName(Component.text(MessageBase.translateColor(name, placeholders)));
+        meta.displayName(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, name, placeholders)));
 
         List<Component> components = new LinkedList<>();
         for (String loreItem : resultLore) {
             meta.lore(new LinkedList<>());
-            components.add(Component.text(MessageBase.translateColor(loreItem, placeholders)));
+            components.add(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders)));
         }
 
         meta.lore(components);
@@ -162,7 +161,7 @@ public class GuiItem {
                     return true;
                 }
 
-                YcoordCore.getInstance().getChatMessage().sendMessageId(clicker, "messages.cooldown", new MessagePlaceholders(clicker));
+                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, clicker, "messages.cooldown", new MessagePlaceholders(clicker));
 
             }
         }
@@ -288,7 +287,7 @@ public class GuiItem {
             }
 
             String noPermissionMessageId = section.getString("no-permission-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, noPermissionMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, noPermissionMessageId, new MessagePlaceholders(player));
             return false;
         }
 
@@ -302,7 +301,7 @@ public class GuiItem {
                 return true;
 
             String noCheckMessageId = section.getString("no-condition-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, noCheckMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, noCheckMessageId, new MessagePlaceholders(player));
             return false;
         }
 
@@ -321,15 +320,24 @@ public class GuiItem {
                 if (tag == null)
                     continue;
                 if (tag.tag.equalsIgnoreCase("message")) {
-                    String message = MessageBase.makeMessage(tag.value, this.placeholders);
+                    String message = MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders);
                     player.sendMessage(message);
-                } else if (tag.tag.equalsIgnoreCase("id")) {
+                } else if (tag.tag.equalsIgnoreCase("id-none")) {
                     String message = tag.value;
-                    chatMessage.sendMessageId(player, message, placeholders);
+                    chatMessage.sendMessageId(MessageBase.Level.NONE, player, message, placeholders);
+                } else if (tag.tag.equalsIgnoreCase("id-info")) {
+                    String message = tag.value;
+                    chatMessage.sendMessageId(MessageBase.Level.INFO, player, message, placeholders);
+                } else if (tag.tag.equalsIgnoreCase("id-error")) {
+                    String message = tag.value;
+                    chatMessage.sendMessageId(MessageBase.Level.ERROR, player, message, placeholders);
+                } else if (tag.tag.equalsIgnoreCase("id-success")) {
+                    String message = tag.value;
+                    chatMessage.sendMessageId(MessageBase.Level.SUCCESS, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("console")) {
-                    Utils.executeConsole(player, MessageBase.makeMessage(tag.value, this.placeholders));
+                    Utils.executeConsole(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 } else if (tag.tag.equalsIgnoreCase("player")) {
-                    Utils.executePlayer(player, MessageBase.makeMessage(tag.value, this.placeholders));
+                    Utils.executePlayer(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 }
             }
         }

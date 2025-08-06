@@ -16,11 +16,49 @@ gui-settings:
       pitch: 1
       volume: 0.5
 
+#&cⓧ &c&lСистема &8»&f Команды &a «%command%»&f не существует! Возможные значения &e%possible%
+
+style:
+  use: true
+  info:
+    prefix: "&6%!X% &6&lСистема &8%!>>%%!text-color% "
+    placeholder: "&6"
+    color: "%text-color%"
+  success:
+    prefix: "&2%X% &6&lСистема &8%>>%%text-color% "
+    placeholder: "&a"
+    color: "%text-color%"
+  error:
+    prefix: "&c%X% &c&lСистема &8%>>%%text-color% "
+    placeholder: "&c"
+    color: "%text-color%"
+
 
 placeholders:
   1:
     placeholder: "%pre%"
     result:  "<"
+  2:
+    placeholder: "%Y%"
+    result: "<"
+  3:
+    placeholder: "%X%"
+    result: "ⓧ"
+  4:
+    placeholder: "%V%"
+    result: "V"
+  5:
+    placeholder: "%text-color%"
+    result: "&f"
+  6:
+    placeholder: "%place-color%"
+    result: "&a"
+  7:
+    placeholder: "%>>%"
+    result: "»"
+  8:
+    placeholder: "%<<%"
+    result: "«"
 
 
 default-string-completion:
@@ -44,7 +82,7 @@ nick-completion:
 
 messages:
   cooldown:
-    - "&cⓧ &c&lСистема &8»&f Не так быстро!"
+    - "Не так быстро! %player%"
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO

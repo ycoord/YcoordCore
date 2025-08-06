@@ -6,6 +6,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.messages.MessageBase;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class PlayerRequirement extends Requirement {
     public void failed(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.player-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.player-error");
         }
     }
 
@@ -38,7 +39,7 @@ public class PlayerRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.offline-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.offline-description");
         }
     }
 }

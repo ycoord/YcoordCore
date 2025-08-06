@@ -66,7 +66,7 @@ public class GuiBase implements InventoryHolder {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
 
-        title = MessageBase.translateColor(title, placeholders);
+        title = MessageBase.translateColor(MessageBase.Level.NONE, title, placeholders);
 
         inventory = Bukkit.createInventory(this, size, Component.text(title));
         rebuild(player);

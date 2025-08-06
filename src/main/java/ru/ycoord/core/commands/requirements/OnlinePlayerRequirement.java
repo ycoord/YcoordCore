@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.Command;
+import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class OnlinePlayerRequirement extends Requirement {
 
                 MessagePlaceholders placeholders = new MessagePlaceholders(player);
                 placeholders.put("%player%", param);
-                YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.player-offline", placeholders);
+                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.player-offline", placeholders);
 
             }
         }
@@ -42,7 +43,7 @@ public class OnlinePlayerRequirement extends Requirement {
     public void failed(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.online-player-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.online-player-error");
         }
     }
 
@@ -50,7 +51,7 @@ public class OnlinePlayerRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.online-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.online-description");
         }
     }
 }
