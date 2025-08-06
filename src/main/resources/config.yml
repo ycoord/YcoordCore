@@ -16,6 +16,13 @@ gui-settings:
       pitch: 1
       volume: 0.5
 
+
+placeholders:
+  1:
+    placeholder: "%pre%"
+    result:  "<"
+
+
 default-string-completion:
   - <строка>
 default-message-completion:
@@ -123,7 +130,7 @@ messages:
         type: SOUND
         name: ENTITY_VILLAGER_NO
   unknown-command:
-    - "&cⓧ &c&lСистема &8»&f Неизвестная команда!"
+    - "&cⓧ &c&lСистема &8»&f %pre% Неизвестная команда!"
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO

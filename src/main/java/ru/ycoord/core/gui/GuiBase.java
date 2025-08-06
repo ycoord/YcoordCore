@@ -91,7 +91,7 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void getExtraPlaceholders(MessagePlaceholders placeholders) {
-        placeholders.put("%current_time%", convertTime(System.currentTimeMillis()));
+
     }
 
     public static class GuiItemCharacter {

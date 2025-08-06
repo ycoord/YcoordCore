@@ -1,17 +1,22 @@
 package ru.ycoord;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.gui.GuiManager;
+import ru.ycoord.core.messages.ChatMessage;
+import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.CorePlaceholders;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.examples.commands.CoreCommand;
-import ru.ycoord.core.messages.ChatMessage;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -23,6 +28,7 @@ public final class YcoordCore extends YcoordPlugin {
     private ChatMessage chatMessage;
     private PlayerDataCache playerDataCache;
     private GuiManager guiManager;
+    private MessagePlaceholders messagePlaceholders;
 
     public static YcoordCore getInstance() {
         return instance;
@@ -39,6 +45,9 @@ public final class YcoordCore extends YcoordPlugin {
 
     public GuiManager getGuiManager() {
         return guiManager;
+    }
+    public MessagePlaceholders getGlobalPlaceholders() {
+        return messagePlaceholders;
     }
 
     @Override
@@ -70,6 +79,23 @@ public final class YcoordCore extends YcoordPlugin {
             }, 10, 10);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        {
+            messagePlaceholders = new MessagePlaceholders(null);
+            ConfigurationSection placeholders = getConfig().getConfigurationSection("placeholders");
+            if (placeholders != null) {
+                for (String key : placeholders.getKeys(false)) {
+                    ConfigurationSection placeholderData = placeholders.getConfigurationSection(key);
+                    if (placeholderData != null) {
+
+                        String placeholderKey = placeholderData.getString("placeholder");
+                        String placeholderValue = placeholderData.getString("result");
+
+                        messagePlaceholders.put(placeholderKey, placeholderValue);
+                    }
+                }
+            }
         }
     }
 

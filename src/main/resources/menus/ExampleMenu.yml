@@ -38,7 +38,7 @@ items:
     type: VIEWER_HEAD
     name: "&6&l▶ &fРадиус &6%player%"
     lore:
-      - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius%"
+      - "§f◦§r &7Радиус &6%radius%&f/&6%max-radius% %pre%"
       - ""
       - "§f◦§r &eЛКМ &7- уменьшить радиус"
       - "§f◦§r &eПКМ &7- увеличить радиус"

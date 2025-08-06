@@ -69,6 +69,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             PlayerPointsAPI pp = PlayerPoints.getInstance().getAPI();
             donateBalance = new DonateBalance(pp);
         }
+
         {
             if (!requirePlugin(this, "Vault"))
                 return;
@@ -79,6 +80,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                 moneyBalance = new MoneyBalance(economyProvider.getProvider());
             }
         }
+
         {
             if (!requirePlugin(this, "PlaceholderAPI"))
                 return;
