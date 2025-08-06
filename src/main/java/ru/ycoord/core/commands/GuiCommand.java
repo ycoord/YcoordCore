@@ -3,19 +3,18 @@ package ru.ycoord.core.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.requirements.Requirement;
 import ru.ycoord.core.commands.requirements.SubcommandRequirement;
 import ru.ycoord.core.gui.GuiBase;
-import ru.ycoord.examples.commands.GuiExample;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GuiCommand extends Command {
     private final ConfigurationSection guiConfig;
     public ConfigurationSection section;
-    private List<Requirement> requirements = new ArrayList<Requirement>();
+    private List<Requirement> requirements = new LinkedList<>();
 
     public GuiCommand(ConfigurationSection guiConfig, ConfigurationSection section) {
         this.section = section;
@@ -74,5 +73,38 @@ public class GuiCommand extends Command {
     @Override
     public List<Requirement> getRequirements(CommandSender sender) {
         return requirements;
+    }
+
+    private void merge(SubcommandRequirement subcommand, SubcommandRequirement otherSubcommand) {
+        List<Command> my = subcommand.getSubcommands();
+        List<Command> other = otherSubcommand.getSubcommands();
+
+        for (Command c1 : my) {
+            if (c1 instanceof GuiCommand gui1) {
+                for (Command c2 : other) {
+                    if (c2 instanceof GuiCommand gui2) {
+
+                        if (gui1.getName().equalsIgnoreCase(gui2.getName())) {
+                            gui1.merge(gui2);
+                        } else {
+                            subcommand.addCommand(gui2);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void merge(GuiCommand toMerge) {
+        for (Requirement requirement : requirements) {
+            if (requirement instanceof SubcommandRequirement subcommand) {
+                for (Requirement otherReq : toMerge.requirements) {
+                    if (otherReq instanceof SubcommandRequirement otherSubcommand) {
+                        merge(subcommand, otherSubcommand);
+                    }
+                }
+            }
+        }
     }
 }

@@ -39,6 +39,10 @@ public class SubcommandRequirement extends Requirement {
         return subcommands.stream().filter(p -> p.canExecute(command.getSender())).map(Command::getName).toList();
     }
 
+    public List<Command> getSubcommands() {
+        return this.subcommands;
+    }
+
     @Override
     public Object validate(CommandSender sender, String param) {
 
@@ -90,5 +94,9 @@ public class SubcommandRequirement extends Requirement {
                 YcoordCore.getInstance().getChatMessage().sendMessageId(player, "messages.help-item-info", placeholders);
             }
         }
+    }
+
+    public void addCommand(Command command) {
+        subcommands.add(command);
     }
 }

@@ -32,7 +32,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance moneyBalance = null;
     protected IBalance donateBalance = null;
     protected PlaceholderManager placeholderManager = null;
-    protected List<Command> guiCommands = new LinkedList<>();
+    protected List<GuiCommand> guiCommands = new LinkedList<>();
     boolean requirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 
@@ -138,8 +138,19 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         ConfigurationSection section = configuration.getConfigurationSection("open-command");
         if (section == null)
             return;
-
-        guiCommands.add(new GuiCommand(configuration, section));
+        String commandName =  section.getString("name", null);
+        if (commandName == null)
+            return;
+        boolean merged = false;
+        for (GuiCommand guiCommand : guiCommands) {
+            if (guiCommand.getName().equalsIgnoreCase(commandName)) {
+                guiCommand.merge(new GuiCommand(configuration, section));
+                merged = true;
+                break;
+            }
+        }
+        if (!merged)
+            guiCommands.add(new GuiCommand(configuration, section));
     }
 
     private void saveAllYmlFiles() {
