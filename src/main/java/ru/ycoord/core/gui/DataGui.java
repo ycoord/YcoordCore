@@ -7,22 +7,56 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiItemStack;
+import ru.ycoord.core.gui.items.GuiPaginationButton;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public abstract class DataGui extends GuiBase {
 
+    private int markerCount = 0;
     public DataGui(ConfigurationSection section) {
         super(section);
+
+        List<String> pattern = section.getStringList("pattern");
+        ConfigurationSection items = section.getConfigurationSection("items");
+
+
+        for (int i = 0; i < pattern.size(); i++) {
+            for (int j = 0; j < pattern.get(i).length(); j++) {
+                char c = pattern.get(i).charAt(j);
+                String stringC = String.valueOf(c);
+
+                assert items != null;
+
+                Set<String> keys = items.getKeys(false);
+                for (String key : keys) {
+                    ConfigurationSection itemSection = items.getConfigurationSection(key);
+                    if (itemSection == null)
+                        continue;
+                    String symbol = itemSection.getString("symbol", null);
+                    if (symbol == null)
+                        continue;
+
+                    if (!symbol.equalsIgnoreCase(stringC))
+                        continue;
+
+                    String type = itemSection.getString("type", null);
+                    if (type == null)
+                        continue;
+                    if (type.equalsIgnoreCase("MARKER"))
+                        markerCount++;
+                }
+            }
+        }
     }
 
     private int currentPage = 0;
 
     @Override
     protected HashMap<Integer, List<GuiItemCharacter>> make(OfflinePlayer player, ConfigurationSection section) {
-
         return super.make(player, section);
     }
 
@@ -39,24 +73,30 @@ public abstract class DataGui extends GuiBase {
     public GuiItem makeItem(int currentIndex, int slot, int priority, OfflinePlayer player, String type, ConfigurationSection section) {
         if (type.equalsIgnoreCase("MARKER")) {
             int itemCount = getItemCount(player);
-            if (currentIndex >= itemCount) {
+            int dataIndex = currentIndex + currentPage * markerCount;
+            if (dataIndex >= itemCount) {
                 return getFillerItem(priority, currentIndex, player, slot);
             }
-            return getItem(currentIndex + currentPage * itemCount, currentIndex, priority, player, slot, type, section);
+            return getItem(dataIndex, currentIndex, priority, player, slot, type, section);
+        } else if (type.equalsIgnoreCase("NEXT")) {
+            return new GuiPaginationButton(priority, this, true, slot, currentIndex, section);
+        } else if (type.equalsIgnoreCase("PREV")) {
+            return new GuiPaginationButton(priority, this, false, slot, currentIndex, section);
         }
         return super.makeItem(currentIndex, slot, priority, player, type, section);
     }
 
     protected GuiItem getFillerItem(int priority, int currentMarkerIndex, OfflinePlayer player, int slotIndex) {
-        return new GuiItemStack(new ItemStack(Material.BARRIER), priority, slotIndex, currentMarkerIndex, null);
+        ConfigurationSection section = this.section.getConfigurationSection("filler-item");
+        if (section == null)
+            return null;
+        return new GuiItem(priority, slotIndex, currentMarkerIndex, section);
     }
 
     protected abstract int getItemCount(OfflinePlayer player);
 
     public int getMaxPages(OfflinePlayer player) {
-        if (!typeCounter.containsKey("MARKER"))
-            return 0;
-        int result = (int) Math.ceil((double) getItemCount(player) / typeCounter.get("MARKER"));
+        int result = (int) Math.ceil((double) getItemCount(player) / markerCount);
         if (result == 0)
             return 1;
         return result;

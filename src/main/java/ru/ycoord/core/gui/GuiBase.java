@@ -21,7 +21,7 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 import java.util.*;
 
 public class GuiBase implements InventoryHolder {
-    private final ConfigurationSection section;
+    protected final ConfigurationSection section;
     private Inventory inventory = null;
     private HashMap<Integer, List<GuiItemCharacter>> items = new HashMap<>();
     private HashMap<Integer, GuiItem> slots = new HashMap<>();
@@ -120,6 +120,7 @@ public class GuiBase implements InventoryHolder {
 
     public void rebuild(OfflinePlayer player) {
         inventory.clear();
+        typeCounter.clear();
         Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
             this.items = make(player, section);
             refresh(player, items);

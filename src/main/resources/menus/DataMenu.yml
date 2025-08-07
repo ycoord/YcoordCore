@@ -18,14 +18,28 @@ open-command:
       type: SUBCOMMAND
       name: test2
       permission: "*"
+filler-item:
+  material: BARRIER
+  name: "Пустота"
+  lore: [ ]
 
+  click:
+    permission: "*"
+    no-permission-message-id: "messages.no-permission"
+    no-condition-message-id: "messages.no-condition"
+    actions:
+      - "[message] Hello %slot%"
+      - "[id-error] messages.unknown-command"
+      - "[console] feed %player%"
+      - "[player] heal %player%"
+      - "[console] lp user %player% meta set test value1"
 pattern:
   - "#########"
   - "#XXXXXXX#"
   - "#XXXXXXX#"
   - "#XXXXXXX#"
   - "#XXXXXXX#"
-  - "#####>###"
+  - "###<#>###"
 items:
   data-item:
     symbol: 'X'
@@ -36,6 +50,7 @@ items:
       - "%bullet% Страница %page%/%pages%"
       - "%bullet% Слот %slot%"
       - "%bullet% Индекс %index%"
+      - "%bullet% Дата индекс %data-index%"
   next:
     symbol: '>'
     type: NEXT
@@ -45,4 +60,12 @@ items:
       - "%bullet% Страница %page%/%pages%"
       - "%bullet% Слот %slot%"
       - "%bullet% Индекс %index%"
-
+  prev:
+    symbol: '<'
+    type: PREV
+    material: ARROW
+    name: "%title% Назад"
+    lore:
+      - "%bullet% Страница %page%/%pages%"
+      - "%bullet% Слот %slot%"
+      - "%bullet% Индекс %index%"
