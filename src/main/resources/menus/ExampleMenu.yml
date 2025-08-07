@@ -106,6 +106,7 @@ items:
         - "[id] messages.unknown-command"
         - "[console] lp user %player% meta set test value1"
         - "[player] heal %player%"
+        - "[open] Example2"
 
     symbol: 'S'
     type: ITEM

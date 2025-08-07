@@ -20,6 +20,7 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.utils.Utils;
+import ru.ycoord.examples.commands.GuiExample;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -338,6 +339,14 @@ public class GuiItem {
                     Utils.executeConsole(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 } else if (tag.tag.equalsIgnoreCase("player")) {
                     Utils.executePlayer(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
+                } else if (tag.tag.equalsIgnoreCase("close")) {
+                    player.closeInventory();
+                } else if (tag.tag.equalsIgnoreCase("open")) {
+                    ConfigurationSection section = YcoordCore.getInstance().getMenus().get(tag.value);
+                    if (section != null) {
+                        GuiExample base = new GuiExample(section);
+                        base.open(player);
+                    }
                 }
             }
         }
