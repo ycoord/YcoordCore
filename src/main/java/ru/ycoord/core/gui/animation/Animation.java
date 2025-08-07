@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
@@ -17,14 +18,16 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class Animation {
-    protected final ConfigurationSection section;
-    protected final int duration;
+    protected @Nullable final ConfigurationSection section;
+    protected int duration = 10;
     private boolean background = false;
     private Material backgroundMaterial = Material.AIR;
     private String backgroundName = "";
 
-    public Animation(ConfigurationSection section) {
+    public Animation(@Nullable ConfigurationSection section) {
         this.section = section;
+        if(section == null)
+            return;
         this.duration = section.getInt("duration", 10);
         ConfigurationSection backgroundSection = section.getConfigurationSection("background");
         if (backgroundSection != null) {

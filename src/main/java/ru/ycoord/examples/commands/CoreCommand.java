@@ -1,30 +1,22 @@
 package ru.ycoord.examples.commands;
 
-import jdk.jshell.execution.Util;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.AdminCommand;
-import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.commands.requirements.PlayerRequirement;
 import ru.ycoord.core.commands.requirements.Requirement;
 import ru.ycoord.core.commands.requirements.StringRequirement;
 import ru.ycoord.core.commands.requirements.SubcommandRequirement;
-import ru.ycoord.core.gui.GuiBase;
-import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.MapMessages;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.nbt.NbtExtension;
 import ru.ycoord.core.utils.Utils;
-import ru.ycoord.examples.guis.ExampleDataGui;
+import ru.ycoord.examples.guis.ExampleGuiPagedData;
 
 import java.util.List;
 import java.util.Map;
@@ -447,7 +439,7 @@ public class CoreCommand extends AdminCommand {
                     return false;
 
                 if (sender instanceof Player player) {
-                    ExampleDataGui gui = new ExampleDataGui(YcoordCore.getInstance().getMenus().get("DataMenu"));
+                    ExampleGuiPagedData gui = new ExampleGuiPagedData(YcoordCore.getInstance().getMenus().get("DataMenu"));
                     gui.open(player);
                 }
 

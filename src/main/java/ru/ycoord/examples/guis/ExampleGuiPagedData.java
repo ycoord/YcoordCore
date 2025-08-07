@@ -3,13 +3,14 @@ package ru.ycoord.examples.guis;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
-import ru.ycoord.core.gui.DataGui;
+import ru.ycoord.core.gui.GuiListData;
+import ru.ycoord.core.gui.GuiPagedData;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
-public class ExampleDataGui extends DataGui {
-    public ExampleDataGui(ConfigurationSection section) {
+public class ExampleGuiPagedData extends GuiListData {
+    public ExampleGuiPagedData(ConfigurationSection section) {
         super(section);
     }
 
@@ -36,6 +37,6 @@ public class ExampleDataGui extends DataGui {
 
     @Override
     protected int getItemCount(OfflinePlayer player) {
-        return 40;
+        return 53;
     }
 }

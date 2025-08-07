@@ -60,7 +60,7 @@ public class GuiBase implements InventoryHolder {
 
     public void open(OfflinePlayer player) {
         int size = section.getInt("size", 54);
-        String title = section.getString("title", "title");
+        String title = section.getString("title", "Заголовок");
 
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
@@ -110,7 +110,6 @@ public class GuiBase implements InventoryHolder {
     }
 
     protected void refresh(OfflinePlayer player, HashMap<Integer, List<GuiItemCharacter>> guiElements) {
-        inventory.clear();
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null)

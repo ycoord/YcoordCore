@@ -4,6 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class NoAnimation extends Animation {
-    public NoAnimation(ConfigurationSection section) {
+    public NoAnimation(@Nullable ConfigurationSection section) {
         super(section);
     }
 
