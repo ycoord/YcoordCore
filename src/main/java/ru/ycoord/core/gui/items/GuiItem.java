@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.gui.GuiManager;
@@ -29,7 +30,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GuiItem {
-    protected final ConfigurationSection section;
+    private final int slot;
+    private final int index;
+    protected @Nullable ConfigurationSection section = null;
     private SoundInfo sound = null;
     private int priority;
     private boolean redraw = false;
@@ -37,9 +40,15 @@ public class GuiItem {
     private List<String> lore = new LinkedList<>();
     private ItemStack stack;
 
-    public GuiItem(int priority, ConfigurationSection section) {
-        this.section = section;
+    public GuiItem(int priority, int slot, int index, @Nullable ConfigurationSection section) {
         this.priority = priority;
+        this.section = section;
+        this.slot = slot;
+        this.index = index;
+        if(section == null)
+            return;
+
+
         this.lore = section.getStringList("lore");
         this.redraw = section.getBoolean("redraw", false);
         ConfigurationSection soundSection = section.getConfigurationSection("sound");
@@ -76,6 +85,8 @@ public class GuiItem {
     }
 
     public void apply(OfflinePlayer clicker, ItemStack stack, MessagePlaceholders placeholders) {
+        if(section == null)
+            return;
         List<String> loreBefore = getLoreBefore(clicker);
 
         List<String> loreAfter = getLoreAfter(clicker);
@@ -122,29 +133,32 @@ public class GuiItem {
                 ItemFlag.HIDE_POTION_EFFECTS);
     }
 
-    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders, boolean onlyMeta) {
+    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, int index, MessagePlaceholders placeholders, boolean onlyMeta) {
         if (!checkCondition(clicker.getPlayer()))
             return null;
-        getExtraPlaceholders(placeholders, slot, base);
+        getExtraPlaceholders(placeholders, slot, index, base);
         if(!onlyMeta)
         {
-            ItemStack stack;
-
-            String texture = section.getString("texture", null);
-            if (texture != null && !texture.isEmpty()) {
-                Utils.createPlayerHeadBase64Async(texture).thenAccept(item -> {
-                    apply(clicker, item, placeholders);
-                    base.setSlotItemReady(slot, this, item);
-                });
-                stack = new ItemStack(Material.PLAYER_HEAD);
-
-            } else {
-                stack = new ItemStack(Material.valueOf(section.getString("material", "BARRIER")));
-            }
-            this.stack = stack;
+            this.stack = createItem(base, slot);
         }
         apply(clicker, this.stack, placeholders);
         return this.stack;
+    }
+
+    protected ItemStack createItem(GuiBase base, int slot) {
+        ItemStack stack;
+        if(section == null)
+            return new  ItemStack(Material.AIR);
+        String texture = section.getString("texture", null);
+        if (texture != null && !texture.isEmpty()) {
+            ItemStack item = Utils.createPlayerHeadBase64(texture);
+            base.setSlotItemReady(slot, this, item);
+            stack = new ItemStack(Material.PLAYER_HEAD);
+
+        } else {
+            stack = new ItemStack(Material.valueOf(section.getString("material", "BARRIER")));
+        }
+        return stack;
     }
 
     private boolean checkCooldown(Player clicker) {
@@ -170,6 +184,8 @@ public class GuiItem {
     }
 
     private void handleClick(boolean left, Player player, MessagePlaceholders placeholders) {
+        if(section == null)
+            return;
         ConfigurationSection clickSection;
         clickSection = section.getConfigurationSection("click");
         if (clickSection == null) {
@@ -192,7 +208,7 @@ public class GuiItem {
         if (event.getWhoClicked() instanceof Player clicker) {
             if (!checkCooldown(clicker))
                 return false;
-            getExtraPlaceholders(placeholders, event.getSlot(), gui);
+            getExtraPlaceholders(placeholders, slot, index, gui);
             if (event.isLeftClick()) {
                 handleClick(true, clicker, placeholders);
             }
@@ -205,11 +221,11 @@ public class GuiItem {
         return true;
     }
 
-    public void update(GuiBase guiBase, int slot, long elapsed, Player player, MessagePlaceholders placeholders) {
-        handleCondition(guiBase, slot, player, placeholders);
+    public void update(GuiBase guiBase, int slot, int index, long elapsed, Player player, MessagePlaceholders placeholders) {
+        handleCondition(guiBase, slot, index, player, placeholders);
     }
 
-    private void handleCondition(GuiBase guiBase, int slot, Player player, MessagePlaceholders messagePlaceholders) {
+    private void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
         boolean condition = checkCondition(player);
 
         HashMap<Integer, GuiItem> slots = guiBase.getSlots();
@@ -223,15 +239,17 @@ public class GuiItem {
 
         boolean otherCondition = itemInSlot.checkCondition(player);
         if (!otherCondition) {
-            guiBase.setSlotItem(slot, this, player, messagePlaceholders);
+            guiBase.setSlotItem(slot, index, this, player, messagePlaceholders);
         } else {
             if (priority > itemInSlot.priority || itemInSlot == this) {
-                guiBase.setSlotItem(slot, this, player, messagePlaceholders);
+                guiBase.setSlotItem(slot, index, this, player, messagePlaceholders);
             }
         }
     }
 
     private boolean checkCondition(Player player) {
+        if(section == null)
+            return true;
         String conditionValue = section.getString("condition", null);
         if (conditionValue == null) {
             return true;
@@ -240,8 +258,9 @@ public class GuiItem {
         return Utils.checkCondition(player, conditionValue, new MessagePlaceholders(player));
     }
 
-    protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, GuiBase base) {
+    protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
         placeholders.put("%slot%", slot);
+        placeholders.put("%index%", index);
     }
 
     public boolean isRedraw() {
@@ -307,8 +326,7 @@ public class GuiItem {
         }
 
         public void handle() {
-            ConfigurationSection clickSettings = this.section;
-            if (clickSettings == null)
+            if (this.section == null)
                 return;
             if (!checkPermission())
                 return;

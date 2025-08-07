@@ -49,10 +49,10 @@ public class GuiManager implements Listener {
         guiElements.put(symbol, section);
     }
 
-    public GuiItem getGlobalItem(String symbol) {
+    public GuiItem getGlobalItem(String symbol, int slot, int index) {
         if (!guiElements.containsKey(symbol))
             return null;
-        return new GuiItem(0, guiElements.get(symbol));
+        return new GuiItem(0, slot, index, guiElements.get(symbol));
     }
 
 

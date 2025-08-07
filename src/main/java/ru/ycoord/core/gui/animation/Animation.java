@@ -69,7 +69,7 @@ public abstract class Animation {
                     if (character.item == null)
                         continue;
      
-                    base.setSlotItem(slot, character.item, player, messagePlaceholders);
+                    base.setSlotItem(slot, character.index, character.item, player, messagePlaceholders);
                 }
             }
             sleep();

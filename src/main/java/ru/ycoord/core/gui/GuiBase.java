@@ -20,13 +20,12 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.*;
 
-import static ru.ycoord.core.utils.Utils.convertTime;
-
 public class GuiBase implements InventoryHolder {
     private final ConfigurationSection section;
     private Inventory inventory = null;
     private HashMap<Integer, List<GuiItemCharacter>> items = new HashMap<>();
     private HashMap<Integer, GuiItem> slots = new HashMap<>();
+    protected HashMap<String, Integer> typeCounter = new HashMap<>();
     private Animation animation = null;
 
     public GuiBase(ConfigurationSection section) {
@@ -85,7 +84,7 @@ public class GuiBase implements InventoryHolder {
             for (int i = 0; i < guiItems.size(); i++) {
                 GuiItemCharacter guiItem = guiItems.get(i);
                 if (guiItem.item != null)
-                    guiItem.item.update(this, slot, elapsed, player, placeholders);
+                    guiItem.item.update(this, slot, guiItem.index, elapsed, player, placeholders);
             }
         }
     }
@@ -95,12 +94,18 @@ public class GuiBase implements InventoryHolder {
     }
 
     public static class GuiItemCharacter {
+        public int slot;
+        public int index;
         public GuiItem item;
         public Character character;
+        public String type;
 
-        public GuiItemCharacter(GuiItem item, Character character) {
+        public GuiItemCharacter(int index, int slot, String type, GuiItem item, Character character) {
+            this.index = index;
+            this.slot = slot;
             this.item = item;
             this.character = character;
+            this.type = type;
         }
     }
 
@@ -121,10 +126,10 @@ public class GuiBase implements InventoryHolder {
         });
     }
 
-    public void setSlotItem(int slot, GuiItem guiItem, Player player, MessagePlaceholders messagePlaceholders) {
+    public void setSlotItem(int slot, int index, GuiItem guiItem, Player player, MessagePlaceholders messagePlaceholders) {
         GuiItem itemInSlot = slots.get(slot);
         boolean onlyUpdateMeta = (itemInSlot == guiItem) && guiItem.isRedraw();
-        ItemStack itemStack = guiItem.buildItem(player, this, slot, messagePlaceholders, onlyUpdateMeta);
+        ItemStack itemStack = guiItem.buildItem(player, this, slot, index, messagePlaceholders, onlyUpdateMeta);
         if (itemStack == null)
             return;
         slots.put(slot, guiItem);
@@ -175,34 +180,42 @@ public class GuiBase implements InventoryHolder {
                     if (type == null)
                         continue;
 
+
                     found = true;
 
+                    int currentIndex = typeCounter.getOrDefault(type, 0);
                     guiElements.computeIfAbsent(slotIndex, k -> new LinkedList<>())
-                            .add(new GuiItemCharacter(makeItem(priority, player, type, itemSection), c));
+                            .add(new GuiItemCharacter(currentIndex, slotIndex, type, makeItem(currentIndex, slotIndex, priority, player, type, itemSection), c));
+                    typeCounter.put(type, currentIndex + 1);
                     priority++;
                 }
 
                 if (!found) {
-                    GuiItem item = YcoordCore.getInstance().getGuiManager().getGlobalItem(stringC);
+                    int currentIndex = typeCounter.getOrDefault("ITEM", 0);
+                    GuiItem item = YcoordCore.getInstance().getGuiManager().getGlobalItem(stringC, slotIndex, currentIndex);
                     if (item == null)
                         continue;
+
                     guiElements.computeIfAbsent(slotIndex, k -> new LinkedList<>())
-                            .add(new GuiItemCharacter(item, c));
+                            .add(new GuiItemCharacter(currentIndex, slotIndex, "ITEM", item, c));
+                    typeCounter.put("ITEM", currentIndex + 1);
                 }
+
             }
         }
         return guiElements;
     }
 
-    public GuiItem makeItem(int priority, OfflinePlayer player, String type, ConfigurationSection section) {
+
+    public GuiItem makeItem(int currentIndex, int slotIndex, int priority, OfflinePlayer player, String type, ConfigurationSection section) {
         Player onlinePlayer = player.getPlayer();
         if (onlinePlayer != null) {
             if (type.equalsIgnoreCase("VIEWER_HEAD")) {
-                return new GuiViewerHeadItem(onlinePlayer.getName(), priority, section);
+                return new GuiViewerHeadItem(onlinePlayer.getName(), priority, slotIndex, currentIndex, section);
             }
         }
 
-        return new GuiItem(priority, section);
+        return new GuiItem(priority, slotIndex, currentIndex, section);
     }
 
 

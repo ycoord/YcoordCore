@@ -16,8 +16,8 @@ public class GuiExample extends GuiBase {
 
     class HelloWorldButton extends GuiItem{
 
-        public HelloWorldButton(int priority, ConfigurationSection section) {
-            super(priority, section);
+        public HelloWorldButton(int priority, int slot, int index, ConfigurationSection section) {
+            super(priority, slot, index, section);
         }
 
         @Override
@@ -35,10 +35,10 @@ public class GuiExample extends GuiBase {
     }
 
     @Override
-    public GuiItem makeItem(int priority, OfflinePlayer player, String type, ConfigurationSection section) {
+    public GuiItem makeItem(int index, int slot, int priority, OfflinePlayer player, String type, ConfigurationSection section) {
         if(type.equalsIgnoreCase("HELLO_WORLD")){
-            return new  HelloWorldButton(priority, section);
+            return new  HelloWorldButton(priority, slot, index, section);
         }
-        return super.makeItem(priority, player, type, section);
+        return super.makeItem(index, slot, priority, player, type, section);
     }
 }

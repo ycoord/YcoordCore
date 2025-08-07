@@ -24,6 +24,7 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.nbt.NbtExtension;
 import ru.ycoord.core.utils.Utils;
+import ru.ycoord.examples.guis.ExampleDataGui;
 
 import java.util.List;
 import java.util.Map;
@@ -446,8 +447,8 @@ public class CoreCommand extends AdminCommand {
                     return false;
 
                 if (sender instanceof Player player) {
-                    GuiExample base = new GuiExample(YcoordCore.getInstance().getMenus().get("Example"));
-                    base.open(player);
+                    ExampleDataGui gui = new ExampleDataGui(YcoordCore.getInstance().getMenus().get("DataMenu"));
+                    gui.open(player);
                 }
 
                 return true;

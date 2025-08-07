@@ -15,13 +15,13 @@ public class GuiHeadItem extends GuiItem {
     @NotNull
     private final String name;
 
-    public GuiHeadItem(@NotNull String name, int priority, ConfigurationSection section) {
-        super(priority, section);
+    public GuiHeadItem(@NotNull String name, int priority, int slot, int index, ConfigurationSection section) {
+        super(priority, slot, index, section);
         this.name = name;
     }
 
     @Override
-    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, MessagePlaceholders placeholders,  boolean onlyUpdateMeta) {
+    public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, int index, MessagePlaceholders placeholders,  boolean onlyUpdateMeta) {
         ItemStack head = Utils.createPlayerHead(name);
 
         apply(clicker, head, placeholders);
