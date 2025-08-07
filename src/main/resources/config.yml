@@ -59,7 +59,15 @@ placeholders:
   8:
     placeholder: "%<<%"
     result: "«"
-
+  9:
+    placeholder: "%title%"
+    result: "&6&l▶&f"
+  10:
+    placeholder: "%accent%"
+    result: "&6"
+  11:
+    placeholder: "%bullet%"
+    result: "§f◦§r&7"
 
 default-string-completion:
   - <строка>

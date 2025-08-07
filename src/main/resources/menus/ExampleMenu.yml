@@ -28,7 +28,7 @@ open-command:
 pattern:
   - "####S####"
   - "####H####"
-  - "#########"
+  - "####W####"
   - "#########"
   - "#########"
   - "#########"
@@ -116,3 +116,11 @@ items:
       - ""
       - "§f◦§r &eЛКМ &7- уменьшить радиус"
       - "§f◦§r &eПКМ &7- увеличить радиус"
+
+  "helloworld":
+    symbol: 'W'
+    type: HELLO_WORLD
+    material: APPLE
+    name: "%title% Тестовая кнопка"
+    lore:
+      - "%bullet% Пишет %accent%hello world"
