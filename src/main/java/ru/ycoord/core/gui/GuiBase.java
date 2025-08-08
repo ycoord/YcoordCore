@@ -18,6 +18,7 @@ import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
+import ru.ycoord.core.sound.SoundInfo;
 
 import java.util.*;
 
@@ -29,11 +30,14 @@ public class GuiBase implements InventoryHolder {
     protected HashMap<String, Integer> typeCounter = new HashMap<>();
     private Animation animation = null;
     private boolean animateOnlyOnOpen = false;
+    private SoundInfo openSound = null;
+    private SoundInfo closeSound = null;
+
     public GuiBase(ConfigurationSection section) {
         this.section = section;
         ConfigurationSection animationSection = section.getConfigurationSection("animation");
         if (animationSection != null) {
-            this.animateOnlyOnOpen =  animationSection.getBoolean("only-on-open");
+            this.animateOnlyOnOpen = animationSection.getBoolean("only-on-open");
             String type = animationSection.getString("type");
             if (type != null) {
                 if (type.equalsIgnoreCase("CORNER")) {
@@ -52,9 +56,18 @@ public class GuiBase implements InventoryHolder {
                     animation = new NoAnimation(animationSection);
                 }
             }
-        }
-        else{
+        } else {
             animation = new NoAnimation(null);
+        }
+
+        ConfigurationSection openSound = section.getConfigurationSection("open-sound");
+        if (openSound != null) {
+            this.openSound = new SoundInfo(openSound);
+        }
+
+        ConfigurationSection closeSound = section.getConfigurationSection("close-sound");
+        if (closeSound != null) {
+            this.closeSound = new SoundInfo(closeSound);
         }
     }
 
@@ -75,9 +88,16 @@ public class GuiBase implements InventoryHolder {
         inventory = Bukkit.createInventory(this, size, Component.text(title));
         rebuild(player);
         Objects.requireNonNull(player.getPlayer()).openInventory(inventory);
+        if (openSound != null)
+            openSound.play(player);
     }
 
     public void onClose(InventoryCloseEvent event) {
+        if (closeSound != null) {
+            if (event.getPlayer() instanceof Player player) {
+                closeSound.play(player);
+            }
+        }
     }
 
     public void update(long elapsed, Player player) {
@@ -117,10 +137,9 @@ public class GuiBase implements InventoryHolder {
     protected void refresh(OfflinePlayer player, HashMap<Integer, List<GuiItemCharacter>> guiElements) {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
-        if (player.getPlayer() != null)
-        {
+        if (player.getPlayer() != null) {
             animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
-            if(animateOnlyOnOpen){
+            if (animateOnlyOnOpen) {
                 animateOnlyOnOpen = false;
                 animation = new NoAnimation(null);
             }

@@ -170,8 +170,6 @@ public class GuiItem {
                 clickSection = section.getConfigurationSection("left-click");
             else
                 clickSection = section.getConfigurationSection("right-click");
-            if (clickSection == null)
-                return;
         }
         ClickHandler clickHandler = new ClickHandler(player, clickSection, placeholders);
         clickHandler.handle();
@@ -319,7 +317,11 @@ public class GuiItem {
 
         public void handle() {
             if (this.section == null)
+            {
+                if(sound != null)
+                    sound.play(player);
                 return;
+            }
             if (!checkPermission())
                 return;
             if (!checkCondition())
@@ -365,9 +367,10 @@ public class GuiItem {
                     }
                 }
 
-                if(sound != null)
-                    sound.play(player);
             }
+
+            if(sound != null)
+                sound.play(player);
         }
 
         protected static class ParsedTag {

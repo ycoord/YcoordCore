@@ -11,7 +11,7 @@ gui-settings:
   item-sound:
     use-default: true
     default-sound:
-      name: ENTITY_EXPERIENCE_ORB_PICKUP
+      name: UI_BUTTON_CLICK
       category: AMBIENT
       pitch: 1
       volume: 0.5
