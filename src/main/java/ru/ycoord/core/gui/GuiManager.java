@@ -20,7 +20,8 @@ public class GuiManager implements Listener {
     private final HashMap<String, ConfigurationSection> guiElements = new HashMap<>();
     public static HashMap<String, Long> cooldowns = new HashMap<>();
     public static int cooldown = 100;
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null)
             return;
@@ -29,15 +30,9 @@ public class GuiManager implements Listener {
 
         InventoryHolder inventoryHolder = event.getClickedInventory().getHolder();
         if (inventoryHolder instanceof GuiBase holder) {
-            event.setCancelled(true);
-
             holder.handleClick((Player) event.getWhoClicked(), event);
-
         } else if (event.getInventory().getHolder() instanceof GuiBase holder) {
             holder.handleClickInventory((Player) event.getWhoClicked(), event);
-            if (event.isCancelled())
-                return;
-            event.setCancelled(true);
         }
     }
 

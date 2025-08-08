@@ -24,8 +24,8 @@ import java.util.*;
 public class GuiBase implements InventoryHolder {
     protected final ConfigurationSection section;
     private Inventory inventory = null;
-    private HashMap<Integer, List<GuiItemCharacter>> items = new HashMap<>();
-    private HashMap<Integer, GuiItem> slots = new HashMap<>();
+    protected HashMap<Integer, List<GuiItemCharacter>> items = new HashMap<>();
+    protected HashMap<Integer, GuiItem> slots = new HashMap<>();
     protected HashMap<String, Integer> typeCounter = new HashMap<>();
     private Animation animation = null;
     private boolean animateOnlyOnOpen = false;
@@ -141,8 +141,8 @@ public class GuiBase implements InventoryHolder {
         GuiItem itemInSlot = slots.get(slot);
         boolean onlyUpdateMeta = (itemInSlot == guiItem) && guiItem.isRedraw();
         ItemStack itemStack = guiItem.buildItem(player, this, slot, index, messagePlaceholders, onlyUpdateMeta);
-        if (itemStack == null)
-            return;
+        //if (itemStack == null)
+        //    return;
         slots.put(slot, guiItem);
         inventory.setItem(slot, itemStack);
     }

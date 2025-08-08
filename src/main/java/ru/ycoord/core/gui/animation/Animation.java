@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class Animation {
-    protected @Nullable final ConfigurationSection section;
+    protected @Nullable
+    final ConfigurationSection section;
     protected int duration = 10;
     protected boolean background = false;
     private Material backgroundMaterial = Material.AIR;
@@ -26,7 +27,7 @@ public abstract class Animation {
 
     public Animation(@Nullable ConfigurationSection section) {
         this.section = section;
-        if(section == null)
+        if (section == null)
             return;
         this.duration = section.getInt("duration", 10);
         ConfigurationSection backgroundSection = section.getConfigurationSection("background");
@@ -61,7 +62,7 @@ public abstract class Animation {
             }
         }
         List<List<Integer>> data = makeFrames(9, inventory.getSize() / 9);
-
+        boolean multipleFrames = data.size() > 1;
         //CompletableFuture.runAsync(() -> {
         for (List<Integer> slots : data) {
             for (Integer slot : slots) {
@@ -71,11 +72,12 @@ public abstract class Animation {
                 for (GuiBase.GuiItemCharacter character : guiElements.get(slot)) {
                     if (character.item == null)
                         continue;
-     
+
                     base.setSlotItem(slot, character.index, character.item, player, messagePlaceholders);
                 }
             }
-            sleep();
+            if (multipleFrames)
+                sleep();
         }
         //});
     }

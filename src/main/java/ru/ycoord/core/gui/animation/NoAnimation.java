@@ -32,9 +32,4 @@ public class NoAnimation extends Animation {
         frames.add(frame);
         return frames;
     }
-
-    @Override
-    void sleep() {
-
-    }
 }

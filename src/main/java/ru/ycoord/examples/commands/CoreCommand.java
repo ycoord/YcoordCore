@@ -16,7 +16,9 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.nbt.NbtExtension;
 import ru.ycoord.core.utils.Utils;
+import ru.ycoord.examples.guis.ExampleGuiListData;
 import ru.ycoord.examples.guis.ExampleGuiPagedData;
+import ru.ycoord.examples.guis.ExampleGuiSlotData;
 
 import java.util.List;
 import java.util.Map;
@@ -417,11 +419,11 @@ public class CoreCommand extends AdminCommand {
             }
         }
 
-        static class ExampleGui extends AdminCommand {
+        static class ExamplePagedGui extends AdminCommand {
 
             @Override
             public String getName() {
-                return "gui";
+                return "paged-gui";
             }
 
             @Override
@@ -447,13 +449,75 @@ public class CoreCommand extends AdminCommand {
             }
         }
 
+        static class ExampleListGui extends AdminCommand {
+
+            @Override
+            public String getName() {
+                return "list-gui";
+            }
+
+            @Override
+            public String getDescription(CommandSender sender) {
+                if (sender instanceof Player player) {
+                    MessagePlaceholders placeholders = new MessagePlaceholders(player);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId(MessageBase.Level.NONE, "messages.example-gui-description", placeholders);
+                }
+                return "";
+            }
+
+            @Override
+            public boolean execute(CommandSender sender, List<String> args, List<Object> params) {
+                if (!super.execute(sender, args, params))
+                    return false;
+
+                if (sender instanceof Player player) {
+                    ExampleGuiListData gui = new ExampleGuiListData(YcoordCore.getInstance().getMenus().get("DataMenu"));
+                    gui.open(player);
+                }
+
+                return true;
+            }
+        }
+
+        static class ExampleSlotGui extends AdminCommand {
+
+            @Override
+            public String getName() {
+                return "slot-gui";
+            }
+
+            @Override
+            public String getDescription(CommandSender sender) {
+                if (sender instanceof Player player) {
+                    MessagePlaceholders placeholders = new MessagePlaceholders(player);
+                    return YcoordCore.getInstance().getChatMessage().makeMessageId(MessageBase.Level.NONE, "messages.example-gui-description", placeholders);
+                }
+                return "";
+            }
+
+            @Override
+            public boolean execute(CommandSender sender, List<String> args, List<Object> params) {
+                if (!super.execute(sender, args, params))
+                    return false;
+
+                if (sender instanceof Player player) {
+                    ExampleGuiSlotData gui = new ExampleGuiSlotData(YcoordCore.getInstance().getMenus().get("DataMenu"));
+                    gui.open(player);
+                }
+
+                return true;
+            }
+        }
+
         @Override
         public List<Requirement> getRequirements(CommandSender sender) {
             return List.of(new SubcommandRequirement(this, List.of(
                     new ExampleMessageCommand(),
                     new ExampleNbtCommand(),
                     new ExamplePlayerHead(),
-                    new ExampleGui()
+                    new ExamplePagedGui(),
+                    new ExampleListGui(),
+                    new ExampleSlotGui()
             )));
         }
 

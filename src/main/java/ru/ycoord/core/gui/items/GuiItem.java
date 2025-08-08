@@ -4,6 +4,8 @@ package ru.ycoord.core.gui.items;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -33,8 +35,7 @@ public class GuiItem {
     private final int slot;
     private final int index;
     protected @Nullable ConfigurationSection section = null;
-    private SoundInfo sound = null;
-    private int priority;
+    private final int priority;
     private boolean redraw = false;
     protected final long current = System.currentTimeMillis();
     private List<String> lore = new LinkedList<>();
@@ -45,35 +46,12 @@ public class GuiItem {
         this.section = section;
         this.slot = slot;
         this.index = index;
-        if(section == null)
+        if (section == null)
             return;
 
 
         this.lore = section.getStringList("lore");
         this.redraw = section.getBoolean("redraw", false);
-        ConfigurationSection soundSection = section.getConfigurationSection("sound");
-
-        if (soundSection != null) {
-            this.sound = new SoundInfo(soundSection);
-        } else {
-            ConfigurationSection config = YcoordCore.getInstance().getConfig();
-            ConfigurationSection itemSettings = config.getConfigurationSection("gui-settings");
-            if (itemSettings == null)
-                return;
-
-            ConfigurationSection soundSettings = itemSettings.getConfigurationSection("item-sound");
-            if (soundSettings == null)
-                return;
-
-
-            boolean useDefaultSound = soundSettings.getBoolean("use-default", true);
-            if (useDefaultSound) {
-                ConfigurationSection defaultSoundSection = soundSettings.getConfigurationSection("default-sound");
-                if (defaultSoundSection == null)
-                    return;
-                this.sound = new SoundInfo(defaultSoundSection);
-            }
-        }
     }
 
     protected List<String> getLoreBefore(OfflinePlayer player) {
@@ -85,7 +63,7 @@ public class GuiItem {
     }
 
     public void apply(OfflinePlayer clicker, ItemStack stack, MessagePlaceholders placeholders) {
-        if(section == null)
+        if (section == null)
             return;
         List<String> loreBefore = getLoreBefore(clicker);
 
@@ -137,8 +115,7 @@ public class GuiItem {
         if (!checkCondition(clicker.getPlayer()))
             return null;
         getExtraPlaceholders(placeholders, slot, index, base);
-        if(!onlyMeta)
-        {
+        if (!onlyMeta) {
             this.stack = createItem(base, slot);
         }
         apply(clicker, this.stack, placeholders);
@@ -147,8 +124,8 @@ public class GuiItem {
 
     protected ItemStack createItem(GuiBase base, int slot) {
         ItemStack stack;
-        if(section == null)
-            return new  ItemStack(Material.AIR);
+        if (section == null)
+            return new ItemStack(Material.AIR);
         String texture = section.getString("texture", null);
         if (texture != null && !texture.isEmpty()) {
             ItemStack item = Utils.createPlayerHeadBase64(texture);
@@ -184,7 +161,7 @@ public class GuiItem {
     }
 
     private void handleClick(boolean left, Player player, MessagePlaceholders placeholders) {
-        if(section == null)
+        if (section == null)
             return;
         ConfigurationSection clickSection;
         clickSection = section.getConfigurationSection("click");
@@ -196,15 +173,12 @@ public class GuiItem {
             if (clickSection == null)
                 return;
         }
-        ClickHandler clickHandler = new ClickHandler(left, player, clickSection, placeholders);
+        ClickHandler clickHandler = new ClickHandler(player, clickSection, placeholders);
         clickHandler.handle();
     }
 
     public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
-        Inventory inventory = gui.getInventory();
-        ItemStack itemStack = inventory.getItem(event.getSlot());
-        if (itemStack == null || itemStack.getType() == Material.AIR)
-            return false;
+        event.setCancelled(true);
         if (event.getWhoClicked() instanceof Player clicker) {
             if (!checkCooldown(clicker))
                 return false;
@@ -248,7 +222,7 @@ public class GuiItem {
     }
 
     private boolean checkCondition(Player player) {
-        if(section == null)
+        if (section == null)
             return true;
         String conditionValue = section.getString("condition", null);
         if (conditionValue == null) {
@@ -268,16 +242,34 @@ public class GuiItem {
     }
 
     static class ClickHandler {
-        private final boolean left;
         private final Player player;
         private final ConfigurationSection section;
         private final MessagePlaceholders placeholders;
+        private SoundInfo sound = null;
 
-        public ClickHandler(boolean left, Player player, ConfigurationSection section, MessagePlaceholders placeholders) {
-            this.left = left;
+        public ClickHandler(Player player, ConfigurationSection section, MessagePlaceholders placeholders) {
             this.player = player;
             this.section = section;
             this.placeholders = placeholders;
+
+
+            ConfigurationSection config = YcoordCore.getInstance().getConfig();
+            ConfigurationSection itemSettings = config.getConfigurationSection("gui-settings");
+            if (itemSettings == null)
+                return;
+
+            ConfigurationSection soundSettings = itemSettings.getConfigurationSection("item-sound");
+            if (soundSettings == null)
+                return;
+
+
+            boolean useDefaultSound = soundSettings.getBoolean("use-default", true);
+            if (useDefaultSound) {
+                ConfigurationSection defaultSoundSection = soundSettings.getConfigurationSection("default-sound");
+                if (defaultSoundSection == null)
+                    return;
+                this.sound = new SoundInfo(defaultSoundSection);
+            }
         }
 
         private ParsedTag parseTaggedLine(String line) {
@@ -359,6 +351,12 @@ public class GuiItem {
                     Utils.executePlayer(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 } else if (tag.tag.equalsIgnoreCase("close")) {
                     player.closeInventory();
+                } else if (tag.tag.equalsIgnoreCase("sound")) {
+                    try {
+                        sound = new SoundInfo(Sound.valueOf(tag.value), SoundCategory.AMBIENT, 0.5f, 0);
+                    }catch (Exception e) {
+
+                    }
                 } else if (tag.tag.equalsIgnoreCase("open")) {
                     ConfigurationSection section = YcoordCore.getInstance().getMenus().get(tag.value);
                     if (section != null) {
@@ -366,6 +364,9 @@ public class GuiItem {
                         base.open(player);
                     }
                 }
+
+                if(sound != null)
+                    sound.play(player);
             }
         }
 
