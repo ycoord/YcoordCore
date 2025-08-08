@@ -15,8 +15,6 @@ import java.util.function.Predicate;
 
 public abstract class MessageBase {
     protected ConfigurationSection messagesSection;
-    protected boolean useDefaultSound = false;
-    protected SoundInfo defaultSound;
 
     public static class Style {
         public void preparePlaceholders(Level level, String key, String value) {
@@ -26,11 +24,15 @@ public abstract class MessageBase {
             public String prefix;
             public String placeholder;
             public String mainColor;
+            public SoundInfo sound = null;
 
             public LevelStyle(ConfigurationSection section) {
                 this.prefix = section.getString("prefix", "");
                 this.placeholder = section.getString("placeholder", "");
                 this.mainColor = section.getString("color", "");
+                ConfigurationSection soundSection = section.getConfigurationSection("sound");
+                if (soundSection != null)
+                    this.sound = new SoundInfo(soundSection);
             }
 
             public String apply(String text) {
@@ -46,9 +48,15 @@ public abstract class MessageBase {
                 String nonFormat = sb.toString();
 
                 text = text.replaceAll(key, String.format("%s%s%s", placeholder, key, mainColor));
-                text = text.replaceAll(nonFormat,key);
+                text = text.replaceAll(nonFormat, key);
 
                 return text;
+            }
+
+            public void playSound(OfflinePlayer listener){
+                if(sound == null)
+                    return;
+                this.sound.play(listener);
             }
         }
 
@@ -94,6 +102,22 @@ public abstract class MessageBase {
             return message;
         }
 
+        public void playSound(Level level, OfflinePlayer listener) {
+            switch (level) {
+                case INFO -> {
+                    info.playSound(listener);
+                }
+                case SUCCESS -> {
+                    success.playSound(listener);
+                }
+                case ERROR -> {
+                    error.playSound(listener);
+                }
+                case NONE -> {
+                }
+            }
+        }
+
 
         public String preparePlaceholder(String text, Level level, String key) {
 
@@ -125,30 +149,15 @@ public abstract class MessageBase {
     public enum Level {
         INFO, SUCCESS, ERROR, NONE
     }
+
     public MessageBase(YcoordCore core, ConfigurationSection messagesSection) {
         this.messagesSection = messagesSection;
 
         ConfigurationSection config = core.getConfig();
-        ConfigurationSection messagesSettings = config.getConfigurationSection("messages-settings");
-        if (messagesSettings == null)
-            return;
 
-        ConfigurationSection soundSettings = messagesSettings.getConfigurationSection("sound");
-        if (soundSettings == null)
-            return;
-
-
-        this.useDefaultSound = soundSettings.getBoolean("use-default", true);
-        if (this.useDefaultSound) {
-            ConfigurationSection defaultSoundSection = soundSettings.getConfigurationSection("default-sound");
-            if (defaultSoundSection == null)
-                this.useDefaultSound = false;
-            else
-                this.defaultSound = new SoundInfo(defaultSoundSection);
-        }
 
         ConfigurationSection mainConfig = core.getConfig();
-        ConfigurationSection style = mainConfig = mainConfig.getConfigurationSection("style");
+        ConfigurationSection style = mainConfig.getConfigurationSection("style");
         if (style == null)
             return;
 

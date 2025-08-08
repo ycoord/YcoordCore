@@ -124,8 +124,11 @@ public class ChatMessage extends MessageBase {
                 }
             }
         }
-        if (!hasSound && useDefaultSound) {
-            defaultSound.play(player);
+        if (!hasSound) {
+            MessageBase.Style style = YcoordCore.getInstance().getChatMessage().getStyle();
+            if (style != null) {
+                style.playSound(level, player);
+            }
         }
     }
 

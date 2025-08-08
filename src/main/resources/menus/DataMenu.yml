@@ -7,13 +7,14 @@ open-sound:
 close-sound:
   name: BLOCK_ENDER_CHEST_CLOSE
 animation:
+  lock: true
   background:
     enabled: true
     material: BLACK_STAINED_GLASS_PANE
     name: ""
   type: CORNER
   center: true
-  duration: 75
+  duration: 100
 open-command:
   name: ycoordgui
   permission: "*"

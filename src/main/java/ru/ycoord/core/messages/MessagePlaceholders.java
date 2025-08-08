@@ -65,15 +65,14 @@ public class MessagePlaceholders {
         }
 
         for (String key : keyValues.keySet()) {
-
-            text = style.preparePlaceholder(text, level, key);
+            if (style != null)
+                text = style.preparePlaceholder(text, level, key);
         }
 
         for (String key : keyValues.keySet()) {
 
             text = text.replace(key, keyValues.get(key));
         }
-
 
 
         return ChatColor.translateAlternateColorCodes('&', text);

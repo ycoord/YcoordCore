@@ -1,12 +1,3 @@
-messages-settings:
-  sound:
-    use-default: true
-    default-sound:
-      name: ENTITY_EXPERIENCE_ORB_PICKUP
-      category: AMBIENT
-      pitch: 1
-      volume: 0.5
-
 gui-settings:
   item-sound:
     use-default: true
@@ -16,7 +7,7 @@ gui-settings:
       pitch: 1
       volume: 0.5
 
-#&cⓧ &c&lСистема &8»&f Команды &a «%command%»&f не существует! Возможные значения &e%possible%
+#Команды &a «%command%»&f не существует! Возможные значения &e%possible%
 
 style:
   use: true
@@ -24,14 +15,26 @@ style:
     prefix: "&6%!X% &6&lСистема &8%!>>%%!text-color% "
     placeholder: "&6"
     color: "%text-color%"
+    sound:
+      name: ENTITY_ITEM_PICKUP
+      pitch: 1.2
+      volume: 0.2
+
   success:
-    prefix: "&2%X% &6&lСистема &8%>>%%text-color% "
+    prefix: "&2%X% &e&lСистема &8%>>%%text-color% "
     placeholder: "&a"
     color: "%text-color%"
+    sound:
+      name: ENTITY_EXPERIENCE_ORB_PICKUP
+      pitch: 1.2
   error:
     prefix: "&c%X% &c&lСистема &8%>>%%text-color% "
     placeholder: "&c"
     color: "%text-color%"
+    sound:
+      name: BLOCK_NOTE_BLOCK_BASS
+      pitch: 0.7
+      volume: 1
 
 
 placeholders:
@@ -90,106 +93,62 @@ nick-completion:
 
 messages:
   cooldown:
-    - "Не так быстро! %player%"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Не так быстро! %executor%"
+    
   not-float:
-    - "&cⓧ &c&lСистема &8»&f Не является вещественным числом!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Не является вещественным числом!"
+    
   data-is-loading:
     - "Данные загружаются, подождите..."
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
   animation-in-progress:
     - "Вы не можете кликать по инвентарю, пока идет анимация!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
   not-integer:
-    - "&cⓧ &c&lСистема &8»&f Не является целым числом!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Не является целым числом!"
   no-subcommand:
-    - "&cⓧ &c&lСистема &8»&f Команды &a «%command%»&f не существует! Возможные значения &e%possible%"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Команды &a «%command%» не существует! Возможные значения %possible%"
   no-range:
-    - "&cⓧ &c&lСистема &8»&f Значение должно быть в диапазоне &e[%min%...%max%]"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Значение должно быть в диапазоне &e[%min%...%max%&e]"
+    
   need-param:
-    - "&cⓧ &c&lСистема&8»&f Недостаточно параметров!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Недостаточно параметров!"
+    
   player-cant:
-    - "&cⓧ &c&lСистема &8»&f Игроки не могут использовать данную команду!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Игроки не могут использовать данную команду!"
+    
   no-permission:
-    - "&cⓧ &c&lСистема &8»&f У вас нет прав!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "У вас нет прав!"
+    
   no-condition:
-    - "&cⓧ &c&lСистема &8»&f Условие не выполняется"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Условие не выполняется"
+    
   player-offline:
-    - "&cⓧ &c&lСистема &8»&f Игрок &e%player%&f не в сети!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Игрок %player% не в сети!"
+    
 
   float-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: &eвещественное число"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: &eвещественное число"
+    
   integer-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: &eчисло"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: &eчисло"
+    
   online-player-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: &eонлайн игрок"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: &eонлайн игрок"
+    
   player-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: &eигрок"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: &eигрок"
+    
   ranged-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: число в диапазоне от %min% до %max%"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: число в диапазоне от %min% до %max%"
+    
   string-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: &eстрока"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: &eстрока"
+    
   subcommand-error:
-    - "&cⓧ &c&lСистема &8»&f Необходим параметр: команда &e%possible%"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Необходим параметр: команда %possible%"
+    
   unknown-command:
-    - "&cⓧ &c&lСистема &8»&f %pre% Неизвестная команда!"
-    - sound-key:
-        type: SOUND
-        name: ENTITY_VILLAGER_NO
+    - "Неизвестная команда!"
+    
 
 
   no-block:
