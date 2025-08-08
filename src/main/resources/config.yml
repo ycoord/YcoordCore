@@ -104,6 +104,11 @@ messages:
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO
+  animation-in-progress:
+    - "Вы не можете кликать по инвентарю, пока идет анимация!"
+    - sound-key:
+        type: SOUND
+        name: ENTITY_VILLAGER_NO
   not-integer:
     - "&cⓧ &c&lСистема &8»&f Не является целым числом!"
     - sound-key:

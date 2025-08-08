@@ -16,9 +16,11 @@ import ru.ycoord.core.gui.animation.*;
 import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
+import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.sound.SoundInfo;
+import ru.ycoord.core.transaction.TransactionManager;
 
 import java.util.*;
 
@@ -32,11 +34,14 @@ public class GuiBase implements InventoryHolder {
     private boolean animateOnlyOnOpen = false;
     private SoundInfo openSound = null;
     private SoundInfo closeSound = null;
+    private boolean lockOnAnimation;
 
     public GuiBase(ConfigurationSection section) {
         this.section = section;
         ConfigurationSection animationSection = section.getConfigurationSection("animation");
         if (animationSection != null) {
+            lockOnAnimation = section.getBoolean("lock", false);
+
             this.animateOnlyOnOpen = animationSection.getBoolean("only-on-open");
             String type = animationSection.getString("type");
             if (type != null) {
@@ -93,8 +98,14 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void onClose(InventoryCloseEvent event) {
+
+
         if (closeSound != null) {
             if (event.getPlayer() instanceof Player player) {
+                if (lockOnAnimation && TransactionManager.inProgress(player.getName(), this.getClass().getSimpleName())) {
+                    TransactionManager.unlock(player.getName(), this.getClass().getSimpleName());
+                    return;
+                }
                 closeSound.play(player);
             }
         }
@@ -150,9 +161,13 @@ public class GuiBase implements InventoryHolder {
     public void rebuild(OfflinePlayer player) {
         typeCounter.clear();
         Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
+            if(lockOnAnimation)
+                TransactionManager.lock(player.getName(), this.getClass().getSimpleName());
             inventory.clear();
             this.items = make(player, section);
             refresh(player, items);
+            if(lockOnAnimation)
+                TransactionManager.unlock(player.getName(), this.getClass().getSimpleName());
         });
     }
 
@@ -253,6 +268,13 @@ public class GuiBase implements InventoryHolder {
 
 
     public void handleClick(Player clicker, InventoryClickEvent e) {
+
+        if (lockOnAnimation && TransactionManager.inProgress(clicker.getName(), this.getClass().getSimpleName())) {
+            e.setCancelled(true);
+            ChatMessage chat = YcoordCore.getInstance().getChatMessage();
+            chat.sendMessageId(MessageBase.Level.INFO, clicker, "animation-in-progress");
+            return;
+        }
         int slot = e.getSlot();
         if (!this.slots.containsKey(slot))
             return;
