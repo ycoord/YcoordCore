@@ -99,6 +99,11 @@ messages:
     - sound-key:
         type: SOUND
         name: ENTITY_VILLAGER_NO
+  data-is-loading:
+    - "Данные загружаются, подождите..."
+    - sound-key:
+        type: SOUND
+        name: ENTITY_VILLAGER_NO
   not-integer:
     - "&cⓧ &c&lСистема &8»&f Не является целым числом!"
     - sound-key:

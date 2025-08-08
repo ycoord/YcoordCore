@@ -6,10 +6,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiSlot;
+import ru.ycoord.core.messages.ChatMessage;
+import ru.ycoord.core.messages.MessageBase;
+import ru.ycoord.core.transaction.TransactionManager;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ExampleGuiSlotData extends GuiBase {
@@ -19,19 +24,27 @@ public class ExampleGuiSlotData extends GuiBase {
 
     private static final ConcurrentHashMap<String, ConcurrentHashMap<Integer, ItemStack>> items = new ConcurrentHashMap<>();
 
-    private void save(Player player, Inventory inventory) {
-        for (Integer slot : slots.keySet()) {
-            GuiItem item = slots.get(slot);
-            if (item instanceof GuiSlot) {
-                items.computeIfAbsent(player.getName(), k -> new ConcurrentHashMap<>());
-                ConcurrentHashMap<Integer, ItemStack> value = items.get(player.getName());
-                ItemStack v = inventory.getItem(slot);
-                if (v == null)
-                    value.remove(slot);
-                else
-                    value.put(slot, v);
+    private void saveAsync(Player player, Inventory inventory) {
+        CompletableFuture.runAsync(() -> {
+            TransactionManager.lock(player.getName(), "SAVE_SLOT_DATA");
+            for (Integer slot : slots.keySet()) {
+                GuiItem item = slots.get(slot);
+                if (item instanceof GuiSlot) {
+                    ConcurrentHashMap<Integer, ItemStack> value = items.computeIfAbsent(player.getName(), k -> new ConcurrentHashMap<>());
+                    ItemStack v = inventory.getItem(slot);
+                    if (v == null)
+                        value.remove(slot);
+                    else
+                        value.put(slot, v);
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception ex) {
+                    }
+                }
             }
-        }
+            TransactionManager.unlock(player.getName(), "SAVE_SLOT_DATA");
+        });
     }
 
     public GuiItem makeItem(int currentIndex, int slotIndex, int priority, OfflinePlayer player, String type, ConfigurationSection section) {
@@ -43,7 +56,7 @@ public class ExampleGuiSlotData extends GuiBase {
 
                     @Override
                     public void saveAll(Player clicker, Inventory inventory) {
-                        save(clicker, inventory);
+                        saveAsync(clicker, inventory);
                     }
 
                     @Override
@@ -67,7 +80,19 @@ public class ExampleGuiSlotData extends GuiBase {
     public void onClose(InventoryCloseEvent event) {
         super.onClose(event);
         if (event.getPlayer() instanceof Player player) {
-            save(player, getInventory());
+            saveAsync(player, getInventory());
         }
+    }
+
+    @Override
+    public void open(OfflinePlayer player) {
+        if (TransactionManager.inProgress(player.getName(), "SAVE_SLOT_DATA")) {
+
+            ChatMessage message = YcoordCore.getInstance().getChatMessage();
+            message.sendMessageId(MessageBase.Level.INFO, player, "data-is-loading");
+
+            return;
+        }
+        super.open(player);
     }
 }
