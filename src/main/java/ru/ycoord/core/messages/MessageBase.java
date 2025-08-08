@@ -17,9 +17,6 @@ public abstract class MessageBase {
     protected ConfigurationSection messagesSection;
 
     public static class Style {
-        public void preparePlaceholders(Level level, String key, String value) {
-        }
-
         public static class LevelStyle {
             public String prefix;
             public String placeholder;
@@ -152,9 +149,6 @@ public abstract class MessageBase {
 
     public MessageBase(YcoordCore core, ConfigurationSection messagesSection) {
         this.messagesSection = messagesSection;
-
-        ConfigurationSection config = core.getConfig();
-
 
         ConfigurationSection mainConfig = core.getConfig();
         ConfigurationSection style = mainConfig.getConfigurationSection("style");
