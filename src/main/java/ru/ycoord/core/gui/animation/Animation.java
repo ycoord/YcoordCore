@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class Animation {
     protected @Nullable final ConfigurationSection section;
     protected int duration = 10;
-    private boolean background = false;
+    protected boolean background = false;
     private Material backgroundMaterial = Material.AIR;
     private String backgroundName = "";
 

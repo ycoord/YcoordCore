@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.animation.*;
+import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
 import ru.ycoord.core.messages.MessageBase;
@@ -27,11 +28,12 @@ public class GuiBase implements InventoryHolder {
     private HashMap<Integer, GuiItem> slots = new HashMap<>();
     protected HashMap<String, Integer> typeCounter = new HashMap<>();
     private Animation animation = null;
-
+    private boolean animateOnlyOnOpen = false;
     public GuiBase(ConfigurationSection section) {
         this.section = section;
         ConfigurationSection animationSection = section.getConfigurationSection("animation");
         if (animationSection != null) {
+            this.animateOnlyOnOpen =  animationSection.getBoolean("only-on-open");
             String type = animationSection.getString("type");
             if (type != null) {
                 if (type.equalsIgnoreCase("CORNER")) {
@@ -50,6 +52,9 @@ public class GuiBase implements InventoryHolder {
                     animation = new NoAnimation(animationSection);
                 }
             }
+        }
+        else{
+            animation = new NoAnimation(null);
         }
     }
 
@@ -113,14 +118,20 @@ public class GuiBase implements InventoryHolder {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null)
+        {
             animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
+            if(animateOnlyOnOpen){
+                animateOnlyOnOpen = false;
+                animation = new NoAnimation(null);
+            }
+        }
 
     }
 
     public void rebuild(OfflinePlayer player) {
-        inventory.clear();
         typeCounter.clear();
         Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
+            inventory.clear();
             this.items = make(player, section);
             refresh(player, items);
         });
@@ -212,6 +223,9 @@ public class GuiBase implements InventoryHolder {
         if (onlinePlayer != null) {
             if (type.equalsIgnoreCase("VIEWER_HEAD")) {
                 return new GuiViewerHeadItem(onlinePlayer.getName(), priority, slotIndex, currentIndex, section);
+            }
+            if (type.equalsIgnoreCase("BACK")) {
+                return new GuiBackButton(priority, slotIndex, currentIndex, section);
             }
         }
 

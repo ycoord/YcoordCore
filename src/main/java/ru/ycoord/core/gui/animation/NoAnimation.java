@@ -15,6 +15,7 @@ import java.util.List;
 public class NoAnimation extends Animation {
     public NoAnimation(@Nullable ConfigurationSection section) {
         super(section);
+        background = false;
     }
 
 
@@ -30,5 +31,10 @@ public class NoAnimation extends Animation {
         }
         frames.add(frame);
         return frames;
+    }
+
+    @Override
+    void sleep() {
+
     }
 }

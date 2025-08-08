@@ -1,12 +1,15 @@
 package ru.ycoord.examples.guis;
 
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.gui.GuiListData;
 import ru.ycoord.core.gui.GuiPagedData;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.gui.items.GuiItem;
+import ru.ycoord.core.gui.items.GuiItemStack;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
 public class ExampleGuiPagedData extends GuiListData {
@@ -14,12 +17,12 @@ public class ExampleGuiPagedData extends GuiListData {
         super(section);
     }
 
-    static class Marker extends GuiItem {
+    static class Marker extends GuiItemStack {
 
         private final int dataIndex;
 
-        public Marker(int dataIndex, int priority, int slot, int index, @Nullable ConfigurationSection section) {
-            super(priority, slot, index, section);
+        public Marker(ItemStack stack, int dataIndex, int priority, int slot, int index, @Nullable ConfigurationSection section) {
+            super(stack, priority, slot, index, section);
             this.dataIndex = dataIndex;
         }
 
@@ -28,11 +31,13 @@ public class ExampleGuiPagedData extends GuiListData {
             super.getExtraPlaceholders(placeholders, slot, index, base);
             placeholders.put("%data-index%", dataIndex);
         }
+
+
     }
 
     @Override
     protected GuiItem getItem(int dataIndex, int currentMarkerIndex, int priority, OfflinePlayer player, int slotIndex, String type, ConfigurationSection config) {
-        return new Marker(dataIndex, priority, slotIndex, currentMarkerIndex, config);
+        return new Marker(new ItemStack(Material.values()[20+dataIndex]), dataIndex, priority, slotIndex, currentMarkerIndex, config);
     }
 
     @Override
