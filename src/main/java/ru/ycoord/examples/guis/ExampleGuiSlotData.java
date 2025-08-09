@@ -89,7 +89,7 @@ public class ExampleGuiSlotData extends GuiBase {
         if (TransactionManager.inProgress(player.getName(), "SAVE_SLOT_DATA")) {
 
             ChatMessage message = YcoordCore.getInstance().getChatMessage();
-            message.sendMessageId(MessageBase.Level.INFO, player, "data-is-loading");
+            message.sendMessageIdAsync(MessageBase.Level.INFO, player, "data-is-loading");
 
             return;
         }

@@ -11,6 +11,7 @@ import ru.ycoord.YcoordCore;
 import ru.ycoord.core.sound.SoundInfo;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 public abstract class MessageBase {
@@ -171,7 +172,7 @@ public abstract class MessageBase {
         return PlaceholderAPI.setPlaceholders(messagePlaceholders.getPlayer(), value);
     }
 
-    public void sendMessageId(Level level, OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
+    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
         @NotNull List<String> messages = getSection().getStringList(id);
         if (messages.isEmpty()) {
             messages = List.of(def);
@@ -181,6 +182,7 @@ public abstract class MessageBase {
         for (String message : messages) {
             displayMessage(level, player, makeMessage(level, message, messagePlaceholders));
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     public static String makeMessage(Level level, String message, MessagePlaceholders messagePlaceholders) {
@@ -200,16 +202,16 @@ public abstract class MessageBase {
 
     public abstract void displayMessage(Level level, OfflinePlayer player, String messages);
 
-    public final void sendMessageId(Level level, OfflinePlayer player, String id, String def) {
-        sendMessageId(level, player, id, def, new MessagePlaceholders(player));
+    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def) {
+        sendMessageIdAsync(level, player, id, def, new MessagePlaceholders(player));
     }
 
-    public final void sendMessageId(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
-        sendMessageId(level, player, id, "", messagePlaceholders);
+    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
+        sendMessageIdAsync(level, player, id, "", messagePlaceholders);
     }
 
-    public final void sendMessageId(Level level, OfflinePlayer player, String id) {
-        sendMessageId(level, player, id, "", new MessagePlaceholders(player));
+    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id) {
+        sendMessageIdAsync(level, player, id, "", new MessagePlaceholders(player));
     }
 
     public void broadcastAll(Level level, OfflinePlayer sender, String id, String def, MessagePlaceholders messagePlaceholders) {
@@ -225,7 +227,7 @@ public abstract class MessageBase {
             if (sender != null)
                 if (sender.getUniqueId().equals(p.getUniqueId()))
                     return;
-            sendMessageId(level, p, id, def, messagePlaceholders);
+            sendMessageIdAsync(level, p, id, def, messagePlaceholders);
         });
     }
 }

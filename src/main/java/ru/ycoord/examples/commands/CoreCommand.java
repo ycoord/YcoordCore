@@ -43,7 +43,7 @@ public class CoreCommand extends AdminCommand {
 
                     if (sender instanceof Player player) {
                         YcoordCore core = YcoordCore.getInstance();
-                        core.getChatMessage().sendMessageId(MessageBase.Level.INFO,player,
+                        core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO,player,
                                 "messages.default-message",
                                 new MapMessages(player, Map.of(
                                         "%some%", "some value"
@@ -79,7 +79,7 @@ public class CoreCommand extends AdminCommand {
 
                     if (sender instanceof Player player) {
                         YcoordCore core = YcoordCore.getInstance();
-                        core.getChatMessage().sendMessageId(MessageBase.Level.INFO, player,
+                        core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player,
                                 "messages.sound-placeholder-particle-command-hover",
                                 new MapMessages(player, Map.of(
                                         "%some%", "some value"
@@ -140,14 +140,14 @@ public class CoreCommand extends AdminCommand {
                             Block block = player.getTargetBlock(5);
                             if (block == null) {
                                 YcoordCore core = YcoordCore.getInstance();
-                                core.getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.no-block");
+                                core.getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.no-block");
                                 return false;
                             }
 
                             String value = NbtExtension.getString(block.getState(), getParam());
 
                             YcoordCore core = YcoordCore.getInstance();
-                            core.getChatMessage().sendMessageId(MessageBase.Level.INFO, player, "messages.block-data", new MapMessages(player, Map.of(
+                            core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player, "messages.block-data", new MapMessages(player, Map.of(
                                     "%value%", value
                             )));
                         }
@@ -189,9 +189,9 @@ public class CoreCommand extends AdminCommand {
                         String value = core.getPlayerDataCache().get(targetPlayer, key);
                         if (value == null) {
                             if (sender instanceof Player player)
-                                core.getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.no-key");
+                                core.getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.no-key");
                         } else if (sender instanceof Player player) {
-                            core.getChatMessage().sendMessageId(MessageBase.Level.INFO, player, "messages.player-get-data", new MapMessages(player, Map.of(
+                            core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player, "messages.player-get-data", new MapMessages(player, Map.of(
                                     "%value%", value
                             )));
                         }
@@ -255,7 +255,7 @@ public class CoreCommand extends AdminCommand {
                             Block block = player.getTargetBlock(5);
                             if (block == null) {
                                 YcoordCore core = YcoordCore.getInstance();
-                                core.getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.no-block");
+                                core.getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.no-block");
                                 return false;
                             }
 
@@ -264,7 +264,7 @@ public class CoreCommand extends AdminCommand {
 
                             NbtExtension.setString(block.getState(), key, value);
                             YcoordCore core = YcoordCore.getInstance();
-                            core.getChatMessage().sendMessageId(MessageBase.Level.INFO, player, "messages.block-set-data", new MapMessages(player, Map.of(
+                            core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player, "messages.block-set-data", new MapMessages(player, Map.of(
                                     "%key%", key,
                                     "%value%", value
                             )));
@@ -310,7 +310,7 @@ public class CoreCommand extends AdminCommand {
 
                             core.getPlayerDataCache().add(targetPlayer, key, value);
 
-                            core.getChatMessage().sendMessageId(MessageBase.Level.INFO, player, "messages.player-set-data", new MapMessages(player, Map.of(
+                            core.getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player, "messages.player-set-data", new MapMessages(player, Map.of(
                                     "%key%", key,
                                     "%value%", value
                             )));

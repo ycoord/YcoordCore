@@ -272,7 +272,7 @@ public class GuiBase implements InventoryHolder {
         if (lockOnAnimation && TransactionManager.inProgress(clicker.getName(), this.getClass().getSimpleName())) {
             e.setCancelled(true);
             ChatMessage chat = YcoordCore.getInstance().getChatMessage();
-            chat.sendMessageId(MessageBase.Level.INFO, clicker, "animation-in-progress");
+            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "animation-in-progress");
             return;
         }
         int slot = e.getSlot();

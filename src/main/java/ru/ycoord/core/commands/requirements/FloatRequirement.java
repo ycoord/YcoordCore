@@ -25,7 +25,7 @@ public class FloatRequirement extends Requirement {
     public void failed(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.float-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.float-error");
         }
     }
 
@@ -33,7 +33,7 @@ public class FloatRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.float-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.float-description");
         }
     }
 
@@ -43,7 +43,7 @@ public class FloatRequirement extends Requirement {
             return Float.parseFloat(param);
         }catch (NumberFormatException ex){
             if (command.getSender() instanceof Player player) {
-                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.not-float");
+                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.not-float");
 
             }
             return null;

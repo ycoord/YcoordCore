@@ -80,12 +80,12 @@ public abstract class Command {
 
     protected void unknownCommand(CommandSender sender) {
         if (sender instanceof Player player)
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.unknown-command", "неизвестная команда", null);
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.unknown-command", "неизвестная команда", null);
     }
 
     protected void noPermission(CommandSender sender) {
         if (sender instanceof Player player)
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, "messages.no-permission", "нет прав", null);
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.no-permission", "нет прав", null);
     }
 
     protected boolean unknownCommandIfCantExecute() {
@@ -103,7 +103,7 @@ public abstract class Command {
         }
 
         if (!canPlayerExecute() && (sender instanceof Player player)) {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.player-cant");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.player-cant");
 
             return false;
         }
@@ -166,7 +166,7 @@ public abstract class Command {
         if (params.size() <= paramCounter) {
             if (sender instanceof Player player) {
                 if (noParamOk)
-                    YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.need-param");
+                    YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.need-param");
             }
 
             return null;

@@ -31,7 +31,7 @@ public class PlayerRequirement extends Requirement {
     public void failed(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.player-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.player-error");
         }
     }
 
@@ -39,7 +39,7 @@ public class PlayerRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.offline-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.offline-description");
         }
     }
 }

@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -153,7 +152,7 @@ public class GuiItem {
                     return true;
                 }
 
-                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, clicker, "messages.cooldown", new MessagePlaceholders(clicker));
+                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, clicker, "messages.cooldown", new MessagePlaceholders(clicker));
 
             }
         }
@@ -297,7 +296,7 @@ public class GuiItem {
             }
 
             String noPermissionMessageId = section.getString("no-permission-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, noPermissionMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noPermissionMessageId, new MessagePlaceholders(player));
             return false;
         }
 
@@ -311,7 +310,7 @@ public class GuiItem {
                 return true;
 
             String noCheckMessageId = section.getString("no-condition-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR, player, noCheckMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noCheckMessageId, new MessagePlaceholders(player));
             return false;
         }
 
@@ -337,16 +336,16 @@ public class GuiItem {
                     player.sendMessage(message);
                 } else if (tag.tag.equalsIgnoreCase("id-none")) {
                     String message = tag.value;
-                    chatMessage.sendMessageId(MessageBase.Level.NONE, player, message, placeholders);
+                    chatMessage.sendMessageIdAsync(MessageBase.Level.NONE, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("id-info")) {
                     String message = tag.value;
-                    chatMessage.sendMessageId(MessageBase.Level.INFO, player, message, placeholders);
+                    chatMessage.sendMessageIdAsync(MessageBase.Level.INFO, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("id-error")) {
                     String message = tag.value;
-                    chatMessage.sendMessageId(MessageBase.Level.ERROR, player, message, placeholders);
+                    chatMessage.sendMessageIdAsync(MessageBase.Level.ERROR, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("id-success")) {
                     String message = tag.value;
-                    chatMessage.sendMessageId(MessageBase.Level.SUCCESS, player, message, placeholders);
+                    chatMessage.sendMessageIdAsync(MessageBase.Level.SUCCESS, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("console")) {
                     Utils.executeConsole(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 } else if (tag.tag.equalsIgnoreCase("player")) {

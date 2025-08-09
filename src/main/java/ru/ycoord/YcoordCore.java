@@ -104,10 +104,10 @@ public final class YcoordCore extends YcoordPlugin {
         return List.of(new CoreCommand());
     }
 
-    @Override
-    public IPlaceholderAPI getPlaceholderAPI() {
-        return new CorePlaceholders();
-    }
+    //@Override
+    //public IPlaceholderAPI getPlaceholderAPI() {
+    //    return new CorePlaceholders();
+    //}
 
     static class Handler implements CommandExecutor, TabCompleter {
 

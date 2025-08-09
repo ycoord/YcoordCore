@@ -40,7 +40,7 @@ public class RangedIntegerRequirement extends IntegerRequirement {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             placeholders.put("%min%", min);
             placeholders.put("%max%", max);
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.no-range", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.no-range", placeholders);
         }
 
         return null;
@@ -54,7 +54,7 @@ public class RangedIntegerRequirement extends IntegerRequirement {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             placeholders.put("%min%", min);
             placeholders.put("%max%", max);
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.ranged-error", placeholders);
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.ranged-error", placeholders);
 
         }
     }

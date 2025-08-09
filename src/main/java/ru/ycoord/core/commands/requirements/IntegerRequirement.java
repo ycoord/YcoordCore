@@ -26,7 +26,7 @@ public class IntegerRequirement extends Requirement {
             return Integer.parseInt(param);
         } catch (NumberFormatException ex) {
             if (command.getSender() instanceof Player player) {
-                YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.not-integer");
+                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.not-integer");
 
             }
             return null;
@@ -36,7 +36,7 @@ public class IntegerRequirement extends Requirement {
     @Override
     public void failed(CommandSender sender) {
         if (sender instanceof Player player) {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.integer-error");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.integer-error");
         }
     }
 
@@ -44,7 +44,7 @@ public class IntegerRequirement extends Requirement {
     public void sendDescription(CommandSender sender) {
         if (sender instanceof Player player)
         {
-            YcoordCore.getInstance().getChatMessage().sendMessageId(MessageBase.Level.ERROR,player, "messages.integer-description");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.integer-description");
         }
     }
 }
