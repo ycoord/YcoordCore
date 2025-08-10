@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
+import ru.ycoord.core.transaction.TransactionManager;
 
 public class GuiSlot extends GuiItem {
     protected final IItemProvider provider;
@@ -37,14 +38,20 @@ public class GuiSlot extends GuiItem {
     }
 
 
-    @Override
-    public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
-        if (!super.handleClick(gui, event, placeholders))
-            return false;
-        event.setCancelled(false);
-        if (event.getWhoClicked() instanceof Player player) {
-            provider.saveAll(player, event.getInventory());
-        }
-        return true;
-    }
+    //@Override
+    //public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
+    //    if (!super.handleClick(gui, event, placeholders))
+    //        return false;
+//
+    //    if (event.getWhoClicked() instanceof Player player) {
+    //            if(TransactionManager.inProgress(player.getName(), "SAVE_SLOT_DATA"))
+    //                return false;
+    //
+    //            event.setCancelled(false);
+    //            provider.saveAll(player, event.getInventory());
+    //        }
+    //    return true;
+    //}
+
+
 }

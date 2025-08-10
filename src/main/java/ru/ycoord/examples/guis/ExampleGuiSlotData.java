@@ -3,7 +3,9 @@ package ru.ycoord.examples.guis;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.ycoord.YcoordCore;
@@ -38,7 +40,7 @@ public class ExampleGuiSlotData extends GuiBase {
                         value.put(slot, v);
 
                     try {
-                        Thread.sleep(500);
+                        //Thread.sleep(200);
                     } catch (Exception ex) {
                     }
                 }
@@ -77,11 +79,44 @@ public class ExampleGuiSlotData extends GuiBase {
     }
 
     @Override
-    public void onClose(InventoryCloseEvent event) {
-        super.onClose(event);
-        if (event.getPlayer() instanceof Player player) {
-            saveAsync(player, getInventory());
+    public void handleClickInventory(Player clicker, InventoryClickEvent e) {
+        super.handleClickInventory(clicker, e);
+        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+            e.setCancelled(true);
+            return;
         }
+
+        saveAsync(clicker, e.getInventory());
+    }
+
+    @Override
+    public void handleClick(Player clicker, InventoryClickEvent e) {
+        super.handleClick(clicker, e);
+        if (e.isCancelled())
+            return;
+
+        GuiItem clicked = this.slots.getOrDefault(e.getSlot(), null);
+        if (clicked == null)
+            return;
+
+        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+            e.setCancelled(true);
+            ChatMessage message = YcoordCore.getInstance().getChatMessage();
+            message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "data-is-loading");
+            return;
+        }
+        saveAsync(clicker, e.getInventory());
+    }
+
+    @Override
+    public void handleDrag(Player clicker, InventoryDragEvent e) {
+        super.handleDrag(clicker, e);
+        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+            e.setCancelled(true);
+            return;
+        }
+
+        saveAsync(clicker, e.getInventory());
     }
 
     @Override

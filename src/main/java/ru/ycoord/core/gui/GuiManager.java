@@ -7,12 +7,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
 import ru.ycoord.core.gui.items.GuiItem;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,6 +38,23 @@ public class GuiManager implements Listener {
             holder.handleClickInventory((Player) event.getWhoClicked(), event);
         }
     }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        if (event.getInventory().getHolder() == null)
+            return;
+
+        int topSize = event.getView().getTopInventory().getSize();
+        Set<Integer> raw = event.getRawSlots();
+        boolean touchesTop = raw.stream().anyMatch(s -> s < topSize);
+        if (touchesTop) {
+            InventoryHolder inventoryHolder = event.getInventory().getHolder();
+            if (inventoryHolder instanceof GuiBase holder) {
+                holder.handleDrag((Player) event.getWhoClicked(), event);
+            }
+        }
+    }
+
 
     public void addGlobalItem(ConfigurationSection section) {
         String symbol = section.getString("symbol", null);
