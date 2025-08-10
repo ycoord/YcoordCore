@@ -37,6 +37,15 @@ public class GuiSlot extends GuiItem {
 
     }
 
+    @Override
+    public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
+        if(!super.handleClick(gui, event, placeholders))
+            return false;
+
+        event.setCancelled(false);
+
+        return true;
+    }
 
     //@Override
     //public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
