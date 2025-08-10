@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Animation {
     protected @Nullable
@@ -51,7 +52,7 @@ public abstract class Animation {
         }
     }
 
-    public void animate(GuiBase base, Inventory inventory, Player player, HashMap<Integer, List<GuiBase.GuiItemCharacter>> guiElements, MessagePlaceholders messagePlaceholders) {
+    public void animate(GuiBase base, Inventory inventory, Player player, ConcurrentHashMap<Integer, List<GuiBase.GuiItemCharacter>> guiElements, MessagePlaceholders messagePlaceholders) {
         if (background) {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack item = new ItemStack(backgroundMaterial);

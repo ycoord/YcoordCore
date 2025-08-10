@@ -27,6 +27,7 @@ import ru.ycoord.examples.commands.GuiExample;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,7 +139,7 @@ public class GuiItem {
     }
 
     private boolean checkCooldown(Player clicker) {
-        HashMap<String, Long> cd = GuiManager.cooldowns;
+        ConcurrentHashMap<String, Long> cd = GuiManager.cooldowns;
         {
             long curr = System.currentTimeMillis();
             if (!cd.containsKey(clicker.getName())) {
@@ -199,7 +200,7 @@ public class GuiItem {
     private void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
         boolean condition = checkCondition(player);
 
-        HashMap<Integer, GuiItem> slots = guiBase.getSlots();
+        ConcurrentHashMap<Integer, GuiItem> slots = guiBase.getSlots();
 
         if (!slots.containsKey(slot)) {
             return;

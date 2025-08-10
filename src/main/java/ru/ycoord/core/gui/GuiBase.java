@@ -23,13 +23,14 @@ import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.transaction.TransactionManager;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiBase implements InventoryHolder {
     protected final ConfigurationSection section;
     private Inventory inventory = null;
-    protected HashMap<Integer, List<GuiItemCharacter>> items = new HashMap<>();
-    protected HashMap<Integer, GuiItem> slots = new HashMap<>();
-    protected HashMap<String, Integer> typeCounter = new HashMap<>();
+    protected ConcurrentHashMap<Integer, List<GuiItemCharacter>> items = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<Integer, GuiItem> slots = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, Integer> typeCounter = new ConcurrentHashMap<>();
     private Animation animation = null;
     private boolean animateOnlyOnOpen = false;
     private SoundInfo openSound = null;
@@ -145,7 +146,7 @@ public class GuiBase implements InventoryHolder {
         }
     }
 
-    protected void refresh(OfflinePlayer player, HashMap<Integer, List<GuiItemCharacter>> guiElements) {
+    protected void refresh(OfflinePlayer player, ConcurrentHashMap<Integer, List<GuiItemCharacter>> guiElements) {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null) {
@@ -188,12 +189,12 @@ public class GuiBase implements InventoryHolder {
         inventory.setItem(slot, itemStack);
     }
 
-    public HashMap<Integer, GuiItem> getSlots() {
+    public ConcurrentHashMap<Integer, GuiItem> getSlots() {
         return slots;
     }
 
-    protected HashMap<Integer, List<GuiItemCharacter>> make(OfflinePlayer player, ConfigurationSection section) {
-        HashMap<Integer, List<GuiItemCharacter>> guiElements = new HashMap<>();
+    protected ConcurrentHashMap<Integer, List<GuiItemCharacter>> make(OfflinePlayer player, ConfigurationSection section) {
+        ConcurrentHashMap<Integer, List<GuiItemCharacter>> guiElements = new ConcurrentHashMap<>();
 
         List<String> pattern = section.getStringList("pattern");
         ConfigurationSection items = section.getConfigurationSection("items");

@@ -14,11 +14,12 @@ import ru.ycoord.core.gui.items.GuiItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiManager implements Listener {
-    public HashMap<Player, Stack<GuiBase>> guis = new HashMap<>();
-    private final HashMap<String, ConfigurationSection> guiElements = new HashMap<>();
-    public static HashMap<String, Long> cooldowns = new HashMap<>();
+    public ConcurrentHashMap<Player, Stack<GuiBase>> guis = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ConfigurationSection> guiElements = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Long> cooldowns = new ConcurrentHashMap<>();
     public static int cooldown = 100;
 
     @EventHandler(priority = EventPriority.HIGHEST)
