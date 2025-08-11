@@ -1,5 +1,6 @@
 package ru.ycoord.examples.guis;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -7,6 +8,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.GuiBase;
@@ -16,6 +18,8 @@ import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.transaction.TransactionManager;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,50 +31,48 @@ public class ExampleGuiSlotData extends GuiBase {
     private static final ConcurrentHashMap<String, ConcurrentHashMap<Integer, ItemStack>> items = new ConcurrentHashMap<>();
 
     private void saveAsync(Player player, Inventory inventory) {
-        CompletableFuture.runAsync(() -> {
-            TransactionManager.lock(player.getName(), "SAVE_SLOT_DATA");
+        TransactionManager.lock("HELLO", "SAVE_SLOT_DATA");
+        Bukkit.getScheduler().runTaskLaterAsynchronously(YcoordCore.getInstance(), (task)->{
             for (Integer slot : slots.keySet()) {
                 GuiItem item = slots.get(slot);
                 if (item instanceof GuiSlot) {
-                    ConcurrentHashMap<Integer, ItemStack> value = items.computeIfAbsent(player.getName(), k -> new ConcurrentHashMap<>());
+                    ConcurrentHashMap<Integer, ItemStack> value = items.computeIfAbsent("HELLO", k -> new ConcurrentHashMap<>());
                     ItemStack v = inventory.getItem(slot);
                     if (v == null)
                         value.remove(slot);
                     else
                         value.put(slot, v);
-
-                    try {
-                        //Thread.sleep(200);
-                    } catch (Exception ex) {
-                    }
                 }
             }
-            TransactionManager.unlock(player.getName(), "SAVE_SLOT_DATA");
-        });
+
+
+
+            List<? extends Player> players = Bukkit.getOnlinePlayers().stream().filter(p -> p.getPlayer() != player).toList();
+
+            for (Player p : players) {
+                InventoryView view = p.getOpenInventory();
+                Inventory top = view.getTopInventory();
+                if (top.getHolder() instanceof ExampleGuiSlotData g) {
+                    g.rebuild(p, false);
+                }
+            }
+
+            TransactionManager.unlock("HELLO", "SAVE_SLOT_DATA");
+        }, 1);
     }
 
     public GuiItem makeItem(int currentIndex, int slotIndex, int priority, OfflinePlayer player, String type, ConfigurationSection section) {
         Player onlinePlayer = player.getPlayer();
         if (onlinePlayer != null) {
             if (type.equalsIgnoreCase("MARKER")) {
-                return new GuiSlot(new GuiSlot.IItemProvider() {
-
-
-                    @Override
-                    public void saveAll(Player clicker, Inventory inventory) {
-                        saveAsync(clicker, inventory);
-                    }
-
-                    @Override
-                    public ItemStack getItem() {
-                        if (items.containsKey(onlinePlayer.getName())) {
-                            ConcurrentHashMap<Integer, ItemStack> slots = items.get(onlinePlayer.getName());
-                            if (slots.containsKey(slotIndex)) {
-                                return slots.get(slotIndex);
-                            }
+                return new GuiSlot(() -> {
+                    if (items.containsKey("HELLO")) {
+                        ConcurrentHashMap<Integer, ItemStack> slots = items.get("HELLO");
+                        if (slots.containsKey(slotIndex)) {
+                            return slots.get(slotIndex);
                         }
-                        return null;
                     }
+                    return null;
                 }, priority, slotIndex, currentIndex, section);
             }
         }
@@ -78,10 +80,11 @@ public class ExampleGuiSlotData extends GuiBase {
         return new GuiItem(priority, slotIndex, currentIndex, section);
     }
 
+
     @Override
     public void handleClickInventory(Player clicker, InventoryClickEvent e) {
         super.handleClickInventory(clicker, e);
-        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
             e.setCancelled(true);
             return;
         }
@@ -99,7 +102,7 @@ public class ExampleGuiSlotData extends GuiBase {
         if (clicked == null)
             return;
 
-        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
             e.setCancelled(true);
             ChatMessage message = YcoordCore.getInstance().getChatMessage();
             message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "data-is-loading");
@@ -111,7 +114,7 @@ public class ExampleGuiSlotData extends GuiBase {
     @Override
     public void handleDrag(Player clicker, InventoryDragEvent e) {
         super.handleDrag(clicker, e);
-        if (TransactionManager.inProgress(clicker.getName(), "SAVE_SLOT_DATA")) {
+        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
             e.setCancelled(true);
             return;
         }
@@ -121,7 +124,7 @@ public class ExampleGuiSlotData extends GuiBase {
 
     @Override
     public void open(OfflinePlayer player) {
-        if (TransactionManager.inProgress(player.getName(), "SAVE_SLOT_DATA")) {
+        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
 
             ChatMessage message = YcoordCore.getInstance().getChatMessage();
             message.sendMessageIdAsync(MessageBase.Level.INFO, player, "data-is-loading");

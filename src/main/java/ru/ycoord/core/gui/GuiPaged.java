@@ -104,20 +104,20 @@ abstract public class GuiPaged extends GuiBase {
 
     abstract protected int calculateDataIndex(int currentIndex);
 
-    public void next(Player player) {
+    public void next(Player player, boolean animate) {
         if (current < getMaxPages(player) - 1) {
             current++;
-            rebuild(player);
+            rebuild(player, animate);
         }
     }
 
     abstract public int getMaxPages(OfflinePlayer player);
 
 
-    public void prev(Player player) {
+    public void prev(Player player, boolean animate) {
         if (current >= 1) {
             current--;
-            rebuild(player);
+            rebuild(player, animate);
         }
     }
 }

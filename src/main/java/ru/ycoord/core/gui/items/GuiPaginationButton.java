@@ -26,9 +26,9 @@ public class GuiPaginationButton extends GuiItem {
 
         if(event.getWhoClicked() instanceof Player player){
             if(forward)
-                parent.next(player);
+                parent.next(player, true);
             else
-                parent.prev(player);
+                parent.prev(player, true);
         }
 
         return true;

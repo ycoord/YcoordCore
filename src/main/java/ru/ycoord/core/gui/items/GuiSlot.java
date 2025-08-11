@@ -17,8 +17,6 @@ public class GuiSlot extends GuiItem {
     protected final IItemProvider provider;
 
     public interface IItemProvider {
-        void saveAll(Player clicker, Inventory inventory);
-
         ItemStack getItem();
     }
 

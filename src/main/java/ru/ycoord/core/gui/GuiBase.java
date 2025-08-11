@@ -93,7 +93,7 @@ public class GuiBase implements InventoryHolder {
         title = MessageBase.translateColor(MessageBase.Level.NONE, title, placeholders);
 
         inventory = Bukkit.createInventory(this, size, Component.text(title));
-        rebuild(player);
+        rebuild(player, true);
         Objects.requireNonNull(player.getPlayer()).openInventory(inventory);
         if (openSound != null)
             openSound.play(player);
@@ -150,30 +150,40 @@ public class GuiBase implements InventoryHolder {
         }
     }
 
-    protected void refresh(OfflinePlayer player, ConcurrentHashMap<Integer, List<GuiItemCharacter>> guiElements) {
+    protected void refresh(OfflinePlayer player, ConcurrentHashMap<Integer, List<GuiItemCharacter>> guiElements, boolean animate) {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null) {
-            animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
-            if (animateOnlyOnOpen) {
-                animateOnlyOnOpen = false;
-                animation = new NoAnimation(null);
+            if(animate) {
+                animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
+                if (animateOnlyOnOpen) {
+                    animateOnlyOnOpen = false;
+                    animation = new NoAnimation(null);
+                }
+            }else{
+                Animation temp  = new NoAnimation(null);;
+                temp.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
+
             }
         }
 
     }
 
-    public void rebuild(OfflinePlayer player) {
+    public void rebuild(OfflinePlayer player, boolean animate) {
         typeCounter.clear();
         Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
-            if(lockOnAnimation)
-                TransactionManager.lock(player.getName(), this.getClass().getSimpleName());
-            inventory.clear();
-            this.items = make(player, section);
-            refresh(player, items);
-            if(lockOnAnimation)
-                TransactionManager.unlock(player.getName(), this.getClass().getSimpleName());
+            subRebuild(player, animate);
         });
+    }
+
+    protected void subRebuild(OfflinePlayer player, boolean animate){
+        if(lockOnAnimation)
+            TransactionManager.lock(player.getName(), this.getClass().getSimpleName());
+        inventory.clear();
+        this.items = make(player, section);
+        refresh(player, items, animate);
+        if(lockOnAnimation)
+            TransactionManager.unlock(player.getName(), this.getClass().getSimpleName());
     }
 
     public void setSlotItem(int slot, int index, GuiItem guiItem, Player player, MessagePlaceholders messagePlaceholders) {
