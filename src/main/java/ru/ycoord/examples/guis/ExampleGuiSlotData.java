@@ -4,9 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -30,22 +28,43 @@ public class ExampleGuiSlotData extends GuiBase {
 
     private static final ConcurrentHashMap<String, ConcurrentHashMap<Integer, ItemStack>> items = new ConcurrentHashMap<>();
 
-    private void saveAsync(Player player, Inventory inventory) {
-        TransactionManager.lock("HELLO", "SAVE_SLOT_DATA");
-        Bukkit.getScheduler().runTaskLaterAsynchronously(YcoordCore.getInstance(), (task)->{
+    protected String getKey(OfflinePlayer player) {
+        return "HELLO";
+    }
+
+    protected String getValue(OfflinePlayer player) {
+        return "SAVE_SLOT_DATA";
+    }
+
+    protected void setItem(OfflinePlayer player, int slot, Inventory inventory, ItemStack item) {
+        ConcurrentHashMap<Integer, ItemStack> value = items.computeIfAbsent(getKey(player), k -> new ConcurrentHashMap<>());
+        ItemStack v = inventory.getItem(slot);
+        if (v == null)
+            value.remove(slot);
+        else
+            value.put(slot, v);
+    }
+
+    protected ItemStack getItem(OfflinePlayer player, int slot) {
+        if (items.containsKey(getKey(player))) {
+            ConcurrentHashMap<Integer, ItemStack> slots = items.get(getKey(player));
+            if (slots.containsKey(slot)) {
+                return slots.get(slot);
+            }
+        }
+        return null;
+    }
+
+    private void saveAsync(OfflinePlayer player, Inventory inventory) {
+        TransactionManager.lock(getKey(player), getValue(player));
+        Bukkit.getScheduler().runTaskLaterAsynchronously(YcoordCore.getInstance(), (task) -> {
             for (Integer slot : slots.keySet()) {
                 GuiItem item = slots.get(slot);
                 if (item instanceof GuiSlot) {
-                    ConcurrentHashMap<Integer, ItemStack> value = items.computeIfAbsent("HELLO", k -> new ConcurrentHashMap<>());
                     ItemStack v = inventory.getItem(slot);
-                    if (v == null)
-                        value.remove(slot);
-                    else
-                        value.put(slot, v);
+                    setItem(player, slot, inventory, v);
                 }
             }
-
-
 
             List<? extends Player> players = Bukkit.getOnlinePlayers().stream().filter(p -> p.getPlayer() != player).toList();
 
@@ -57,7 +76,7 @@ public class ExampleGuiSlotData extends GuiBase {
                 }
             }
 
-            TransactionManager.unlock("HELLO", "SAVE_SLOT_DATA");
+            TransactionManager.unlock(getKey(player), getValue(player));
         }, 1);
     }
 
@@ -65,15 +84,7 @@ public class ExampleGuiSlotData extends GuiBase {
         Player onlinePlayer = player.getPlayer();
         if (onlinePlayer != null) {
             if (type.equalsIgnoreCase("MARKER")) {
-                return new GuiSlot(() -> {
-                    if (items.containsKey("HELLO")) {
-                        ConcurrentHashMap<Integer, ItemStack> slots = items.get("HELLO");
-                        if (slots.containsKey(slotIndex)) {
-                            return slots.get(slotIndex);
-                        }
-                    }
-                    return null;
-                }, priority, slotIndex, currentIndex, section);
+                return new GuiSlot(() -> getItem(player, slotIndex), priority, slotIndex, currentIndex, section);
             }
         }
 
@@ -81,15 +92,30 @@ public class ExampleGuiSlotData extends GuiBase {
     }
 
 
+    boolean canCanProcess(OfflinePlayer clicker) {
+        if (TransactionManager.inProgress(getKey(clicker), getValue(clicker))) {
+            ChatMessage message = YcoordCore.getInstance().getChatMessage();
+            message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "data-is-loading");
+            return false;
+        }
+        return true;
+    }
+
+    boolean handleEvent(OfflinePlayer clicker, InventoryInteractEvent e) {
+        if (!canCanProcess(clicker)) {
+            e.setCancelled(true);
+            return false;
+        }
+        saveAsync(clicker, e.getInventory());
+        return true;
+    }
+
     @Override
     public void handleClickInventory(Player clicker, InventoryClickEvent e) {
         super.handleClickInventory(clicker, e);
-        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
-            e.setCancelled(true);
+        if (e.isCancelled())
             return;
-        }
-
-        saveAsync(clicker, e.getInventory());
+        handleEvent(clicker, e);
     }
 
     @Override
@@ -97,38 +123,20 @@ public class ExampleGuiSlotData extends GuiBase {
         super.handleClick(clicker, e);
         if (e.isCancelled())
             return;
-
-        GuiItem clicked = this.slots.getOrDefault(e.getSlot(), null);
-        if (clicked == null)
-            return;
-
-        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
-            e.setCancelled(true);
-            ChatMessage message = YcoordCore.getInstance().getChatMessage();
-            message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "data-is-loading");
-            return;
-        }
-        saveAsync(clicker, e.getInventory());
+        handleEvent(clicker, e);
     }
 
     @Override
     public void handleDrag(Player clicker, InventoryDragEvent e) {
         super.handleDrag(clicker, e);
-        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
-            e.setCancelled(true);
+        if (e.isCancelled())
             return;
-        }
-
-        saveAsync(clicker, e.getInventory());
+        handleEvent(clicker, e);
     }
 
     @Override
     public void open(OfflinePlayer player) {
-        if (TransactionManager.inProgress("HELLO", "SAVE_SLOT_DATA")) {
-
-            ChatMessage message = YcoordCore.getInstance().getChatMessage();
-            message.sendMessageIdAsync(MessageBase.Level.INFO, player, "data-is-loading");
-
+        if (!canCanProcess(player)) {
             return;
         }
         super.open(player);
