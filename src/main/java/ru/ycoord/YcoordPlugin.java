@@ -33,7 +33,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance donateBalance = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
 
-    boolean requirePlugin(JavaPlugin plugin, String name) {
+    public boolean requirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 
         boolean enabled = Bukkit.getPluginManager().isPluginEnabled(name);
@@ -46,7 +46,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         return true;
     }
 
-    boolean checkPlugin(JavaPlugin plugin, String name) {
+    public boolean checkPlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 
         boolean enabled = Bukkit.getPluginManager().isPluginEnabled(name);
