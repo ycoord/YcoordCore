@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance moneyBalance = null;
     protected IBalance donateBalance = null;
-    protected PlaceholderManager placeholderManager = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
 
     boolean requirePlugin(JavaPlugin plugin, String name) {
@@ -86,12 +85,10 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             if (!requirePlugin(this, "PlaceholderAPI"))
                 return;
 
-            placeholderManager = new PlaceholderManager();
-            placeholderManager.register();
 
             IPlaceholderAPI placeholder = getPlaceholderAPI();
             if (placeholder != null) {
-                placeholderManager.registerPlaceholder(placeholder);
+                YcoordCore.getInstance().getPlaceholderManager().registerPlaceholder(placeholder);
             }
         }
 
@@ -190,7 +187,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
     @Override
     public void onDisable() {
-        placeholderManager.unregister();
+        YcoordCore.getInstance().getPlaceholderManager().unregister();
     }
     public IPlaceholderAPI getPlaceholderAPI() {
         return new PlaceholderDummy();

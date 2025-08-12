@@ -14,16 +14,16 @@ public class MoneyBalance implements IBalance {
 
     @Override
     public void withdraw(Player player, double money) {
-
+        provider.withdrawPlayer(player, money);
     }
 
     @Override
     public void deposit(Player player, double money) {
-
+        provider.depositPlayer(player, money);
     }
 
     @Override
     public double get(Player player) {
-        return 0;
+        return provider.getBalance(player);
     }
 }

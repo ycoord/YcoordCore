@@ -16,6 +16,7 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.CorePlaceholders;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
+import ru.ycoord.core.placeholder.PlaceholderManager;
 import ru.ycoord.examples.commands.CoreCommand;
 
 import java.sql.SQLException;
@@ -29,6 +30,7 @@ public final class YcoordCore extends YcoordPlugin {
     private PlayerDataCache playerDataCache;
     private GuiManager guiManager;
     private MessagePlaceholders messagePlaceholders;
+    private final PlaceholderManager placeholderManager = new PlaceholderManager();
 
     public static YcoordCore getInstance() {
         return instance;
@@ -50,10 +52,18 @@ public final class YcoordCore extends YcoordPlugin {
         return messagePlaceholders;
     }
 
+    public PlaceholderManager getPlaceholderManager() {
+        return placeholderManager;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
+
+
         super.onEnable();
+
+        placeholderManager.register();
 
         {
             chatMessage = new ChatMessage(this, getConfig());
@@ -104,10 +114,6 @@ public final class YcoordCore extends YcoordPlugin {
         return List.of(new CoreCommand());
     }
 
-    //@Override
-    //public IPlaceholderAPI getPlaceholderAPI() {
-    //    return new CorePlaceholders();
-    //}
 
     static class Handler implements CommandExecutor, TabCompleter {
 

@@ -7,10 +7,10 @@ import ru.ycoord.YcoordCore;
 
 import java.util.List;
 
-public class CorePlaceholders implements IPlaceholderAPI {
+public class CorePlaceholders extends IPlaceholderAPI {
     @Override
     public String getId() {
-        return "ycoordcore";
+        return "core";
     }
 
     @Override
