@@ -36,7 +36,7 @@ public class GuiBase implements InventoryHolder {
     private boolean animateOnlyOnOpen = false;
     private SoundInfo openSound = null;
     private SoundInfo closeSound = null;
-    private boolean lockOnAnimation;
+    protected boolean lockOnAnimation;
 
     public GuiBase(ConfigurationSection section) {
         this.section = section;
@@ -119,8 +119,7 @@ public class GuiBase implements InventoryHolder {
         for (Integer slot : items.keySet()) {
             List<GuiItemCharacter> guiItems = items.get(slot);
 
-            for (int i = 0; i < guiItems.size(); i++) {
-                GuiItemCharacter guiItem = guiItems.get(i);
+            for (GuiItemCharacter guiItem : guiItems) {
                 if (guiItem.item != null)
                     guiItem.item.update(this, slot, guiItem.index, elapsed, player, placeholders);
             }
@@ -161,7 +160,7 @@ public class GuiBase implements InventoryHolder {
                     animation = new NoAnimation(null);
                 }
             }else{
-                Animation temp  = new NoAnimation(null);;
+                Animation temp  = new NoAnimation(null);
                 temp.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
 
             }
@@ -171,9 +170,7 @@ public class GuiBase implements InventoryHolder {
 
     public void rebuild(OfflinePlayer player, boolean animate) {
         typeCounter.clear();
-        Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> {
-            subRebuild(player, animate);
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> subRebuild(player, animate));
     }
 
     protected void subRebuild(OfflinePlayer player, boolean animate){
@@ -304,6 +301,10 @@ public class GuiBase implements InventoryHolder {
     }
 
     public void handleClickInventory(Player clicker, InventoryClickEvent e) {
-
+        if (lockOnAnimation && TransactionManager.inProgress(clicker.getName(), this.getClass().getSimpleName())) {
+            e.setCancelled(true);
+            ChatMessage chat = YcoordCore.getInstance().getChatMessage();
+            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "animation-in-progress");
+        }
     }
 }

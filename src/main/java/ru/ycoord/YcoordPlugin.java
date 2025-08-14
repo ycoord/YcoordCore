@@ -16,9 +16,9 @@ import ru.ycoord.core.color.Color;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.commands.GuiCommand;
 import ru.ycoord.core.messages.ChatMessage;
+import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.core.placeholder.PlaceholderDummy;
-import ru.ycoord.core.placeholder.PlaceholderManager;
 
 import java.io.File;
 import java.net.JarURLConnection;
@@ -33,17 +33,17 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance donateBalance = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
 
-    public boolean requirePlugin(JavaPlugin plugin, String name) {
+    public boolean doesntRequirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
 
         boolean enabled = Bukkit.getPluginManager().isPluginEnabled(name);
         if (!enabled) {
             logger.severe(String.format("❌ %s is not enabled. Shutting down...", Color.color(Color.YELLOW, name)));
             Bukkit.getPluginManager().disablePlugin(plugin);
-            return false;
+            return true;
         }
         logger.info(String.format("✅ %s is enabled.", Color.color(Color.YELLOW, name)));
-        return true;
+        return false;
     }
 
     public boolean checkPlugin(JavaPlugin plugin, String name) {
@@ -63,7 +63,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         saveDefaultConfig();
 
         {
-            if (!requirePlugin(this, "PlayerPoints"))
+            if (doesntRequirePlugin(this, "PlayerPoints"))
                 return;
 
             PlayerPointsAPI pp = PlayerPoints.getInstance().getAPI();
@@ -71,7 +71,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         }
 
         {
-            if (!requirePlugin(this, "Vault"))
+            if (doesntRequirePlugin(this, "Vault"))
                 return;
 
             RegisteredServiceProvider<Economy> economyProvider = this.getServer().getServicesManager().getRegistration(Economy.class);
@@ -82,7 +82,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         }
 
         {
-            if (!requirePlugin(this, "PlaceholderAPI"))
+            if (doesntRequirePlugin(this, "PlaceholderAPI"))
                 return;
 
 
@@ -105,9 +105,12 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             File dataFolder = getDataFolder().getAbsoluteFile();
             File menusFolder = new File(dataFolder, "menus");
             if (!menusFolder.exists())
-                menusFolder.mkdir();
+            {
+                boolean ignored = menusFolder.mkdir();
+            }
             if (menusFolder.exists()) {
                 File[] files = menusFolder.listFiles();
+                assert files != null;
                 for (File file : files) {
                     if (!file.isFile())
                         continue;
@@ -121,20 +124,40 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             for (Command root : guiCommands)
                 YcoordCore.getInstance().registerCommand(this, root);
         }
+
+        {
+            MessagePlaceholders messagePlaceholders = YcoordCore.getInstance().getGlobalPlaceholders();
+            ConfigurationSection s = getConfig();
+            ConfigurationSection placeholders = s.getConfigurationSection("placeholders");
+            if (placeholders != null) {
+                for (String key : placeholders.getKeys(false)) {
+                    ConfigurationSection placeholderData = placeholders.getConfigurationSection(key);
+                    if (placeholderData != null) {
+
+                        String placeholderKey = placeholderData.getString("placeholder");
+                        String placeholderValue = placeholderData.getString("result");
+
+                        assert placeholderKey != null;
+                        messagePlaceholders.put(placeholderKey, placeholderValue);
+                    }
+                }
+            }
+        }
+
+        {
+            ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
+            chatMessage.addConfig(getConfig());
+        }
     }
 
-    private final Map<String, ConfigurationSection> menus = new HashMap<>();
 
-    public Map<String, ConfigurationSection> getMenus() {
-        return menus;
-    }
 
     private void loadMenu(FileConfiguration configuration) {
         String name = configuration.getString("name", null);
         if (name == null)
             return;
 
-        menus.put(name, configuration);
+        YcoordCore.getInstance().getMenus().put(name, configuration);
         ConfigurationSection section = configuration.getConfigurationSection("open-command");
         if (section == null)
             return;
@@ -177,9 +200,6 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         }
     }
 
-    public final ChatMessage getCoreChatMessage(){
-        return YcoordCore.getInstance().getChatMessage();
-    }
 
     public List<Command> getRootCommands() {
         return null;
@@ -187,7 +207,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
     @Override
     public void onDisable() {
-        YcoordCore.getInstance().getPlaceholderManager().unregister();
+        //YcoordCore.getInstance().getPlaceholderManager().unregister();
     }
     public IPlaceholderAPI getPlaceholderAPI() {
         return new PlaceholderDummy();

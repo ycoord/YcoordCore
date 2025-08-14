@@ -2,14 +2,7 @@ package ru.ycoord.core.gui;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-import ru.ycoord.core.gui.items.GuiItem;
-import ru.ycoord.core.gui.items.GuiPaginationButton;
 import ru.ycoord.core.messages.MessagePlaceholders;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 public abstract class GuiPagedData extends GuiPaged {
     public GuiPagedData(ConfigurationSection section) {
@@ -21,6 +14,7 @@ public abstract class GuiPagedData extends GuiPaged {
     public void getExtraPlaceholders(MessagePlaceholders placeholders) {
         super.getExtraPlaceholders(placeholders);
         placeholders.put("%page%", current + 1);
+        placeholders.put("%page-index%", current);
         placeholders.put("%pages%", getMaxPages(placeholders.getPlayer()));
     }
 

@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.sound.SoundInfo;
 
@@ -16,6 +17,25 @@ import java.util.function.Predicate;
 
 public abstract class MessageBase {
     protected ConfigurationSection messagesSection;
+
+    public void addConfig(@Nullable ConfigurationSection config) {
+        if (!messagesSection.contains("messages")) {
+            messagesSection.createSection("messages");
+        }
+
+        ConfigurationSection messages = messagesSection.getConfigurationSection("messages");
+        if (config == null)
+            return;
+        ConfigurationSection otherMessages = config.getConfigurationSection("messages");
+        if (otherMessages == null) {
+            return;
+        }
+
+        for (String key : otherMessages.getKeys(false)) {
+            assert messages != null;
+            messages.set(key, otherMessages.get(key));
+        }
+    }
 
     public static class Style {
         public static class LevelStyle {
@@ -44,15 +64,21 @@ public abstract class MessageBase {
                 StringBuilder sb = new StringBuilder(key);
                 sb.insert(1, "!");
                 String nonFormat = sb.toString();
+                String temp = String.format("%s%s%s", placeholder, key, mainColor);
+                key = key.replace("{", "\\{").replace("}", "\\}");
+                key = key.replace("%", "\\%");
 
-                text = text.replaceAll(key, String.format("%s%s%s", placeholder, key, mainColor));
+                nonFormat = nonFormat.replace("{", "\\{").replace("}", "\\}");
+                nonFormat = nonFormat.replace("%", "\\%");
+
+                text = text.replaceAll(key, temp);
                 text = text.replaceAll(nonFormat, key);
 
                 return text;
             }
 
-            public void playSound(OfflinePlayer listener){
-                if(sound == null)
+            public void playSound(OfflinePlayer listener) {
+                if (sound == null)
                     return;
                 this.sound.play(listener);
             }
@@ -102,15 +128,9 @@ public abstract class MessageBase {
 
         public void playSound(Level level, OfflinePlayer listener) {
             switch (level) {
-                case INFO -> {
-                    info.playSound(listener);
-                }
-                case SUCCESS -> {
-                    success.playSound(listener);
-                }
-                case ERROR -> {
-                    error.playSound(listener);
-                }
+                case INFO -> info.playSound(listener);
+                case SUCCESS -> success.playSound(listener);
+                case ERROR -> error.playSound(listener);
                 case NONE -> {
                 }
             }
@@ -172,7 +192,24 @@ public abstract class MessageBase {
         return PlaceholderAPI.setPlaceholders(messagePlaceholders.getPlayer(), value);
     }
 
-    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def, MessagePlaceholders messagePlaceholders) {
+    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
+        String id = null;
+        if (idWithPlace.contains("|")) {
+            String[] splitted = idWithPlace.split("\\|");
+            id = splitted[0];
+            if (splitted.length > 1) {
+                String[] pl = splitted[1].split(",");
+                for(String p : pl) {
+                    String[] keyValue = p.split(":");
+                    if(keyValue.length == 2) {
+                        messagePlaceholders.put(keyValue[0], keyValue[1]);
+                    }
+                }
+            }
+        } else {
+            id = idWithPlace;
+        }
+
         @NotNull List<String> messages = getSection().getStringList(id);
         if (messages.isEmpty()) {
             messages = List.of(def);
@@ -191,7 +228,7 @@ public abstract class MessageBase {
 
     public String makeMessageId(Level level, String messageId, MessagePlaceholders messagePlaceholders) {
         List<String> messages = getSection().getStringList(messageId);
-        String message = null;
+        String message;
         if (messages.isEmpty())
             message = getSection().getString(messageId);
         else

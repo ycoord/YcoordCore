@@ -21,7 +21,7 @@ public class ChatMessage extends MessageBase {
     }
 
     public void sendMessageId(Level level, OfflinePlayer player, String messageId, String def, final MessagePlaceholders messagePlaceholders){
-        CompletableFuture.runAsync(() -> {
+
             if (player == null)
                 return;
             if (!player.isOnline() || player.getPlayer() == null)
@@ -127,22 +127,37 @@ public class ChatMessage extends MessageBase {
                     style.playSound(level, player);
                 }
             }
-        });
+
     }
 
     @Override
-    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String messageId, String def, MessagePlaceholders messagePlaceholders) {
+    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
 
 
         if (messagePlaceholders == null) {
             messagePlaceholders = new MessagePlaceholders(null);
         }
 
-        MessagePlaceholders finalPlaceholders = messagePlaceholders;
+        String messageId;
+        if (idWithPlace.contains("|")) {
+            String[] splitted = idWithPlace.split("\\|");
+            messageId = splitted[0];
+            if (splitted.length > 1) {
+                String[] pl = splitted[1].split(",");
+                for(String p : pl) {
+                    String[] keyValue = p.split(":");
+                    if(keyValue.length == 2) {
+                        messagePlaceholders.put(keyValue[0], keyValue[1]);
+                    }
+                }
+            }
+        } else {
+            messageId = idWithPlace;
+        }
 
-        return CompletableFuture.runAsync(() -> {
-            sendMessageId(level, player, messageId, def, finalPlaceholders);
-        });
+        MessagePlaceholders finalPlaceholders = messagePlaceholders;
+        String finalMessageId = messageId;
+        return CompletableFuture.runAsync(() -> sendMessageId(level, player, finalMessageId, def, finalPlaceholders));
     }
 
     @Override

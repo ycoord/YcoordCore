@@ -32,6 +32,10 @@ public class MessagePlaceholders {
     }
 
     public void put(String key, Object value) {
+        if (key.startsWith("%") && key.endsWith("%")) {
+            String raw = key.substring(1, key.length() - 1);
+            map.put("{" + raw + "}", String.valueOf(value));
+        }
         map.put(key, String.valueOf(value));
     }
 
@@ -54,14 +58,14 @@ public class MessagePlaceholders {
             keyValues.put(key, YcoordCore.getInstance().getGlobalPlaceholders().get(key));
 
         String time = convertTime(System.currentTimeMillis());
-        keyValues.put("%current_time%", time);
-        keyValues.put("%current-time%", time);
+        put("%current_time%", time);
+        put("%current-time%", time);
 
         if (player != null) {
             String name = player.getName();
 
             if (name != null)
-                keyValues.put("%executor%", name);
+                put("%executor%", name);
         }
 
         for (String key : keyValues.keySet()) {
@@ -69,11 +73,12 @@ public class MessagePlaceholders {
                 text = style.preparePlaceholder(text, level, key);
         }
 
-        for (String key : keyValues.keySet()) {
+        for (int i = 0; i < 5; i++) {
+            for (String key : keyValues.keySet()) {
 
-            text = text.replace(key, keyValues.get(key));
+                text = text.replace(key, keyValues.get(key));
+            }
         }
-
 
         return ChatColor.translateAlternateColorCodes('&', text);
     }

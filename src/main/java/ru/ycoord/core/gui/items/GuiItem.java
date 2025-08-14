@@ -24,7 +24,6 @@ import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.utils.Utils;
 import ru.ycoord.examples.commands.GuiExample;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,10 +33,9 @@ import java.util.regex.Pattern;
 public class GuiItem {
     private final int slot;
     private final int index;
-    protected @Nullable ConfigurationSection section = null;
+    protected @Nullable ConfigurationSection section;
     private final int priority;
     private boolean redraw = false;
-    protected final long current = System.currentTimeMillis();
     private List<String> lore = new LinkedList<>();
     private ItemStack stack;
 
@@ -54,11 +52,11 @@ public class GuiItem {
         this.redraw = section.getBoolean("redraw", false);
     }
 
-    protected List<String> getLoreBefore(OfflinePlayer player) {
+    protected List<String> getLoreBefore(OfflinePlayer ignored) {
         return new LinkedList<>();
     }
 
-    protected List<String> getLoreAfter(OfflinePlayer player) {
+    protected List<String> getLoreAfter(OfflinePlayer ignored) {
         return new LinkedList<>();
     }
 
@@ -112,7 +110,7 @@ public class GuiItem {
     }
 
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, int index, MessagePlaceholders placeholders, boolean onlyMeta) {
-        if (!checkCondition(clicker.getPlayer()))
+        if (!checkCondition(clicker.getPlayer(), placeholders))
             return null;
         getExtraPlaceholders(placeholders, slot, index, base);
         if (!onlyMeta) {
@@ -160,9 +158,9 @@ public class GuiItem {
         return false;
     }
 
-    private void handleClick(boolean left, Player player, MessagePlaceholders placeholders) {
+    private boolean handleClick(GuiBase gui, boolean left, Player player, MessagePlaceholders placeholders) {
         if (section == null)
-            return;
+            return true;
         ConfigurationSection clickSection;
         clickSection = section.getConfigurationSection("click");
         if (clickSection == null) {
@@ -171,8 +169,8 @@ public class GuiItem {
             else
                 clickSection = section.getConfigurationSection("right-click");
         }
-        ClickHandler clickHandler = new ClickHandler(player, clickSection, placeholders);
-        clickHandler.handle();
+        ClickHandler clickHandler = new ClickHandler(gui, player, clickSection, placeholders);
+        return clickHandler.handle(placeholders);
     }
 
     public boolean handleClick(GuiBase gui, InventoryClickEvent event, MessagePlaceholders placeholders) {
@@ -182,11 +180,11 @@ public class GuiItem {
                 return false;
             getExtraPlaceholders(placeholders, slot, index, gui);
             if (event.isLeftClick()) {
-                handleClick(true, clicker, placeholders);
+                return handleClick(gui, true, clicker, placeholders);
             }
 
             if (event.isRightClick()) {
-                handleClick(false, clicker, placeholders);
+                return handleClick(gui, false, clicker, placeholders);
             }
         }
 
@@ -194,11 +192,12 @@ public class GuiItem {
     }
 
     public void update(GuiBase guiBase, int slot, int index, long elapsed, Player player, MessagePlaceholders placeholders) {
+        getExtraPlaceholders(placeholders, slot, index, guiBase);
         handleCondition(guiBase, slot, index, player, placeholders);
     }
 
     private void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
-        boolean condition = checkCondition(player);
+        boolean condition = checkCondition(player, messagePlaceholders);
 
         ConcurrentHashMap<Integer, GuiItem> slots = guiBase.getSlots();
 
@@ -209,7 +208,7 @@ public class GuiItem {
             return;
         GuiItem itemInSlot = slots.get(slot);
 
-        boolean otherCondition = itemInSlot.checkCondition(player);
+        boolean otherCondition = itemInSlot.checkCondition(player, messagePlaceholders);
         if (!otherCondition) {
             guiBase.setSlotItem(slot, index, this, player, messagePlaceholders);
         } else {
@@ -219,7 +218,7 @@ public class GuiItem {
         }
     }
 
-    private boolean checkCondition(Player player) {
+    public boolean checkCondition(Player player, MessagePlaceholders placeholders) {
         if (section == null)
             return true;
         String conditionValue = section.getString("condition", null);
@@ -227,10 +226,10 @@ public class GuiItem {
             return true;
         }
 
-        return Utils.checkCondition(player, conditionValue, new MessagePlaceholders(player));
+        return Utils.checkCondition(player, conditionValue, placeholders);
     }
 
-    protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
+    public void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
         placeholders.put("%slot%", slot);
         placeholders.put("%index%", index);
     }
@@ -240,12 +239,14 @@ public class GuiItem {
     }
 
     static class ClickHandler {
+        private final GuiBase gui;
         private final Player player;
         private final ConfigurationSection section;
         private final MessagePlaceholders placeholders;
         private SoundInfo sound = null;
 
-        public ClickHandler(Player player, ConfigurationSection section, MessagePlaceholders placeholders) {
+        public ClickHandler(GuiBase gui, Player player, ConfigurationSection section, MessagePlaceholders placeholders) {
+            this.gui = gui;
             this.player = player;
             this.section = section;
             this.placeholders = placeholders;
@@ -287,7 +288,7 @@ public class GuiItem {
             return null; // или выбросить исключение
         }
 
-        private boolean checkPermission() {
+        private boolean checkPermission(MessagePlaceholders placeholders) {
             String permission = section.getString("permission", null);
             if (permission == null) {
                 return true;
@@ -297,35 +298,34 @@ public class GuiItem {
             }
 
             String noPermissionMessageId = section.getString("no-permission-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noPermissionMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noPermissionMessageId, placeholders);
             return false;
         }
 
-        private boolean checkCondition() {
+        private boolean checkCondition(MessagePlaceholders placeholders) {
             String condition = section.getString("condition", null);
             if (condition == null) {
                 return true;
             }
 
-            if (Utils.checkCondition(player, condition, new MessagePlaceholders(player)))
+            if (Utils.checkCondition(player, condition, placeholders))
                 return true;
 
             String noCheckMessageId = section.getString("no-condition-message-id");
-            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noCheckMessageId, new MessagePlaceholders(player));
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, noCheckMessageId, placeholders);
             return false;
         }
 
-        public void handle() {
-            if (this.section == null)
-            {
-                if(sound != null)
+        public boolean handle(MessagePlaceholders placeholders) {
+            if (this.section == null) {
+                if (sound != null)
                     sound.play(player);
-                return;
+                return true;
             }
-            if (!checkPermission())
-                return;
-            if (!checkCondition())
-                return;
+            if (!checkPermission(placeholders))
+                return false;
+            if (!checkCondition(placeholders))
+                return false;
             List<String> actions = section.getStringList("actions");
             ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
             for (String action : actions) {
@@ -335,16 +335,16 @@ public class GuiItem {
                 if (tag.tag.equalsIgnoreCase("message")) {
                     String message = MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders);
                     player.sendMessage(message);
-                } else if (tag.tag.equalsIgnoreCase("id-none")) {
+                } else if (tag.tag.equalsIgnoreCase("id")) {
                     String message = tag.value;
                     chatMessage.sendMessageIdAsync(MessageBase.Level.NONE, player, message, placeholders);
-                } else if (tag.tag.equalsIgnoreCase("id-info")) {
+                } else if (tag.tag.equalsIgnoreCase("info")) {
                     String message = tag.value;
                     chatMessage.sendMessageIdAsync(MessageBase.Level.INFO, player, message, placeholders);
-                } else if (tag.tag.equalsIgnoreCase("id-error")) {
+                } else if (tag.tag.equalsIgnoreCase("error")) {
                     String message = tag.value;
                     chatMessage.sendMessageIdAsync(MessageBase.Level.ERROR, player, message, placeholders);
-                } else if (tag.tag.equalsIgnoreCase("id-success")) {
+                } else if (tag.tag.equalsIgnoreCase("success")) {
                     String message = tag.value;
                     chatMessage.sendMessageIdAsync(MessageBase.Level.SUCCESS, player, message, placeholders);
                 } else if (tag.tag.equalsIgnoreCase("console")) {
@@ -353,10 +353,14 @@ public class GuiItem {
                     Utils.executePlayer(player, MessageBase.makeMessage(MessageBase.Level.NONE, tag.value, this.placeholders));
                 } else if (tag.tag.equalsIgnoreCase("close")) {
                     player.closeInventory();
+                } else if (tag.tag.equalsIgnoreCase("update")) {
+                    gui.rebuild(player, false);
+                } else if (tag.tag.equalsIgnoreCase("animate")) {
+                    gui.rebuild(player, true);
                 } else if (tag.tag.equalsIgnoreCase("sound")) {
                     try {
                         sound = new SoundInfo(Sound.valueOf(tag.value), SoundCategory.AMBIENT, 0.5f, 0);
-                    }catch (Exception e) {
+                    } catch (Exception ignored) {
 
                     }
                 } else if (tag.tag.equalsIgnoreCase("open")) {
@@ -369,8 +373,9 @@ public class GuiItem {
 
             }
 
-            if(sound != null)
+            if (sound != null)
                 sound.play(player);
+            return true;
         }
 
         protected static class ParsedTag {

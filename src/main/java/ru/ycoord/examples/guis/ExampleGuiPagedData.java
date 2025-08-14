@@ -5,7 +5,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import ru.ycoord.core.gui.GuiListData;
 import ru.ycoord.core.gui.GuiPagedData;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.gui.items.GuiItem;
@@ -27,7 +26,7 @@ public class ExampleGuiPagedData extends GuiPagedData {
         }
 
         @Override
-        protected void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
+        public void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
             super.getExtraPlaceholders(placeholders, slot, index, base);
             placeholders.put("%data-index%", dataIndex);
         }

@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,24 +15,25 @@ import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.persistance.PlayerDataCache;
-import ru.ycoord.core.placeholder.CorePlaceholders;
-import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.core.placeholder.PlaceholderManager;
 import ru.ycoord.examples.commands.CoreCommand;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
     private ChatMessage chatMessage;
     private PlayerDataCache playerDataCache;
     private GuiManager guiManager;
-    private MessagePlaceholders messagePlaceholders;
+    private final MessagePlaceholders messagePlaceholders = new MessagePlaceholders(null);
     private final PlaceholderManager placeholderManager = new PlaceholderManager();
 
+    private final Map<String, ConfigurationSection> menus = new HashMap<>();
+
+    public Map<String, ConfigurationSection> getMenus() {
+        return menus;
+    }
     public static YcoordCore getInstance() {
         return instance;
     }
@@ -60,21 +62,19 @@ public final class YcoordCore extends YcoordPlugin {
     public void onEnable() {
         instance = this;
 
+        {
+            chatMessage = new ChatMessage(this, new YamlConfiguration());
+        }
 
         super.onEnable();
 
         placeholderManager.register();
 
-        {
-            chatMessage = new ChatMessage(this, getConfig());
-        }
 
         try {
             playerDataCache = new PlayerDataCache("players.db");
 
-            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
-                playerDataCache.update();
-            }, 20, 10);
+            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> playerDataCache.update(), 20, 10);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -84,28 +84,9 @@ public final class YcoordCore extends YcoordPlugin {
         long currentTime = System.currentTimeMillis();
         this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
-            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
-                guiManager.update(System.currentTimeMillis() - currentTime);
-            }, 10, 10);
+            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 10, 10);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-
-        {
-            messagePlaceholders = new MessagePlaceholders(null);
-            ConfigurationSection placeholders = getConfig().getConfigurationSection("placeholders");
-            if (placeholders != null) {
-                for (String key : placeholders.getKeys(false)) {
-                    ConfigurationSection placeholderData = placeholders.getConfigurationSection(key);
-                    if (placeholderData != null) {
-
-                        String placeholderKey = placeholderData.getString("placeholder");
-                        String placeholderValue = placeholderData.getString("result");
-
-                        messagePlaceholders.put(placeholderKey, placeholderValue);
-                    }
-                }
-            }
         }
     }
 
