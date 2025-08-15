@@ -84,7 +84,7 @@ public class ExampleGuiSlotData extends GuiBase {
         Player onlinePlayer = player.getPlayer();
         if (onlinePlayer != null) {
             if (type.equalsIgnoreCase("MARKER")) {
-                return new GuiSlot(() -> getItem(player, slotIndex), priority, slotIndex, currentIndex, section);
+                return new GuiSlot((player1) -> getItem(player1, slotIndex), priority, slotIndex, currentIndex, section);
             }
         }
 

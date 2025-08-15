@@ -26,8 +26,8 @@ public class ExampleGuiListData extends GuiListData {
         }
 
         @Override
-        public void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
-            super.getExtraPlaceholders(placeholders, slot, index, base);
+        public void getExtraPlaceholders(OfflinePlayer player, MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
+            super.getExtraPlaceholders(player, placeholders, slot, index, base);
             placeholders.put("%data-index%", dataIndex);
         }
 

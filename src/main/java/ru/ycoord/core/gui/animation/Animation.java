@@ -25,12 +25,14 @@ public abstract class Animation {
     protected boolean background = false;
     private Material backgroundMaterial = Material.AIR;
     private String backgroundName = "";
+    private List<String> ignoredTypes = new LinkedList<>();
 
     public Animation(@Nullable ConfigurationSection section) {
         this.section = section;
         if (section == null)
             return;
         this.duration = section.getInt("duration", 10);
+        this.ignoredTypes = section.getStringList("ignored");
         ConfigurationSection backgroundSection = section.getConfigurationSection("background");
         if (backgroundSection != null) {
             this.background = backgroundSection.getBoolean("enabled", false);
@@ -52,14 +54,35 @@ public abstract class Animation {
         }
     }
 
+    boolean isIgnored(int slot, ConcurrentHashMap<Integer, List<GuiBase.GuiItemCharacter>> guiElements) {
+        List<GuiBase.GuiItemCharacter> items = guiElements.getOrDefault(slot, new LinkedList<>());
+        for (GuiBase.GuiItemCharacter item : items) {
+            if (ignoredTypes.contains(item.type))
+                return true;
+        }
+
+        return false;
+    }
+
     public void animate(GuiBase base, Inventory inventory, Player player, ConcurrentHashMap<Integer, List<GuiBase.GuiItemCharacter>> guiElements, MessagePlaceholders messagePlaceholders) {
         if (background) {
             for (int i = 0; i < inventory.getSize(); i++) {
-                ItemStack item = new ItemStack(backgroundMaterial);
-                ItemMeta meta = item.getItemMeta();
-                meta.displayName(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, backgroundName, new MessagePlaceholders(player))));
-                item.setItemMeta(meta);
-                inventory.setItem(i, item);
+
+                boolean ignored = isIgnored(i, guiElements);
+                if (!ignored) {
+                    ItemStack item = new ItemStack(backgroundMaterial);
+                    ItemMeta meta = item.getItemMeta();
+                    meta.displayName(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, backgroundName, messagePlaceholders)));
+                    item.setItemMeta(meta);
+                    inventory.setItem(i, item);
+                } else {
+                    for (GuiBase.GuiItemCharacter character : guiElements.get(i)) {
+                        if (character.item == null)
+                            continue;
+
+                        base.setSlotItem(i, character.index, character.item, player, messagePlaceholders);
+                    }
+                }
             }
         }
         List<List<Integer>> data = makeFrames(9, inventory.getSize() / 9);
@@ -69,7 +92,8 @@ public abstract class Animation {
             for (Integer slot : slots) {
                 if (!guiElements.containsKey(slot))
                     continue;
-
+                if (isIgnored(slot, guiElements))
+                    continue;
                 for (GuiBase.GuiItemCharacter character : guiElements.get(slot)) {
                     if (character.item == null)
                         continue;

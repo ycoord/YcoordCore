@@ -1,5 +1,6 @@
 package ru.ycoord.core.gui.items;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import ru.ycoord.core.gui.GuiBase;
@@ -13,7 +14,7 @@ public class GuiItemStack extends GuiItem {
     }
 
     @Override
-    protected ItemStack createItem(GuiBase base, int slot) {
+    public ItemStack createItem(OfflinePlayer player, GuiBase base, int slot) {
         return item.clone();
     }
 }

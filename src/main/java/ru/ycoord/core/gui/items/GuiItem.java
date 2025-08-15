@@ -31,13 +31,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GuiItem {
-    private final int slot;
-    private final int index;
+    protected final int slot;
+    protected final int index;
     protected @Nullable ConfigurationSection section;
-    private final int priority;
-    private boolean redraw = false;
-    private List<String> lore = new LinkedList<>();
-    private ItemStack stack;
+    protected final int priority;
+    protected boolean redraw = false;
+    protected List<String> lore = new LinkedList<>();
+    protected ItemStack stack;
 
     public GuiItem(int priority, int slot, int index, @Nullable ConfigurationSection section) {
         this.priority = priority;
@@ -52,11 +52,11 @@ public class GuiItem {
         this.redraw = section.getBoolean("redraw", false);
     }
 
-    protected List<String> getLoreBefore(OfflinePlayer ignored) {
+    public List<String> getLoreBefore(OfflinePlayer ignored) {
         return new LinkedList<>();
     }
 
-    protected List<String> getLoreAfter(OfflinePlayer ignored) {
+    public List<String> getLoreAfter(OfflinePlayer ignored) {
         return new LinkedList<>();
     }
 
@@ -112,15 +112,15 @@ public class GuiItem {
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, int index, MessagePlaceholders placeholders, boolean onlyMeta) {
         if (!checkCondition(clicker.getPlayer(), placeholders))
             return null;
-        getExtraPlaceholders(placeholders, slot, index, base);
+        getExtraPlaceholders(clicker, placeholders, slot, index, base);
         if (!onlyMeta) {
-            this.stack = createItem(base, slot);
+            this.stack = createItem(clicker, base, slot);
         }
         apply(clicker, this.stack, placeholders);
         return this.stack;
     }
 
-    protected ItemStack createItem(GuiBase base, int slot) {
+    public ItemStack createItem(OfflinePlayer clicker, GuiBase base, int slot) {
         ItemStack stack;
         if (section == null)
             return new ItemStack(Material.AIR);
@@ -136,7 +136,7 @@ public class GuiItem {
         return stack;
     }
 
-    private boolean checkCooldown(Player clicker) {
+    public boolean checkCooldown(Player clicker) {
         ConcurrentHashMap<String, Long> cd = GuiManager.cooldowns;
         {
             long curr = System.currentTimeMillis();
@@ -158,7 +158,7 @@ public class GuiItem {
         return false;
     }
 
-    private boolean handleClick(GuiBase gui, boolean left, Player player, MessagePlaceholders placeholders) {
+    public boolean handleClick(GuiBase gui, boolean left, Player player, MessagePlaceholders placeholders) {
         if (section == null)
             return true;
         ConfigurationSection clickSection;
@@ -178,7 +178,7 @@ public class GuiItem {
         if (event.getWhoClicked() instanceof Player clicker) {
             if (!checkCooldown(clicker))
                 return false;
-            getExtraPlaceholders(placeholders, slot, index, gui);
+            getExtraPlaceholders(clicker, placeholders, slot, index, gui);
             if (event.isLeftClick()) {
                 return handleClick(gui, true, clicker, placeholders);
             }
@@ -192,11 +192,11 @@ public class GuiItem {
     }
 
     public void update(GuiBase guiBase, int slot, int index, long elapsed, Player player, MessagePlaceholders placeholders) {
-        getExtraPlaceholders(placeholders, slot, index, guiBase);
+        getExtraPlaceholders(player, placeholders, slot, index, guiBase);
         handleCondition(guiBase, slot, index, player, placeholders);
     }
 
-    private void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
+    public void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
         boolean condition = checkCondition(player, messagePlaceholders);
 
         ConcurrentHashMap<Integer, GuiItem> slots = guiBase.getSlots();
@@ -229,7 +229,7 @@ public class GuiItem {
         return Utils.checkCondition(player, conditionValue, placeholders);
     }
 
-    public void getExtraPlaceholders(MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
+    public void getExtraPlaceholders(OfflinePlayer player, MessagePlaceholders placeholders, int slot, int index, GuiBase base) {
         placeholders.put("%slot%", slot);
         placeholders.put("%index%", index);
     }

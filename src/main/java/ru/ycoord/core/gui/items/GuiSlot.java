@@ -14,10 +14,10 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.transaction.TransactionManager;
 
 public class GuiSlot extends GuiItem {
-    protected final IItemProvider provider;
+    protected IItemProvider provider;
 
     public interface IItemProvider {
-        ItemStack getItem();
+        ItemStack getItem(OfflinePlayer player);
     }
 
     public GuiSlot(IItemProvider provider, int priority, int slot, int index, @Nullable ConfigurationSection section) {
@@ -27,7 +27,7 @@ public class GuiSlot extends GuiItem {
 
     @Override
     public ItemStack buildItem(OfflinePlayer clicker, GuiBase base, int slot, int index, MessagePlaceholders placeholders, boolean onlyMeta) {
-        return provider.getItem();
+        return provider.getItem(clicker);
     }
 
     @Override

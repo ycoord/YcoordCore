@@ -284,7 +284,7 @@ public class GuiBase implements InventoryHolder {
         if (lockOnAnimation && TransactionManager.inProgress(clicker.getName(), this.getClass().getSimpleName())) {
             e.setCancelled(true);
             ChatMessage chat = YcoordCore.getInstance().getChatMessage();
-            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "animation-in-progress");
+            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "messages.animation-in-progress");
             return;
         }
         int slot = e.getSlot();
@@ -304,7 +304,7 @@ public class GuiBase implements InventoryHolder {
         if (lockOnAnimation && TransactionManager.inProgress(clicker.getName(), this.getClass().getSimpleName())) {
             e.setCancelled(true);
             ChatMessage chat = YcoordCore.getInstance().getChatMessage();
-            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "animation-in-progress");
+            chat.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "messages.animation-in-progress");
         }
     }
 }
