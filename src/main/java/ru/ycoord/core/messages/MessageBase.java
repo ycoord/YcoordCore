@@ -239,16 +239,16 @@ public abstract class MessageBase {
 
     public abstract void displayMessage(Level level, OfflinePlayer player, String messages);
 
-    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def) {
-        sendMessageIdAsync(level, player, id, def, new MessagePlaceholders(player));
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def) {
+        return sendMessageIdAsync(level, player, id, def, new MessagePlaceholders(player));
     }
 
-    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
-        sendMessageIdAsync(level, player, id, "", messagePlaceholders);
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
+        return sendMessageIdAsync(level, player, id, "", messagePlaceholders);
     }
 
-    public final void sendMessageIdAsync(Level level, OfflinePlayer player, String id) {
-        sendMessageIdAsync(level, player, id, "", new MessagePlaceholders(player));
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id) {
+        return sendMessageIdAsync(level, player, id, "", new MessagePlaceholders(player));
     }
 
     public void broadcastAll(Level level, OfflinePlayer sender, String id, String def, MessagePlaceholders messagePlaceholders) {

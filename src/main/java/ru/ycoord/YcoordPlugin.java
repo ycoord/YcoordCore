@@ -60,8 +60,8 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-
+        boolean replace = true;
+        this.saveResource("config.yml", replace);
         {
             if (doesntRequirePlugin(this, "PlayerPoints"))
                 return;
@@ -101,7 +101,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         }
 
         {
-            saveAllYmlFiles();
+            saveAllYmlFiles(replace);
             File dataFolder = getDataFolder().getAbsoluteFile();
             File menusFolder = new File(dataFolder, "menus");
             if (!menusFolder.exists())
@@ -176,7 +176,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             guiCommands.add(new GuiCommand(configuration, section));
     }
 
-    private void saveAllYmlFiles() {
+    private void saveAllYmlFiles(boolean replace) {
         try {
             URL url = getClassLoader().getResource("menus");
 
@@ -192,7 +192,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                     if (name.equalsIgnoreCase("config.yml") || name.equalsIgnoreCase("plugin.yml"))
                         continue;
 
-                    saveResource(name, false);
+                    saveResource(name, replace);
                 }
             }
         } catch (Exception ignored) {

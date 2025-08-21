@@ -93,7 +93,7 @@ nick-completion:
 
 messages:
   cooldown:
-    - "Не так быстро! %executor%"
+    - "Не так быстро!"
     
   not-float:
     - "Не является вещественным числом!"

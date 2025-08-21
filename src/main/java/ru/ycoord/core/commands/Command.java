@@ -123,7 +123,8 @@ public abstract class Command {
                     return false;
 
                 if (result instanceof Command command) {
-                    return executeNext(command, params);
+                    executeNext(command, params);
+                    return false;
                 }
 
                 params.add(result);

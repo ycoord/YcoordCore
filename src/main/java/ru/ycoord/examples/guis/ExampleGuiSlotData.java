@@ -95,7 +95,7 @@ public class ExampleGuiSlotData extends GuiBase {
     boolean canCanProcess(OfflinePlayer clicker) {
         if (TransactionManager.inProgress(getKey(clicker), getValue(clicker))) {
             ChatMessage message = YcoordCore.getInstance().getChatMessage();
-            message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "data-is-loading");
+            message.sendMessageIdAsync(MessageBase.Level.INFO, clicker, "messages.data-is-loading");
             return false;
         }
         return true;
