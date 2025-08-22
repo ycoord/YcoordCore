@@ -71,6 +71,15 @@ placeholders:
   11:
     placeholder: "%bullet%"
     result: "§f◦§r&7"
+  12:
+    placeholder: "%rmb%"
+    result: "§6[✔]§r §eПКМ§r §7-"
+  13:
+    placeholder: "%lmb%"
+    result: "§6[✔]§r §eЛКМ§r §7-"
+  14:
+    placeholder: "%money%"
+    result: "Ⓜ"
 
 default-string-completion:
   - <строка>
@@ -254,5 +263,5 @@ items:
     material: ORANGE_STAINED_GLASS_PANE
     texture: ""
     glow: true
-    name: 'ycoord'
+    name: '§x§F§B§4§4§0§0y§x§F§C§5§D§0§0c§x§F§D§7§5§0§0o§x§F§D§8§E§0§0o§x§F§E§A§6§0§0r§x§F§F§B§F§0§0d'
     lore: [ ]

@@ -1,8 +1,8 @@
 package ru.ycoord.core.messages;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -14,6 +14,8 @@ import ru.ycoord.core.sound.SoundInfo;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class MessageBase {
     protected ConfigurationSection messagesSection;
@@ -183,7 +185,17 @@ public abstract class MessageBase {
         return messagesSection;
     }
 
+    private final static Pattern HEX_PATTERN = Pattern
+            .compile("&(#[a-f0-9]{6})", Pattern.CASE_INSENSITIVE);
+
     public static String translateColor(Level level, String value, MessagePlaceholders messagePlaceholders) {
+
+        Matcher m = HEX_PATTERN.matcher(value);
+        while (m.find()) {
+            value = value.replace(m.group(), ChatColor.of(m.group(1)).toString());
+        }
+
+
         String tran = ChatColor.translateAlternateColorCodes('&', value);
         if (messagePlaceholders == null) {
             return tran;

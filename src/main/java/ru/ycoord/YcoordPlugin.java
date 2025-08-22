@@ -9,6 +9,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import ru.ycoord.core.balance.CustomBalance;
 import ru.ycoord.core.balance.DonateBalance;
 import ru.ycoord.core.balance.IBalance;
 import ru.ycoord.core.balance.MoneyBalance;
@@ -31,7 +33,26 @@ import java.util.logging.Logger;
 public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected IBalance moneyBalance = null;
     protected IBalance donateBalance = null;
+    protected IBalance customBalance = null;
+    protected IBalance currencyBalance = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
+
+    public IBalance getMoneyBalance() {
+        return moneyBalance;
+    }
+
+    public IBalance getDonateBalance() {
+        return donateBalance;
+    }
+
+    public IBalance getCustomBalance() {
+        return customBalance;
+    }
+
+    public IBalance getCurrenyBalance() {
+        return currencyBalance;
+    }
+
 
     public boolean doesntRequirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
@@ -61,6 +82,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     @Override
     public void onEnable() {
         boolean replace = true;
+        @NotNull FileConfiguration cfg = getConfig();
         this.saveResource("config.yml", replace);
         {
             if (doesntRequirePlugin(this, "PlayerPoints"))
@@ -78,6 +100,24 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
             if (economyProvider != null) {
                 moneyBalance = new MoneyBalance(economyProvider.getProvider());
+            }
+        }
+
+        {
+            ConfigurationSection currency = cfg.getConfigurationSection("currency");
+
+            if (currency != null) {
+                String type = currency.getString("name", "MONEY");
+                if (type.equalsIgnoreCase("MONEY")) {
+                    currencyBalance = moneyBalance;
+                } else if (type.equalsIgnoreCase("DONATE")) {
+                    currencyBalance = donateBalance;
+                } else if (type.equalsIgnoreCase("CUSTOM")) {
+                    currencyBalance = new CustomBalance(currency);
+                    customBalance = currencyBalance;
+                }
+            }else{
+                currencyBalance = moneyBalance;
             }
         }
 
@@ -104,8 +144,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
             saveAllYmlFiles(replace);
             File dataFolder = getDataFolder().getAbsoluteFile();
             File menusFolder = new File(dataFolder, "menus");
-            if (!menusFolder.exists())
-            {
+            if (!menusFolder.exists()) {
                 boolean ignored = menusFolder.mkdir();
             }
             if (menusFolder.exists()) {
@@ -151,7 +190,6 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     }
 
 
-
     private void loadMenu(FileConfiguration configuration) {
         String name = configuration.getString("name", null);
         if (name == null)
@@ -161,7 +199,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         ConfigurationSection section = configuration.getConfigurationSection("open-command");
         if (section == null)
             return;
-        String commandName =  section.getString("name", null);
+        String commandName = section.getString("name", null);
         if (commandName == null)
             return;
         boolean merged = false;
@@ -209,6 +247,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     public void onDisable() {
         //YcoordCore.getInstance().getPlaceholderManager().unregister();
     }
+
     public IPlaceholderAPI getPlaceholderAPI() {
         return new PlaceholderDummy();
     }

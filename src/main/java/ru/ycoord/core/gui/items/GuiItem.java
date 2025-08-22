@@ -68,6 +68,12 @@ public class GuiItem {
         List<String> loreAfter = getLoreAfter(clicker);
 
         List<String> resultLore = new LinkedList<>();
+
+        if(!lore.isEmpty())
+        {
+            resultLore.add("");
+        }
+
         for (String loreItem : loreBefore) {
             resultLore.add(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders));
         }
@@ -82,15 +88,17 @@ public class GuiItem {
 
         ItemMeta meta = stack.getItemMeta();
         String name = section.getString("name", "имя");
-        meta.displayName(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, name, placeholders)));
+        meta.setDisplayName(MessageBase.translateColor(MessageBase.Level.NONE, name, placeholders));
 
-        List<Component> components = new LinkedList<>();
-        for (String loreItem : resultLore) {
-            meta.lore(new LinkedList<>());
-            components.add(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders)));
-        }
+        //List<Component> components = new LinkedList<>();
+        //for (String loreItem : resultLore) {
+        //    meta.lore(new LinkedList<>());
+        //    components.add(Component.text(MessageBase.translateColor(MessageBase.Level.NONE, loreItem, placeholders)));
+        //}
+//
+        //meta.lore(components);
 
-        meta.lore(components);
+        meta.setLore(resultLore);
 
         meta.setCustomModelData(999);
         stack.setItemMeta(meta);
@@ -199,14 +207,13 @@ public class GuiItem {
     public void handleCondition(GuiBase guiBase, int slot, int index, Player player, MessagePlaceholders messagePlaceholders) {
         boolean condition = checkCondition(player, messagePlaceholders);
 
-        ConcurrentHashMap<Integer, GuiItem> slots = guiBase.getSlots();
 
-        if (!slots.containsKey(slot)) {
+        if (!guiBase.hasSlot(slot)) {
             return;
         }
         if (!condition)
             return;
-        GuiItem itemInSlot = slots.get(slot);
+        GuiItem itemInSlot = guiBase.getItemInSlot(player, slot);
 
         boolean otherCondition = itemInSlot.checkCondition(player, messagePlaceholders);
         if (!otherCondition) {

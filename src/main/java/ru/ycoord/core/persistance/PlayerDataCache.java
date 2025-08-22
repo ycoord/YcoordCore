@@ -6,7 +6,6 @@ import com.j256.ormlite.table.TableUtils;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.YcoordCore;
-import ru.ycoord.core.persistance.PlayerDataRecord;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -57,6 +56,14 @@ public class PlayerDataCache {
         if (map == null) return null;
         return map.get(key);
     }
+
+    public boolean has(OfflinePlayer player, String key) {
+        String uuid = player.getName();
+        Map<String, String> map = cache.get(uuid);
+        if(map == null) return false;
+        return  map.containsKey(key);
+    }
+
 
     // Сбросить dirty-данные в БД
     public void update() {

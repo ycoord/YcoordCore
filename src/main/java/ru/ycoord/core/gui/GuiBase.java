@@ -16,6 +16,7 @@ import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.animation.*;
 import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
+import ru.ycoord.core.gui.items.GuiMultiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessageBase;
@@ -200,8 +201,17 @@ public class GuiBase implements InventoryHolder {
         inventory.setItem(slot, itemStack);
     }
 
-    public ConcurrentHashMap<Integer, GuiItem> getSlots() {
-        return slots;
+
+    public boolean hasSlot(int slot){
+        return slots.containsKey(slot);
+    }
+
+    public GuiItem getItemInSlot(OfflinePlayer player, int slot){
+        GuiItem itemInSlot = slots.get(slot);
+        if(itemInSlot instanceof GuiMultiItem muiti){
+            return muiti.getCurrentSlot(player);
+        }
+        return itemInSlot;
     }
 
     protected ConcurrentHashMap<Integer, List<GuiItemCharacter>> make(OfflinePlayer player, ConfigurationSection section) {
