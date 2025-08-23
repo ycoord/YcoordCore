@@ -10,13 +10,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import ru.ycoord.core.balance.CustomBalance;
-import ru.ycoord.core.balance.DonateBalance;
-import ru.ycoord.core.balance.IBalance;
-import ru.ycoord.core.balance.MoneyBalance;
+import ru.ycoord.core.balance.*;
 import ru.ycoord.core.color.Color;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.commands.GuiCommand;
+import ru.ycoord.core.logging.FileLogger;
+import ru.ycoord.core.logging.YLogger;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
@@ -31,28 +30,42 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 public class YcoordPlugin extends JavaPlugin implements EventListener {
-    protected IBalance moneyBalance = null;
-    protected IBalance donateBalance = null;
-    protected IBalance customBalance = null;
-    protected IBalance currencyBalance = null;
+    protected Balance moneyBalance = null;
+    protected Balance donateBalance = null;
+    protected Balance customBalance = null;
+    protected Balance expBalance = null;
+    protected Balance levelBalance = null;
+    protected Balance currencyBalance = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
+    private YLogger logger;
 
-    public IBalance getMoneyBalance() {
+    public Balance getMoneyBalance() {
         return moneyBalance;
     }
 
-    public IBalance getDonateBalance() {
+    public Balance getDonateBalance() {
         return donateBalance;
     }
 
-    public IBalance getCustomBalance() {
+    public Balance getCustomBalance() {
         return customBalance;
     }
 
-    public IBalance getCurrenyBalance() {
+    public Balance getExpBalance() {
+        return expBalance;
+    }
+
+    public Balance getLevelBalance() {
+        return levelBalance;
+    }
+
+    public Balance getCurrenyBalance() {
         return currencyBalance;
     }
 
+    public YLogger logger() {
+        return logger;
+    }
 
     public boolean doesntRequirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
@@ -84,6 +97,10 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         boolean replace = true;
         @NotNull FileConfiguration cfg = getConfig();
         this.saveResource("config.yml", replace);
+
+        logger = new FileLogger(getDataFolder(), this);
+
+
         {
             if (doesntRequirePlugin(this, "PlayerPoints"))
                 return;
@@ -104,6 +121,11 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         }
 
         {
+            levelBalance = new LevelBalance();
+            expBalance = new ExpBalance();
+        }
+
+        {
             ConfigurationSection currency = cfg.getConfigurationSection("currency");
 
             if (currency != null) {
@@ -112,11 +134,15 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                     currencyBalance = moneyBalance;
                 } else if (type.equalsIgnoreCase("DONATE")) {
                     currencyBalance = donateBalance;
+                } else if (type.equalsIgnoreCase("LEVEL")) {
+                    currencyBalance = levelBalance;
+                } else if (type.equalsIgnoreCase("EXP")) {
+                    currencyBalance = expBalance;
                 } else if (type.equalsIgnoreCase("CUSTOM")) {
                     currencyBalance = new CustomBalance(currency);
                     customBalance = currencyBalance;
                 }
-            }else{
+            } else {
                 currencyBalance = moneyBalance;
             }
         }

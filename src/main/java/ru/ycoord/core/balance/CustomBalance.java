@@ -7,14 +7,14 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.utils.Utils;
 
-public class CustomBalance implements IBalance {
+public class CustomBalance extends Balance {
     private final ConfigurationSection section;
 
     public CustomBalance(ConfigurationSection section) {
         this.section = section;
     }
     @Override
-    public void withdraw(Player player, double money) {
+    public void subWithdraw(Player player, double money) {
         String withDrawCommand = section.getString("withdraw");
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         placeholders.put("%amount%", money);
@@ -22,7 +22,7 @@ public class CustomBalance implements IBalance {
     }
 
     @Override
-    public void deposit(Player player, double money) {
+    public void subDeposit(Player player, double money) {
         String depositCommand = section.getString("deposit");
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         placeholders.put("%amount%", money);
@@ -30,7 +30,7 @@ public class CustomBalance implements IBalance {
     }
 
     @Override
-    public double get(Player player) {
+    public double subGet(Player player) {
         String getPlaceholder = section.getString("get");
         assert getPlaceholder != null;
         String result = PlaceholderAPI.setPlaceholders(player, getPlaceholder.replace("%player%", player.getName()));

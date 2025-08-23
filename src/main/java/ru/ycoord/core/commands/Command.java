@@ -93,7 +93,7 @@ public abstract class Command {
     }
 
     public boolean execute(CommandSender sender, List<String> args, List<Object> params) {
-
+        YcoordCore.getInstance().logger().info(String.format("%s выполняет %s с аргументами %s", sender.getName(), this.getClass().getSimpleName(), args));
         if (!canExecute(sender)) {
             if (unknownCommandIfCantExecute())
                 unknownCommand(sender);

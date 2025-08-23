@@ -93,7 +93,7 @@ public class GuiBase implements InventoryHolder {
 
         title = MessageBase.translateColor(MessageBase.Level.NONE, title, placeholders);
 
-        inventory = Bukkit.createInventory(this, size, Component.text(title));
+        inventory = Bukkit.createInventory(this, size, title);
         rebuild(player, true);
         Objects.requireNonNull(player.getPlayer()).openInventory(inventory);
         if (openSound != null)
