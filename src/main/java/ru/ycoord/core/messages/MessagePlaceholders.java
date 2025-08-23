@@ -3,10 +3,13 @@ package ru.ycoord.core.messages;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import ru.ycoord.YcoordCore;
+import ru.ycoord.core.balance.Balance;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ru.ycoord.core.utils.Utils.convertTime;
 
@@ -43,8 +46,32 @@ public class MessagePlaceholders {
         return map.get(key);
     }
 
+    static Pattern p = Pattern.compile("\\{([^{}]*;[^{}]*)}");
+
+    private String processPlaceholdersWithArgs(String text) {
+        Matcher m = p.matcher(text);
+
+        while (m.find()) {
+            String inside = m.group(1);
+            String fullInside = "{" + inside + "}";
+
+            String[] parts = inside.split("\\s*;\\s*"); // режем по ';' с обрезкой пробелов
+
+            String name = parts[0];                     // "MONEY" / "CMD"
+
+            YcoordCore core = YcoordCore.getInstance();
+            Balance balance = core.getBalance(name);
+            if (balance != null) {
+                int amount = Integer.parseInt(parts[1]);
+
+                text = text.replace(fullInside, balance.format(amount));
+            }
+        }
+        return text;
+    }
 
     public String apply(MessageBase.Level level, String text) {
+        text = processPlaceholdersWithArgs(text);
         MessageBase.Style style = YcoordCore.getInstance().getChatMessage().getStyle();
         if (style != null) {
             text = style.apply(level, text);

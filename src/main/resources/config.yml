@@ -36,6 +36,33 @@ style:
       pitch: 0.7
       volume: 1
 
+      # %yc_gr_~<#FB8000><#F2FF00>{yc_pl_%arg% Ⓜ}%
+      # %yc_gr_~<#04FBC9><#0BFF00>{yc_pl_%arg% Ⓒ}%
+      # %yc_gr_~<#00FBE6><#0010FF>{yc_pl_%arg% Ⓛ}%
+      # %yc_gr_~<#003DFB><#FF05FB>{yc_pl_%arg% Ⓔ}%
+      # ls("DONATE")) {
+
+
+money:
+  1:
+    type: MONEY
+    style: "%yc_gr_~<#FB8000><#F2FF00>{yc_pl_%AMOUNT% Ⓜ}%"
+  2:
+    type: DONATE
+    style: "%yc_gr_~<#04FBC9><#0BFF00>{yc_pl_%AMOUNT% Ⓒ}%"
+  3:
+    type: LEVEL
+    style: "%yc_gr_~<#00FBE6><#0010FF>{yc_pl_%AMOUNT% Ⓛ}%"
+  4:
+    type: EXP
+    style: "%yc_gr_~<#003DFB><#FF05FB>{yc_pl_%AMOUNT% Ⓔ}%"
+  5:
+    type: CUSTOM1
+    style: "%yc_gr_~<#0616FB><#0BFF00>{yc_pl_%AMOUNT% Ⓖ}%"
+    give: "points give %player% %count%"
+    take: "points take %player% %count%"
+    get:  "%playerpoints_points%"
+
 
 placeholders:
   1:
@@ -82,7 +109,7 @@ placeholders:
     result: "§x§f§b§3§5§0§0§ly§x§f§c§3§e§0§0§lc§x§f§d§4§7§0§0§lo§x§f§d§5§1§0§0§lo§x§f§e§5§a§0§0§lr§x§f§f§6§3§0§0§ld"
   16:
     placeholder: "%logo-inv%"
-    result: " &8&l» §x§D§E§3§C§0§0"
+    result: " &8&l»§x§D§E§3§C§0§0"
 
 default-string-completion:
   - <строка>
@@ -266,4 +293,9 @@ items:
     material: ORANGE_STAINED_GLASS_PANE
     texture: ""
     name: '%logo%'
-    lore: [ ]
+    lore:
+      -  "{MONEY;600}  {DONATE;600}"
+      -  "{LEVEL;600}"
+      -  "{EXP;600}"
+      -  "{DONATE;600}"
+      -  "{CUSTOM1;600}"

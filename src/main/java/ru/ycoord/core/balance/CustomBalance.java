@@ -11,29 +11,32 @@ public class CustomBalance extends Balance {
     private final ConfigurationSection section;
 
     public CustomBalance(ConfigurationSection section) {
+        super(section);
         this.section = section;
     }
     @Override
-    public void subWithdraw(Player player, double money) {
-        String withDrawCommand = section.getString("withdraw");
+    public void subWithdraw(Player player, int money) {
+        String withDrawCommand = section.getString("take");
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-        placeholders.put("%amount%", money);
+        placeholders.put("%count%", money);
+        placeholders.put("%player%", player.getName());
         Utils.executeConsole(MessageBase.makeMessage(MessageBase.Level.NONE, withDrawCommand, placeholders));
     }
 
     @Override
-    public void subDeposit(Player player, double money) {
-        String depositCommand = section.getString("deposit");
+    public void subDeposit(Player player, int money) {
+        String depositCommand = section.getString("give");
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
-        placeholders.put("%amount%", money);
+        placeholders.put("%count%", money);
+        placeholders.put("%player%", player.getName());
         Utils.executeConsole(MessageBase.makeMessage(MessageBase.Level.NONE, depositCommand, placeholders));
     }
 
     @Override
-    public double subGet(Player player) {
+    public int subGet(Player player) {
         String getPlaceholder = section.getString("get");
         assert getPlaceholder != null;
         String result = PlaceholderAPI.setPlaceholders(player, getPlaceholder.replace("%player%", player.getName()));
-        return Double.parseDouble(result);
+        return Integer.parseInt(result);
     }
 }

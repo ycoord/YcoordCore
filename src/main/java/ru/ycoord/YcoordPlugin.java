@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.balance.*;
 import ru.ycoord.core.color.Color;
 import ru.ycoord.core.commands.Command;
@@ -25,43 +26,14 @@ import java.io.File;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 public class YcoordPlugin extends JavaPlugin implements EventListener {
-    protected Balance moneyBalance = null;
-    protected Balance donateBalance = null;
-    protected Balance customBalance = null;
-    protected Balance expBalance = null;
-    protected Balance levelBalance = null;
-    protected Balance currencyBalance = null;
     protected List<GuiCommand> guiCommands = new LinkedList<>();
     private YLogger logger;
-
-    public Balance getMoneyBalance() {
-        return moneyBalance;
-    }
-
-    public Balance getDonateBalance() {
-        return donateBalance;
-    }
-
-    public Balance getCustomBalance() {
-        return customBalance;
-    }
-
-    public Balance getExpBalance() {
-        return expBalance;
-    }
-
-    public Balance getLevelBalance() {
-        return levelBalance;
-    }
-
-    public Balance getCurrenyBalance() {
-        return currencyBalance;
-    }
 
     public YLogger logger() {
         return logger;
@@ -99,53 +71,6 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         this.saveResource("config.yml", replace);
 
         logger = new FileLogger(getDataFolder(), this);
-
-
-        {
-            if (doesntRequirePlugin(this, "PlayerPoints"))
-                return;
-
-            PlayerPointsAPI pp = PlayerPoints.getInstance().getAPI();
-            donateBalance = new DonateBalance(pp);
-        }
-
-        {
-            if (doesntRequirePlugin(this, "Vault"))
-                return;
-
-            RegisteredServiceProvider<Economy> economyProvider = this.getServer().getServicesManager().getRegistration(Economy.class);
-
-            if (economyProvider != null) {
-                moneyBalance = new MoneyBalance(economyProvider.getProvider());
-            }
-        }
-
-        {
-            levelBalance = new LevelBalance();
-            expBalance = new ExpBalance();
-        }
-
-        {
-            ConfigurationSection currency = cfg.getConfigurationSection("currency");
-
-            if (currency != null) {
-                String type = currency.getString("name", "MONEY");
-                if (type.equalsIgnoreCase("MONEY")) {
-                    currencyBalance = moneyBalance;
-                } else if (type.equalsIgnoreCase("DONATE")) {
-                    currencyBalance = donateBalance;
-                } else if (type.equalsIgnoreCase("LEVEL")) {
-                    currencyBalance = levelBalance;
-                } else if (type.equalsIgnoreCase("EXP")) {
-                    currencyBalance = expBalance;
-                } else if (type.equalsIgnoreCase("CUSTOM")) {
-                    currencyBalance = new CustomBalance(currency);
-                    customBalance = currencyBalance;
-                }
-            } else {
-                currencyBalance = moneyBalance;
-            }
-        }
 
         {
             if (doesntRequirePlugin(this, "PlaceholderAPI"))

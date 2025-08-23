@@ -1,5 +1,8 @@
 package ru.ycoord;
 
+import net.milkbowl.vault.economy.Economy;
+import org.black_ixx.playerpoints.PlayerPoints;
+import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -7,9 +10,11 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.ycoord.core.balance.*;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.ChatMessage;
@@ -20,6 +25,7 @@ import ru.ycoord.examples.commands.CoreCommand;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
@@ -30,10 +36,32 @@ public final class YcoordCore extends YcoordPlugin {
     private final PlaceholderManager placeholderManager = new PlaceholderManager();
 
     private final Map<String, ConfigurationSection> menus = new HashMap<>();
+    private ConcurrentHashMap<String, Balance> balances = new ConcurrentHashMap<>();
+
+    public Balance getMoneyBalance() {
+        return balances.get("MONEY");
+    }
+
+    public Balance getDonateBalance() {
+        return balances.get("MONEY");
+    }
+
+    public Balance getExpBalance() {
+        return balances.get("EXP");
+    }
+
+    public Balance getLevelBalance() {
+        return balances.get("LEVEL");
+    }
+
+    public @Nullable Balance getBalance(String balance) {
+        return balances.getOrDefault(balance, null);
+    }
 
     public Map<String, ConfigurationSection> getMenus() {
         return menus;
     }
+
     public static YcoordCore getInstance() {
         return instance;
     }
@@ -50,6 +78,7 @@ public final class YcoordCore extends YcoordPlugin {
     public GuiManager getGuiManager() {
         return guiManager;
     }
+
     public MessagePlaceholders getGlobalPlaceholders() {
         return messagePlaceholders;
     }
@@ -67,6 +96,43 @@ public final class YcoordCore extends YcoordPlugin {
         }
 
         super.onEnable();
+
+        ConfigurationSection moneySection = getConfig().getConfigurationSection("money");
+
+
+        if (doesntRequirePlugin(this, "PlayerPoints"))
+            return;
+
+        PlayerPointsAPI pp = PlayerPoints.getInstance().getAPI();
+
+
+        if (doesntRequirePlugin(this, "Vault"))
+            return;
+
+        RegisteredServiceProvider<Economy> economyProvider = this.getServer().getServicesManager().getRegistration(Economy.class);
+
+        assert moneySection != null;
+        for (String key : moneySection.getKeys(false)) {
+            ConfigurationSection moneyCfg = moneySection.getConfigurationSection(key);
+            assert moneyCfg != null;
+            String type = moneyCfg.getString("type", null);
+            if (type == null)
+                continue;
+
+            if (type.equalsIgnoreCase("MONEY")) {
+                assert economyProvider != null;
+                balances.put(type, new MoneyBalance(moneyCfg, economyProvider.getProvider()));
+            } else if (type.equalsIgnoreCase("DONATE")) {
+                balances.put(type, new DonateBalance(moneyCfg, pp));
+            } else if (type.equalsIgnoreCase("EXP")) {
+                balances.put(type, new ExpBalance(moneyCfg));
+            } else if (type.equalsIgnoreCase("LEVEL")) {
+                balances.put(type, new LevelBalance(moneyCfg));
+            } else {
+                balances.put(type, new CustomBalance(moneyCfg));
+            }
+        }
+
 
         placeholderManager.register();
 
