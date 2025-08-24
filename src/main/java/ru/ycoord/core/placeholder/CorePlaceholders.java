@@ -14,7 +14,7 @@ public class CorePlaceholders extends IPlaceholderAPI {
     }
 
     @Override
-    public String process(Player player, List<String> args) {
+    public String process(OfflinePlayer player, List<String> args) {
         int len = args.size();
         YcoordCore core = YcoordCore.getInstance();
 

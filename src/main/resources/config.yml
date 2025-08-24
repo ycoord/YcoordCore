@@ -105,6 +105,15 @@ placeholders:
   17:
     placeholder: "%title-red%"
     result: "&4&l▶&6"
+  18:
+    placeholder: "%next%"
+    result: "&4&l▶&6"
+  19:
+    placeholder: "%prev%"
+    result: "&4&l◀&6"
+  20:
+    placeholder: "%back%"
+    result: "&4&l▼&6"
 
 default-string-completion:
   - <строка>

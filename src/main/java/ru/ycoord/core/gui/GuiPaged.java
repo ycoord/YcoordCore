@@ -3,6 +3,7 @@ package ru.ycoord.core.gui;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiPaginationButton;
 import ru.ycoord.core.messages.MessagePlaceholders;
@@ -67,6 +68,10 @@ abstract public class GuiPaged extends GuiBase {
         markerHeight = maxY - minY;
     }
 
+    public int getCurrentPageIndex() {
+        return current;
+    }
+
     protected abstract GuiItem getItem(int dataIndex, int currentMarkerIndex, int priority, OfflinePlayer player, int slotIndex, String type, ConfigurationSection config);
 
     protected GuiItem getFillerItem(int priority, int currentMarkerIndex, OfflinePlayer player, int slotIndex) {
@@ -98,7 +103,10 @@ abstract public class GuiPaged extends GuiBase {
             return new GuiPaginationButton(priority, this, false, slot, currentIndex, section);
         } else if (type.equalsIgnoreCase("NEXT")) {
             return new GuiPaginationButton(priority, this, true, slot, currentIndex, section);
+        } else if (type.equalsIgnoreCase("BACK")) {
+            return new GuiBackButton(this, priority, slot, currentIndex, section);
         }
+
         return super.makeItem(currentIndex, slot, priority, player, type, section);
     }
 
@@ -110,6 +118,7 @@ abstract public class GuiPaged extends GuiBase {
             rebuild(player, animate);
         }
     }
+
 
     abstract public int getMaxPages(OfflinePlayer player);
 

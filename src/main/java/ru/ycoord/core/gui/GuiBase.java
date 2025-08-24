@@ -280,9 +280,6 @@ public class GuiBase implements InventoryHolder {
             if (type.equalsIgnoreCase("VIEWER_HEAD")) {
                 return new GuiViewerHeadItem(onlinePlayer.getName(), priority, slotIndex, currentIndex, section);
             }
-            if (type.equalsIgnoreCase("BACK")) {
-                return new GuiBackButton(priority, slotIndex, currentIndex, section);
-            }
         }
 
         return new GuiItem(priority, slotIndex, currentIndex, section);

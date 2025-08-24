@@ -1,8 +1,10 @@
 package ru.ycoord.core.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -25,7 +27,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, String identifier) {
+    public @Nullable String onRequest(OfflinePlayer player, @NotNull String identifier) {
         String[] args = identifier.split("_");
         if (args.length >= 1) {
             String registered = args[0];
@@ -38,6 +40,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
         return null;
     }
+
 
 
     public void registerPlaceholder(IPlaceholderAPI papi) {
