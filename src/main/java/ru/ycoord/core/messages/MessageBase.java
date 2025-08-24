@@ -170,15 +170,13 @@ public abstract class MessageBase {
         INFO, SUCCESS, ERROR, NONE
     }
 
-    public MessageBase(YcoordCore core, ConfigurationSection messagesSection) {
+    public MessageBase(ConfigurationSection styleSection, ConfigurationSection messagesSection) {
         this.messagesSection = messagesSection;
 
-        ConfigurationSection mainConfig = core.getConfig();
-        ConfigurationSection style = mainConfig.getConfigurationSection("style");
-        if (style == null)
+        if (styleSection == null)
             return;
 
-        this.style = new Style(style);
+        this.style = new Style(styleSection);
     }
 
     public ConfigurationSection getSection() {

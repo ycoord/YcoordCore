@@ -98,6 +98,7 @@ public class SubcommandRequirement extends Requirement {
     }
 
     public void addCommand(Command command) {
+        subcommands.removeIf(c->c.getClass().equals(command.getClass()));
         subcommands.add(command);
     }
 }

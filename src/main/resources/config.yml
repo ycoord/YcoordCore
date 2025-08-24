@@ -114,6 +114,9 @@ placeholders:
   20:
     placeholder: "%back%"
     result: "&6&l▼&f"
+  21:
+    placeholder: "%nick%"
+    result: "&e"
 
 default-string-completion:
   - <строка>
@@ -149,47 +152,47 @@ messages:
     - "Команды &a «%command%» не существует! Возможные значения %possible%"
   no-range:
     - "Значение должно быть в диапазоне &e[%min%...%max%&e]"
-    
+
   need-param:
     - "Недостаточно параметров!"
-    
+
   player-cant:
     - "Игроки не могут использовать данную команду!"
-    
+
   no-permission:
     - "У вас нет прав!"
-    
+
   no-condition:
     - "Условие не выполняется"
-    
+
   player-offline:
     - "Игрок %player% не в сети!"
-    
+
 
   float-error:
     - "Необходим параметр: &eвещественное число"
-    
+
   integer-error:
     - "Необходим параметр: &eчисло"
-    
+
   online-player-error:
     - "Необходим параметр: &eонлайн игрок"
-    
+
   player-error:
     - "Необходим параметр: &eигрок"
-    
+
   ranged-error:
     - "Необходим параметр: число в диапазоне от %min% до %max%"
-    
+
   string-error:
     - "Необходим параметр: &eстрока"
-    
+
   subcommand-error:
     - "Необходим параметр: команда %possible%"
-    
+
   unknown-command:
     - "Неизвестная команда!"
-    
+
 
 
   no-block:
@@ -231,13 +234,13 @@ messages:
             text: Command1
             hover: Command1 Description, executor %executor%
             commands:
-            - /command1
+              - /command1
           3:
             text: " Command2"
             hover: Command2 Description, executor %executor%
             commands:
-            - /command1
-            - /command2
+              - /command1
+              - /command2
           4:
             text: " Open Url"
             hover: opens google.com
@@ -287,7 +290,8 @@ messages:
     - "получение головы игрока"
   example-gui-description:
     - "пример gui"
-
+  reloaded:
+    - "Плагин перезагружен. Перезагрузка плагинов на живом работающем сервере может привести к последствиям. Рекомендуется полная перезагрузка сервера после перезагрузки плагина"
 items:
   filler:
     symbol: '#'

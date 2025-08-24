@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ChatMessage extends MessageBase {
-    public ChatMessage(YcoordCore core, ConfigurationSection messagesSection) {
-        super(core, messagesSection);
+    public ChatMessage(ConfigurationSection styleSection, ConfigurationSection messagesSection) {
+        super(styleSection, messagesSection);
     }
 
     public void sendMessageId(Level level, OfflinePlayer player, String messageId, String def, final MessagePlaceholders messagePlaceholders){

@@ -10,33 +10,33 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.balance.*;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.gui.GuiManager;
 import ru.ycoord.core.messages.ChatMessage;
+import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
-import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.PlaceholderManager;
 import ru.ycoord.examples.commands.CoreCommand;
 
-import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
-    private ChatMessage chatMessage;
+    private ChatMessage chatMessage = null;
     private GuiManager guiManager;
     private final MessagePlaceholders messagePlaceholders = new MessagePlaceholders(null);
     private final PlaceholderManager placeholderManager = new PlaceholderManager();
 
     private final Map<String, ConfigurationSection> menus = new HashMap<>();
-    private ConcurrentHashMap<String, Balance> balances = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Balance> balances = new ConcurrentHashMap<>();
+    private BukkitTask guiTimer;
 
     public Balance getMoneyBalance() {
         return balances.get("MONEY");
@@ -87,14 +87,15 @@ public final class YcoordCore extends YcoordPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
-        {
-            chatMessage = new ChatMessage(this, new YamlConfiguration());
-        }
-
+        this.saveResource("config.yml", false);
+        reloadConfig();
+        chatMessage = new ChatMessage(getConfig().getConfigurationSection("style"), new YamlConfiguration());
         super.onEnable();
+    }
 
-        ConfigurationSection moneySection = getConfig().getConfigurationSection("money");
+
+    void initMoney(ConfigurationSection cfg) {
+        ConfigurationSection moneySection = cfg.getConfigurationSection("money");
 
 
         if (doesntRequirePlugin(this, "PlayerPoints"))
@@ -129,10 +130,14 @@ public final class YcoordCore extends YcoordPlugin {
                 balances.put(type, new CustomBalance(moneyCfg));
             }
         }
+    }
 
+    void initPlaceholderManager(boolean reload) {
+        if (!reload)
+            placeholderManager.register();
+    }
 
-        placeholderManager.register();
-
+    void initGuiManager(boolean reload) {
         guiManager = new GuiManager();
 
 
@@ -146,10 +151,21 @@ public final class YcoordCore extends YcoordPlugin {
         long currentTime = System.currentTimeMillis();
         this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
-            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
+            if (reload)
+                guiTimer.cancel();
+            guiTimer = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
         } catch (Exception e) {
             YcoordCore.getInstance().logger().error(e.getMessage());
         }
+    }
+
+    @Override
+    public void load(ConfigurationSection cfg, boolean reload) {
+        super.load(cfg, reload);
+
+        initMoney(cfg);
+        initGuiManager(reload);
+        initPlaceholderManager(reload);
     }
 
     @Override
@@ -160,26 +176,41 @@ public final class YcoordCore extends YcoordPlugin {
 
     static class Handler implements CommandExecutor, TabCompleter {
 
+        private final YcoordPlugin plugin;
         private final Command base;
 
-        public Handler(Command base) {
+        public Handler(YcoordPlugin plugin, Command base) {
+            this.plugin = plugin;
             this.base = base;
         }
 
         @Override
         public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-            return base.complete(sender, List.of(args));
+            List<String> complete = base.complete(sender, List.of(args));
+            List<String> newList = new LinkedList<>(complete);
+            if (sender.hasPermission("*")) {
+                newList.add("reload");
+            }
+            return newList;
         }
 
 
         @Override
         public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String[] args) {
+            if (args.length == 1) {
+                if (args[0].equalsIgnoreCase("reload")) {
+                    plugin.reload();
+                    if (sender instanceof Player player)
+                        YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO, player, "messages.reloaded");
+                    return true;
+                }
+            }
             return base.execute(sender, List.of(args), new LinkedList<>());
         }
     }
 
-    public void registerCommand(JavaPlugin plugin, Command command) {
-        Handler handler = new Handler(command);
+    public void registerCommand(YcoordPlugin plugin, Command command) {
+        Handler handler = new Handler(plugin, command);
         PluginCommand cmd = plugin.getCommand(command.getName());
         if (cmd == null)
             return;

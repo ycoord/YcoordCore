@@ -1,17 +1,11 @@
 package ru.ycoord;
 
-import net.milkbowl.vault.economy.Economy;
-import org.black_ixx.playerpoints.PlayerPoints;
-import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import ru.ycoord.core.balance.*;
+import org.bukkit.scheduler.BukkitTask;
 import ru.ycoord.core.color.Color;
 import ru.ycoord.core.commands.Command;
 import ru.ycoord.core.commands.GuiCommand;
@@ -28,7 +22,6 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -72,13 +65,10 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         return true;
     }
 
-    @Override
-    public void onEnable() {
-        boolean replace = true;
-        @NotNull FileConfiguration cfg = getConfig();
-        this.saveResource("config.yml", replace);
+    BukkitTask updatePDCTask;
 
 
+    private void initDb(ConfigurationSection cfg, boolean reload) {
         try {
             ConfigurationSection database = cfg.getConfigurationSection("database");
             if (database != null) {
@@ -88,61 +78,70 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
                 playerDataCache = new PlayerDataCache(conn, dataFolder);
             }
-            if (playerDataCache != null)
-                Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> playerDataCache.update(), 20, 10);
+
+            if (playerDataCache != null) {
+                if (reload)
+                    updatePDCTask.cancel();
+                updatePDCTask = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> playerDataCache.update(), 20, 10);
+            }
         } catch (SQLException e) {
             YcoordCore.getInstance().logger().error(e.getMessage());
         }
+    }
 
+    private void initLogger(boolean reload) {
         logger = new FileLogger(getDataFolder(), this);
 
-        {
-            if (doesntRequirePlugin(this, "PlaceholderAPI"))
-                return;
+    }
+
+    private void initPlaceholders(boolean reload) {
+        if (doesntRequirePlugin(this, "PlaceholderAPI"))
+            return;
 
 
-            IPlaceholderAPI placeholder = getPlaceholderAPI();
-            if (placeholder != null) {
-                YcoordCore.getInstance().getPlaceholderManager().registerPlaceholder(placeholder);
+        IPlaceholderAPI placeholder = getPlaceholderAPI();
+        if (placeholder != null) {
+            YcoordCore.getInstance().getPlaceholderManager().registerPlaceholder(placeholder);
+        }
+    }
+
+    private void initRootCommands() {
+        List<Command> roots = getRootCommands();
+        if (roots != null) {
+            for (Command root : roots)
+                YcoordCore.getInstance().registerCommand(this, root);
+        }
+    }
+
+    private void initMenus(boolean reload) {
+        saveAllYmlFiles(false);
+        File dataFolder = getDataFolder().getAbsoluteFile();
+        File menusFolder = new File(dataFolder, "menus");
+        if (!menusFolder.exists()) {
+            boolean ignored = menusFolder.mkdir();
+        }
+        if (menusFolder.exists()) {
+            File[] files = menusFolder.listFiles();
+            assert files != null;
+            for (File file : files) {
+                if (!file.isFile())
+                    continue;
+
+                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+                loadMenu(config);
             }
         }
 
-        {
-            List<Command> roots = getRootCommands();
-            if (roots != null) {
-                for (Command root : roots)
-                    YcoordCore.getInstance().registerCommand(this, root);
-            }
-        }
-
-        {
-            saveAllYmlFiles(replace);
-            File dataFolder = getDataFolder().getAbsoluteFile();
-            File menusFolder = new File(dataFolder, "menus");
-            if (!menusFolder.exists()) {
-                boolean ignored = menusFolder.mkdir();
-            }
-            if (menusFolder.exists()) {
-                File[] files = menusFolder.listFiles();
-                assert files != null;
-                for (File file : files) {
-                    if (!file.isFile())
-                        continue;
-
-                    FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-                    loadMenu(config);
-                }
-            }
-
-
+        if (!reload) {
             for (Command root : guiCommands)
                 YcoordCore.getInstance().registerCommand(this, root);
         }
+    }
 
+    void initMessagePlaceholders(ConfigurationSection cfg, boolean reload) {
         {
             MessagePlaceholders messagePlaceholders = YcoordCore.getInstance().getGlobalPlaceholders();
-            ConfigurationSection s = getConfig();
-            ConfigurationSection placeholders = s.getConfigurationSection("placeholders");
+            ConfigurationSection placeholders = cfg.getConfigurationSection("placeholders");
             if (placeholders != null) {
                 for (String key : placeholders.getKeys(false)) {
                     ConfigurationSection placeholderData = placeholders.getConfigurationSection(key);
@@ -160,8 +159,24 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
         {
             ChatMessage chatMessage = YcoordCore.getInstance().getChatMessage();
-            chatMessage.addConfig(getConfig());
+            chatMessage.addConfig(cfg);
         }
+    }
+
+    public void load(ConfigurationSection cfg, boolean reload) {
+        initDb(cfg, reload);
+        initLogger(reload);
+        initPlaceholders(reload);
+        initMenus(reload);
+        initMessagePlaceholders(cfg, reload);
+        initRootCommands();
+    }
+
+    @Override
+    public void onEnable() {
+        this.saveResource("config.yml", false);
+        reloadConfig();
+        load(getConfig(), false);
     }
 
 
@@ -220,10 +235,15 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
 
     @Override
     public void onDisable() {
-        //YcoordCore.getInstance().getPlaceholderManager().unregister();
+
     }
 
     public IPlaceholderAPI getPlaceholderAPI() {
         return new PlaceholderDummy();
+    }
+
+    public void reload() {
+        reloadConfig();
+        load(getConfig(), true);
     }
 }
