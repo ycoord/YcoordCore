@@ -10,7 +10,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
+import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
+import ru.ycoord.core.gui.items.GuiPaginationButton;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,10 @@ public class GuiManager implements Listener {
     private final ConcurrentHashMap<String, ConfigurationSection> guiElements = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Long> cooldowns = new ConcurrentHashMap<>();
     public static int cooldown = 100;
+
+    public ConcurrentHashMap<String, ConfigurationSection> getGlobalElements() {
+        return guiElements;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
@@ -64,10 +70,27 @@ public class GuiManager implements Listener {
         guiElements.put(symbol, section);
     }
 
-    public GuiItem getGlobalItem(String symbol, int slot, int index) {
-        if (!guiElements.containsKey(symbol))
-            return null;
-        return new GuiItem(0, slot, index, guiElements.get(symbol));
+
+    public GuiItem getGlobalItem(GuiBase gui, ConfigurationSection globalItemSection, int slot, int index) {
+
+        String type = globalItemSection.getString("type", "ITEM");
+
+        if (type.equalsIgnoreCase("ITEM")) {
+            return new GuiItem(0, slot, index, globalItemSection);
+        } else if (type.equalsIgnoreCase("NEXT")) {
+            if (gui instanceof GuiPaged paged) {
+                return new GuiPaginationButton(0, paged, true, slot, index, globalItemSection);
+            }
+        } else if (type.equalsIgnoreCase("PREV")) {
+            if (gui instanceof GuiPaged paged) {
+                return new GuiPaginationButton(0, paged, false, slot, index, globalItemSection);
+            }
+        } else if (type.equalsIgnoreCase("BACK")) {
+            if (gui instanceof GuiPaged paged) {
+                return new GuiBackButton(paged, 0, slot, index, globalItemSection);
+            }
+        }
+        return null;
     }
 
 

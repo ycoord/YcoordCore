@@ -104,16 +104,16 @@ placeholders:
     result: "&8&l»§x§D§E§3§C§0§0"
   17:
     placeholder: "%title-red%"
-    result: "&4&l▶&6"
+    result: "&4&l▶&c"
   18:
     placeholder: "%next%"
-    result: "&4&l▶&6"
+    result: "&6&l▶&f"
   19:
     placeholder: "%prev%"
-    result: "&4&l◀&6"
+    result: "&6&l◀&f"
   20:
     placeholder: "%back%"
-    result: "&4&l▼&6"
+    result: "&6&l▼&f"
 
 default-string-completion:
   - <строка>
@@ -137,10 +137,8 @@ nick-completion:
 messages:
   cooldown:
     - "Не так быстро!"
-    
   not-float:
     - "Не является вещественным числом!"
-    
   data-is-loading:
     - "Данные загружаются, подождите..."
   animation-in-progress:
@@ -298,6 +296,29 @@ items:
     texture: ""
     name: '%logo%'
     lore: []
-
+  next:
+    symbol: '>'
+    type: NEXT
+    material: ARROW
+    name: "%next% Следующая"
+    lore:
+      - "%lmb% перейти"
+  prev:
+    symbol: '<'
+    type: PREV
+    material: ARROW
+    name: "%prev% Предыдущая"
+    lore:
+      - "%lmb% перейти"
+  back:
+    symbol: '~'
+    counter: true
+    type: BACK
+    material: HOPPER
+    name: "%back% Назад"
+    lore:
+      - "%bullet% Страница: %page%/%pages%"
+      - ""
+      - "%lmb% перейти"
 database:
   connection-string: "jdbc:sqlite:{path}\\players.db"

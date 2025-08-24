@@ -52,6 +52,12 @@ public class GuiItem {
         this.redraw = section.getBoolean("redraw", false);
     }
 
+    public String getType(){
+        if(section == null)
+            return "ITEM";
+        return section.getString("type", "ITEM");
+    }
+
     public List<String> getLoreBefore(OfflinePlayer ignored) {
         return new LinkedList<>();
     }

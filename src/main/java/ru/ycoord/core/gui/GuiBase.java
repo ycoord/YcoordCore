@@ -154,14 +154,14 @@ public class GuiBase implements InventoryHolder {
         MessagePlaceholders placeholders = new MessagePlaceholders(player);
         getExtraPlaceholders(placeholders);
         if (player.getPlayer() != null) {
-            if(animate) {
+            if (animate) {
                 animation.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
                 if (animateOnlyOnOpen) {
                     animateOnlyOnOpen = false;
                     animation = new NoAnimation(null);
                 }
-            }else{
-                Animation temp  = new NoAnimation(null);
+            } else {
+                Animation temp = new NoAnimation(null);
                 temp.animate(this, inventory, player.getPlayer(), guiElements, placeholders);
 
             }
@@ -174,13 +174,13 @@ public class GuiBase implements InventoryHolder {
         Bukkit.getScheduler().runTaskAsynchronously(YcoordCore.getInstance(), () -> subRebuild(player, animate));
     }
 
-    protected void subRebuild(OfflinePlayer player, boolean animate){
-        if(lockOnAnimation)
+    protected void subRebuild(OfflinePlayer player, boolean animate) {
+        if (lockOnAnimation)
             TransactionManager.lock(player.getName(), this.getClass().getSimpleName());
         inventory.clear();
         this.items = make(player, section);
         refresh(player, items, animate);
-        if(lockOnAnimation)
+        if (lockOnAnimation)
             TransactionManager.unlock(player.getName(), this.getClass().getSimpleName());
     }
 
@@ -202,13 +202,13 @@ public class GuiBase implements InventoryHolder {
     }
 
 
-    public boolean hasSlot(int slot){
+    public boolean hasSlot(int slot) {
         return slots.containsKey(slot);
     }
 
-    public GuiItem getItemInSlot(OfflinePlayer player, int slot){
+    public GuiItem getItemInSlot(OfflinePlayer player, int slot) {
         GuiItem itemInSlot = slots.get(slot);
-        if(itemInSlot instanceof GuiMultiItem muiti){
+        if (itemInSlot instanceof GuiMultiItem muiti) {
             return muiti.getCurrentSlot(player);
         }
         return itemInSlot;
@@ -258,14 +258,23 @@ public class GuiBase implements InventoryHolder {
                 }
 
                 if (!found) {
-                    int currentIndex = typeCounter.getOrDefault("ITEM", 0);
-                    GuiItem item = YcoordCore.getInstance().getGuiManager().getGlobalItem(stringC, slotIndex, currentIndex);
+                    GuiManager manager = YcoordCore.getInstance().getGuiManager();
+                    ConcurrentHashMap<String, ConfigurationSection> els = manager.getGlobalElements();
+                    if (!els.containsKey(stringC)) {
+                        continue;
+                    }
+
+
+                    ConfigurationSection globalItemSection = els.get(stringC);
+                    String type = globalItemSection.getString("type", "ITEM");
+                    int currentIndex = typeCounter.getOrDefault(type, 0);
+                    GuiItem item = YcoordCore.getInstance().getGuiManager().getGlobalItem(this, globalItemSection, slotIndex, currentIndex);
                     if (item == null)
                         continue;
 
                     guiElements.computeIfAbsent(slotIndex, k -> new LinkedList<>())
-                            .add(new GuiItemCharacter(currentIndex, slotIndex, "ITEM", item, c));
-                    typeCounter.put("ITEM", currentIndex + 1);
+                            .add(new GuiItemCharacter(currentIndex, slotIndex, type, item, c));
+                    typeCounter.put(type, currentIndex + 1);
                 }
 
             }
