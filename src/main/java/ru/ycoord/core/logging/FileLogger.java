@@ -1,6 +1,7 @@
 package ru.ycoord.core.logging;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.ycoord.YcoordCore;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,7 +30,7 @@ public class FileLogger extends YLogger {
              PrintWriter pw = new PrintWriter(fw)) {
             pw.println("[" + time + "] " + "<" + level.name() + "> " + message);
         } catch (IOException e) {
-            e.fillInStackTrace();
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
     }
 }

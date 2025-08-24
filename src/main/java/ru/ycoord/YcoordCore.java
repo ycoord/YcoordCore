@@ -25,12 +25,12 @@ import ru.ycoord.examples.commands.CoreCommand;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class YcoordCore extends YcoordPlugin {
     public static YcoordCore instance;
     private ChatMessage chatMessage;
-    private PlayerDataCache playerDataCache;
     private GuiManager guiManager;
     private final MessagePlaceholders messagePlaceholders = new MessagePlaceholders(null);
     private final PlaceholderManager placeholderManager = new PlaceholderManager();
@@ -71,9 +71,6 @@ public final class YcoordCore extends YcoordPlugin {
         return chatMessage;
     }
 
-    public PlayerDataCache getPlayerDataCache() {
-        return playerDataCache;
-    }
 
     public GuiManager getGuiManager() {
         return guiManager;
@@ -136,23 +133,22 @@ public final class YcoordCore extends YcoordPlugin {
 
         placeholderManager.register();
 
+        guiManager = new GuiManager();
 
-        try {
-            playerDataCache = new PlayerDataCache("players.db");
 
-            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> playerDataCache.update(), 20, 10);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        ConfigurationSection s = getConfig().getConfigurationSection("items");
+        assert s != null;
+        for (String key : s.getKeys(false)) {
+            ConfigurationSection itemCfg = s.getConfigurationSection(key);
+            guiManager.addGlobalItem(Objects.requireNonNull(itemCfg));
         }
 
-        guiManager = new GuiManager();
-        guiManager.addGlobalItem(Objects.requireNonNull(getConfig().getConfigurationSection("items.filler")));
         long currentTime = System.currentTimeMillis();
         this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
-            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 5, 10);
+            Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
     }
 

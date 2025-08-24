@@ -3,6 +3,7 @@ package ru.ycoord.core.utils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import ru.ycoord.YcoordCore;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class ConfigurationUtil
         try {
             fileConfiguration.save(new File(dataFolder, fileName));
         } catch (IOException e) {
-            e.printStackTrace();
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
     }
 

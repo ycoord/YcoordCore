@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
+import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.GuiBase;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
@@ -40,8 +41,8 @@ public abstract class Animation {
             try {
                 String material = backgroundSection.getString("material", "BLACK_STAINED_GLASS_PANE");
                 this.backgroundMaterial = Material.valueOf(material);
-            } catch (Exception ignored) {
-
+            } catch (Exception e) {
+                YcoordCore.getInstance().logger().error(e.getMessage());
             }
         }
     }
@@ -49,8 +50,8 @@ public abstract class Animation {
     void sleep() {
         try {
             Thread.sleep(duration);
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
     }
 

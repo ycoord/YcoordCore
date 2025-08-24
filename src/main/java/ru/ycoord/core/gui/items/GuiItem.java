@@ -367,8 +367,8 @@ public class GuiItem {
                 } else if (tag.tag.equalsIgnoreCase("sound")) {
                     try {
                         sound = new SoundInfo(Sound.valueOf(tag.value), SoundCategory.AMBIENT, 0.5f, 0);
-                    } catch (Exception ignored) {
-
+                    } catch (Exception e) {
+                        YcoordCore.getInstance().logger().error(e.getMessage());
                     }
                 } else if (tag.tag.equalsIgnoreCase("open")) {
                     ConfigurationSection section = YcoordCore.getInstance().getMenus().get(tag.value);

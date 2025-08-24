@@ -19,12 +19,14 @@ import ru.ycoord.core.logging.FileLogger;
 import ru.ycoord.core.logging.YLogger;
 import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessagePlaceholders;
+import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
 import ru.ycoord.core.placeholder.PlaceholderDummy;
 
 import java.io.File;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
@@ -34,10 +36,16 @@ import java.util.logging.Logger;
 public class YcoordPlugin extends JavaPlugin implements EventListener {
     protected List<GuiCommand> guiCommands = new LinkedList<>();
     private YLogger logger;
+    private PlayerDataCache playerDataCache;
 
     public YLogger logger() {
         return logger;
     }
+
+    public PlayerDataCache getPlayerDataCache() {
+        return playerDataCache;
+    }
+
 
     public boolean doesntRequirePlugin(JavaPlugin plugin, String name) {
         Logger logger = plugin.getLogger();
@@ -69,6 +77,22 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
         boolean replace = true;
         @NotNull FileConfiguration cfg = getConfig();
         this.saveResource("config.yml", replace);
+
+
+        try {
+            ConfigurationSection database = cfg.getConfigurationSection("database");
+            if (database != null) {
+                String conn = database.getString("connection-string", "jdbc:sqlite:{path}/players.db");
+
+                String dataFolder = getDataFolder().toString();
+
+                playerDataCache = new PlayerDataCache(conn, dataFolder);
+            }
+            if (playerDataCache != null)
+                Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> playerDataCache.update(), 20, 10);
+        } catch (SQLException e) {
+            YcoordCore.getInstance().logger().error(e.getMessage());
+        }
 
         logger = new FileLogger(getDataFolder(), this);
 
@@ -184,8 +208,8 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
                     saveResource(name, replace);
                 }
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
     }
 

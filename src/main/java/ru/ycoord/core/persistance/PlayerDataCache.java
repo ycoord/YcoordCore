@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.YcoordCore;
 
@@ -15,19 +16,18 @@ import java.util.concurrent.*;
 public class PlayerDataCache {
 
     private final Dao<PlayerDataRecord, String> dao;
-    // Весь кэш: UUID -> (key -> value)
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, String>> cache = new ConcurrentHashMap<>();
-    // UUID:key "грязные" данные, которые надо сбросить в БД
     private final Set<String> dirtySet = ConcurrentHashMap.newKeySet();
 
-    public PlayerDataCache(String dbPath) throws SQLException {
-        String path = YcoordCore.getInstance().getDataFolder() + File.separator + dbPath;
-        String url = "jdbc:sqlite:" + path;
+    public PlayerDataCache(String connectionString, String dataFolder) throws SQLException {
+        connectionString = connectionString.replace("{path}", dataFolder);
+
+        String url = connectionString;
 
         JdbcConnectionSource connectionSource = new JdbcConnectionSource(url);
         dao = com.j256.ormlite.dao.DaoManager.createDao(connectionSource, PlayerDataRecord.class);
         TableUtils.createTableIfNotExists(connectionSource, PlayerDataRecord.class);
-        loadAll(); // загрузить всё при старте
+        loadAll();
     }
 
     // Загрузка всех данных из базы в память
@@ -60,8 +60,8 @@ public class PlayerDataCache {
     public boolean has(OfflinePlayer player, String key) {
         String uuid = player.getName();
         Map<String, String> map = cache.get(uuid);
-        if(map == null) return false;
-        return  map.containsKey(key);
+        if (map == null) return false;
+        return map.containsKey(key);
     }
 
 
@@ -80,7 +80,7 @@ public class PlayerDataCache {
                 PlayerDataRecord record = new PlayerDataRecord(uuid, key, value);
                 dao.createOrUpdate(record);
             } catch (SQLException e) {
-                e.printStackTrace();
+                YcoordCore.getInstance().logger().error(e.getMessage());
                 // не забываем вернуть в dirtySet если не удалось сохранить!
                 dirtySet.add(id);
             }

@@ -11,6 +11,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import ru.ycoord.YcoordCore;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 
@@ -56,7 +57,7 @@ public class Utils {
             profileField.setAccessible(true);
             profileField.set(meta, profile);
         } catch (Exception e) {
-            e.printStackTrace();
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
 
         head.setItemMeta(meta);
@@ -93,8 +94,8 @@ public class Utils {
         try {
             EvaluationValue result = expression.evaluate();
             return result.getBooleanValue();
-        } catch (Exception ex) {
-            ex.printStackTrace(System.err);
+        } catch (Exception e) {
+            YcoordCore.getInstance().logger().error(e.getMessage());
         }
 
         return false;
