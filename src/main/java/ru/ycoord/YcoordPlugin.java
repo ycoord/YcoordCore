@@ -15,7 +15,6 @@ import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.persistance.PlayerDataCache;
 import ru.ycoord.core.placeholder.IPlaceholderAPI;
-import ru.ycoord.core.placeholder.PlaceholderDummy;
 
 import java.io.File;
 import java.net.JarURLConnection;
@@ -239,7 +238,7 @@ public class YcoordPlugin extends JavaPlugin implements EventListener {
     }
 
     public IPlaceholderAPI getPlaceholderAPI() {
-        return new PlaceholderDummy();
+        return null;
     }
 
     public void reload() {

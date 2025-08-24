@@ -11,10 +11,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +36,6 @@ public final class YcoordCore extends YcoordPlugin {
 
     private final Map<String, ConfigurationSection> menus = new HashMap<>();
     private final ConcurrentHashMap<String, Balance> balances = new ConcurrentHashMap<>();
-    private BukkitTask guiTimer;
 
     public Balance getMoneyBalance() {
         return balances.get("MONEY");
@@ -158,7 +153,7 @@ public final class YcoordCore extends YcoordPlugin {
             this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
             if (!reload)
-                guiTimer = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
+                Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
         } catch (Exception e) {
             YcoordCore.getInstance().logger().error(e.getMessage());
         }

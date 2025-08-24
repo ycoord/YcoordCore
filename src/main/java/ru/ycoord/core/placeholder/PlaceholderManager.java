@@ -2,9 +2,10 @@ package ru.ycoord.core.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.ycoord.GradientExtension;
+import ru.ycoord.core.placeholder.extensions.InnerExtension;
 
 import java.util.HashMap;
 
@@ -41,6 +42,10 @@ public class PlaceholderManager extends PlaceholderExpansion {
         return null;
     }
 
+    public PlaceholderManager() {
+        registerPlaceholder(new GradientExtension());
+        registerPlaceholder(new InnerExtension());
+    }
 
 
     public void registerPlaceholder(IPlaceholderAPI papi) {

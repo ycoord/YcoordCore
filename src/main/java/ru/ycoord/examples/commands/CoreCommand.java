@@ -546,7 +546,7 @@ public class CoreCommand extends AdminCommand {
 
     @Override
     public String getName() {
-        return "ycoordcore";
+        return "yc";
     }
 
     @Override
