@@ -11,6 +11,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +142,8 @@ public final class YcoordCore extends YcoordPlugin {
     }
 
     void initGuiManager(boolean reload) {
-        guiManager = new GuiManager();
+        if (!reload)
+            guiManager = new GuiManager();
 
 
         ConfigurationSection s = getConfig().getConfigurationSection("items");
@@ -149,11 +154,11 @@ public final class YcoordCore extends YcoordPlugin {
         }
 
         long currentTime = System.currentTimeMillis();
-        this.getServer().getPluginManager().registerEvents(guiManager, this);
+        if (!reload)
+            this.getServer().getPluginManager().registerEvents(guiManager, this);
         try {
-            if (reload)
-                guiTimer.cancel();
-            guiTimer = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
+            if (!reload)
+                guiTimer = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> guiManager.update(System.currentTimeMillis() - currentTime), 1, 1);
         } catch (Exception e) {
             YcoordCore.getInstance().logger().error(e.getMessage());
         }
