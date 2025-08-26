@@ -15,10 +15,11 @@ import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiPaginationButton;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiManager implements Listener {
@@ -149,12 +150,19 @@ public class GuiManager implements Listener {
     }
 
     public void update(long elapsed) {
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (Player player : guis.keySet()) {
             Stack<GuiBase> stack = guis.get(player);
             if (stack.empty())
                 continue;
             GuiBase base = stack.peek();
-            base.update(elapsed, player);
+            futures.add(base.updateAsync(elapsed, player));
         }
+
+        CompletableFuture<Void> all = CompletableFuture.allOf(
+                futures.toArray(new CompletableFuture[0])
+        );
+
+        all.join();
     }
 }

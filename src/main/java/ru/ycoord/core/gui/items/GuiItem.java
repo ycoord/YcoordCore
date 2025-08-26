@@ -1,7 +1,6 @@
 package ru.ycoord.core.gui.items;
 
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -22,7 +21,6 @@ import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.utils.Utils;
-import ru.ycoord.examples.commands.GuiExample;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -379,7 +377,7 @@ public class GuiItem {
                 } else if (tag.tag.equalsIgnoreCase("open")) {
                     ConfigurationSection section = YcoordCore.getInstance().getMenus().get(tag.value);
                     if (section != null) {
-                        GuiExample base = new GuiExample(section);
+                        GuiBase base = new GuiBase(section);
                         base.open(player);
                     }
                 }

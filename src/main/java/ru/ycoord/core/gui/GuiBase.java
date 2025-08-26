@@ -1,6 +1,5 @@
 package ru.ycoord.core.gui;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.animation.*;
-import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiMultiItem;
 import ru.ycoord.core.gui.items.GuiViewerHeadItem;
@@ -25,6 +23,7 @@ import ru.ycoord.core.sound.SoundInfo;
 import ru.ycoord.core.transaction.TransactionManager;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiBase implements InventoryHolder {
@@ -114,17 +113,19 @@ public class GuiBase implements InventoryHolder {
         }
     }
 
-    public void update(long elapsed, Player player) {
-        MessagePlaceholders placeholders = new MessagePlaceholders(player);
-        getExtraPlaceholders(placeholders);
-        for (Integer slot : items.keySet()) {
-            List<GuiItemCharacter> guiItems = items.get(slot);
+    public CompletableFuture<Void> updateAsync(long elapsed, Player player) {
+        return CompletableFuture.runAsync(()->{
+            MessagePlaceholders placeholders = new MessagePlaceholders(player);
+            getExtraPlaceholders(placeholders);
+            for (Integer slot : items.keySet()) {
+                List<GuiItemCharacter> guiItems = items.get(slot);
 
-            for (GuiItemCharacter guiItem : guiItems) {
-                if (guiItem.item != null)
-                    guiItem.item.update(this, slot, guiItem.index, elapsed, player, placeholders);
+                for (GuiItemCharacter guiItem : guiItems) {
+                    if (guiItem.item != null)
+                        guiItem.item.update(this, slot, guiItem.index, elapsed, player, placeholders);
+                }
             }
-        }
+        });
     }
 
     public void getExtraPlaceholders(MessagePlaceholders placeholders) {
