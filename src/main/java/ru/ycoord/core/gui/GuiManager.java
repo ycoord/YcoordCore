@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryHolder;
+import ru.ycoord.YcoordCore;
 import ru.ycoord.core.gui.items.GuiBackButton;
 import ru.ycoord.core.gui.items.GuiItem;
 import ru.ycoord.core.gui.items.GuiPaginationButton;
@@ -24,7 +25,7 @@ public class GuiManager implements Listener {
     public ConcurrentHashMap<Player, Stack<GuiBase>> guis = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ConfigurationSection> guiElements = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Long> cooldowns = new ConcurrentHashMap<>();
-    public static int cooldown = 100;
+    public static int cooldown = YcoordCore.getInstance().getConfig().getInt("cooldown", 100);
 
     public ConcurrentHashMap<String, ConfigurationSection> getGlobalElements() {
         return guiElements;

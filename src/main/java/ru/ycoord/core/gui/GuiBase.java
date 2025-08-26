@@ -304,11 +304,13 @@ public class GuiBase implements InventoryHolder {
             return;
         }
         int slot = e.getSlot();
-        if (!this.slots.containsKey(slot))
-            return;
-        GuiItem i = this.slots.get(slot);
+
+        GuiItem i = this.slots.getOrDefault(slot, null);
         if (i == null)
+        {
+            e.setCancelled(true);
             return;
+        }
         if (e.getWhoClicked() instanceof Player player) {
             MessagePlaceholders placeholders = new MessagePlaceholders(player);
             getExtraPlaceholders(placeholders);

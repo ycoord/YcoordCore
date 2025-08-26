@@ -12,7 +12,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.ycoord.core.balance.*;
@@ -22,7 +21,6 @@ import ru.ycoord.core.messages.ChatMessage;
 import ru.ycoord.core.messages.MessageBase;
 import ru.ycoord.core.messages.MessagePlaceholders;
 import ru.ycoord.core.placeholder.PlaceholderManager;
-import ru.ycoord.examples.commands.CoreCommand;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -167,12 +165,6 @@ public final class YcoordCore extends YcoordPlugin {
         initGuiManager(reload);
         initPlaceholderManager(reload);
     }
-
-    @Override
-    public List<Command> getRootCommands() {
-        return List.of(new CoreCommand());
-    }
-
 
     static class Handler implements CommandExecutor, TabCompleter {
 
