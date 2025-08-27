@@ -180,7 +180,7 @@ public final class YcoordCore extends YcoordPlugin {
         public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String alias, @NotNull String[] args) {
             List<String> complete = base.complete(sender, List.of(args));
             List<String> newList = new LinkedList<>(complete);
-            if (sender.hasPermission("*")) {
+            if (sender.hasPermission("*") && args.length == 1) {
                 newList.add("reload");
             }
             return newList;

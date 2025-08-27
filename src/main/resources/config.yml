@@ -38,19 +38,19 @@ style:
 money:
   1:
     type: MONEY
-    style: "%yc_gr_~<#FB8000><#F2FF00>{yc_ie_%AMOUNT% Ⓜ}%"
+    style: "%yc_gr_~<#FB8000><#F2FF00>{yc_ie_{AMOUNT} Ⓜ}%"
   2:
     type: DONATE
-    style: "%yc_gr_~<#04FBC9><#0BFF00>{yc_ie_%AMOUNT% Ⓒ}%"
+    style: "%yc_gr_~<#04FBC9><#0BFF00>{yc_ie_{AMOUNT} Ⓒ}%"
   3:
     type: LEVEL
-    style: "%yc_gr_~<#00FBE6><#0010FF>{yc_ie_%AMOUNT% Ⓛ}%"
+    style: "%yc_gr_~<#00FBE6><#0010FF>{yc_ie_{AMOUNT} Ⓛ}%"
   4:
     type: EXP
-    style: "%yc_gr_~<#003DFB><#FF05FB>{yc_ie_%AMOUNT% Ⓔ}%"
+    style: "%yc_gr_~<#003DFB><#FF05FB>{yc_ie_{AMOUNT} Ⓔ}%"
   5:
     type: CUSTOM1
-    style: "%yc_gr_~<#0616FB><#0BFF00>{yc_ie_%AMOUNT% Ⓖ}%"
+    style: "%yc_gr_~<#0616FB><#0BFF00>{yc_ie_{AMOUNT} Ⓖ}%"
     give: "points give %player% %count%"
     take: "points take %player% %count%"
     get:  "%playerpoints_points%"

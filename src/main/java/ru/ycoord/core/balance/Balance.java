@@ -35,7 +35,7 @@ public abstract class Balance {
         if (style == null)
             return String.valueOf(amount);
 
-        return style.replace("%AMOUNT%", String.valueOf(amount));
+        return style.replace("{AMOUNT}", String.valueOf(amount));
     }
 
     abstract void subWithdraw(Player player, int money);
