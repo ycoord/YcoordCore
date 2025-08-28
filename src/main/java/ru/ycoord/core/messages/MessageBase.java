@@ -202,7 +202,7 @@ public abstract class MessageBase {
         return PlaceholderAPI.setPlaceholders(messagePlaceholders.getPlayer(), value);
     }
 
-    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
+    public CompletableFuture<Void> sendMessageIdAsync(Level level, Object listener, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
         String id = null;
         if (idWithPlace.contains("|")) {
             String[] splitted = idWithPlace.split("\\|");
@@ -227,7 +227,7 @@ public abstract class MessageBase {
 
 
         for (String message : messages) {
-            displayMessage(level, player, makeMessage(level, message, messagePlaceholders));
+            displayMessage(level, listener, makeMessage(level, message, messagePlaceholders));
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -247,18 +247,18 @@ public abstract class MessageBase {
     }
 
 
-    public abstract void displayMessage(Level level, OfflinePlayer player, String messages);
+    public abstract void displayMessage(Level level, Object player, String messages);
 
-    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, String def) {
-        return sendMessageIdAsync(level, player, id, def, new MessagePlaceholders(player));
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, Object player, String id, String def) {
+        return sendMessageIdAsync(level, player, id, def, new MessagePlaceholders(player instanceof Player ? (Player) player : null));
     }
 
-    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id, MessagePlaceholders messagePlaceholders) {
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, Object player, String id, MessagePlaceholders messagePlaceholders) {
         return sendMessageIdAsync(level, player, id, "", messagePlaceholders);
     }
 
-    public final CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String id) {
-        return sendMessageIdAsync(level, player, id, "", new MessagePlaceholders(player));
+    public final CompletableFuture<Void> sendMessageIdAsync(Level level, Object player, String id) {
+        return sendMessageIdAsync(level, player, id, "", new MessagePlaceholders(player instanceof Player ? (Player) player : null));
     }
 
     public void broadcastAll(Level level, OfflinePlayer sender, String id, String def, MessagePlaceholders messagePlaceholders) {

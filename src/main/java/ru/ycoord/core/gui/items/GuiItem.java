@@ -50,18 +50,22 @@ public class GuiItem {
         this.redraw = section.getBoolean("redraw", false);
     }
 
-    public String getType(){
-        if(section == null)
+    public String getType() {
+        if (section == null)
             return "ITEM";
         return section.getString("type", "ITEM");
     }
 
     public List<String> getLoreBefore(OfflinePlayer ignored) {
-        return new LinkedList<>();
+        if (section == null)
+            return new LinkedList<>();
+        return section.getStringList("lore-before");
     }
 
     public List<String> getLoreAfter(OfflinePlayer ignored) {
-        return new LinkedList<>();
+        if (section == null)
+            return new LinkedList<>();
+        return section.getStringList("lore-after");
     }
 
     public void apply(OfflinePlayer clicker, ItemStack stack, MessagePlaceholders placeholders) {
@@ -73,8 +77,7 @@ public class GuiItem {
 
         List<String> resultLore = new LinkedList<>();
 
-        if(!lore.isEmpty())
-        {
+        if (!lore.isEmpty()) {
             resultLore.add("");
         }
 
@@ -91,8 +94,9 @@ public class GuiItem {
         }
 
         ItemMeta meta = stack.getItemMeta();
-        String name = section.getString("name", "имя");
-        meta.setDisplayName(MessageBase.translateColor(MessageBase.Level.NONE, name, placeholders));
+        String name = section.getString("name", null);
+        if (name != null)
+            meta.setDisplayName(MessageBase.translateColor(MessageBase.Level.NONE, name, placeholders));
 
         //List<Component> components = new LinkedList<>();
         //for (String loreItem : resultLore) {

@@ -10,7 +10,7 @@ gui-settings:
 style:
   use: true
   info:
-    prefix: "&6%!X% &6&lСистема &8%!>>%%!text-color% "
+    prefix: "&7&l| &6Система &8%!>>%%!text-color% "
     placeholder: "&6"
     color: "%text-color%"
     sound:
@@ -19,16 +19,16 @@ style:
       volume: 0.2
 
   success:
-    prefix: "&2%X% &e&lСистема &8%>>%%text-color% "
+    prefix: "&2%V% &eСистема &8%>>%%text-color% "
     placeholder: "&a"
     color: "%text-color%"
     sound:
       name: ENTITY_EXPERIENCE_ORB_PICKUP
       pitch: 1.2
   error:
-    prefix: "&c%X% &c&lСистема &8%>>%%text-color% "
+    prefix: "&4%X% &cСистема &8%>>%&7 "
     placeholder: "&c"
-    color: "%text-color%"
+    color: "&7"
     sound:
       name: BLOCK_NOTE_BLOCK_BASS
       pitch: 0.7
@@ -65,10 +65,10 @@ placeholders:
     result: "<"
   3:
     placeholder: "%X%"
-    result: "ⓧ"
+    result: "✘"
   4:
     placeholder: "%V%"
-    result: "V"
+    result: "✔"
   5:
     placeholder: "%text-color%"
     result: "&f"
@@ -90,6 +90,9 @@ placeholders:
   11:
     placeholder: "%bullet%"
     result: "§f◦§r&7"
+  113:
+    placeholder: "%bullet-next%"
+    result: " &7"
   12:
     placeholder: "%rmb%"
     result: "§6[✔]§r §eПКМ§r §7-"
@@ -136,6 +139,8 @@ default-float-completion:
 nick-completion:
   - <ник>
 
+ys-item-name-completion:
+  - название
 
 messages:
   cooldown:
@@ -149,10 +154,13 @@ messages:
   not-integer:
     - "Не является целым числом!"
   no-subcommand:
-    - "Команды &a «%command%» не существует! Возможные значения %possible%"
+    - "Команды «%command%» не существует! Возможные значения %possible%"
+  help-description:
+    - "информация о команде"
   no-range:
     - "Значение должно быть в диапазоне &e[%min%...%max%&e]"
-
+  no-hand-item:
+    - "Необходим предмет в руке!"
   need-param:
     - "Недостаточно параметров!"
 
@@ -252,7 +260,7 @@ messages:
 
 
   help-item-info:
-    - "> %command% - %description%"
+    - "> &6%command% &8- &f%description%"
   string-description:
     - "строка"
   integer-description:
@@ -263,33 +271,6 @@ messages:
     - "онлайн игрок"
   offline-description:
     - "игрок"
-  example-command-description:
-    - "примеры ядра"
-  example-message-command-description:
-    - "примеры сообщений"
-  example-message-simple-command-description:
-    - "простое сообщение"
-  example-message-complex-command-description:
-    - "сложное сообщение"
-  example-nbt-command-description:
-    - "примеры извлечения и установки nbt тегов для сущностей и блоков"
-  example-get-nbt-command-description:
-    - "извлечение значения"
-  example-get-nbt-block-command-description:
-    - "извлечение значения из блока"
-  example-get-nbt-player-command-description:
-    - "извлечение значения из игрока"
-
-  example-set-nbt-command-description:
-    - "извлечение значения"
-  example-set-nbt-block-command-description:
-    - "извлечение значения из блока"
-  example-set-nbt-player-command-description:
-    - "извлечение значения из игрока"
-  example-head-description:
-    - "получение головы игрока"
-  example-gui-description:
-    - "пример gui"
   reloaded:
     - "Плагин перезагружен; на живом сервере это рискованно — рекомендуется полный перезапуск сервера"
 items:

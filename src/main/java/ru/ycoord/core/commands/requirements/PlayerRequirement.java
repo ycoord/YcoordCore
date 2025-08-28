@@ -24,7 +24,7 @@ public class PlayerRequirement extends Requirement {
 
     @Override
     public Object validate(CommandSender sender,String param) {
-        return Bukkit.getOfflinePlayer(param);
+        return Bukkit.getOfflinePlayerIfCached(param);
     }
 
     @Override

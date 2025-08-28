@@ -10,6 +10,7 @@ import ru.ycoord.core.messages.MessagePlaceholders;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class GuiPaged extends GuiBase {
     protected int current = 0;
@@ -86,6 +87,16 @@ abstract public class GuiPaged extends GuiBase {
         super.getExtraPlaceholders(placeholders);
         placeholders.put("%page%", current + 1);
         placeholders.put("%pages%", getMaxPages(placeholders.getPlayer()));
+    }
+
+    protected void prepareData(OfflinePlayer player, ConfigurationSection section){
+
+    }
+
+    @Override
+    protected ConcurrentHashMap<Integer, List<GuiItemCharacter>> make(OfflinePlayer player, ConfigurationSection section) {
+        prepareData(player, section);
+        return super.make(player, section);
     }
 
     protected abstract int getItemCount(OfflinePlayer player);

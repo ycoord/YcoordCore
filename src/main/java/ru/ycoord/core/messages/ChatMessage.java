@@ -3,9 +3,12 @@ package ru.ycoord.core.messages;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.parcticle.ParticlesInfo;
 import ru.ycoord.core.sound.SoundInfo;
@@ -20,17 +23,23 @@ public class ChatMessage extends MessageBase {
         super(styleSection, messagesSection);
     }
 
-    public void sendMessageId(Level level, OfflinePlayer player, String messageId, String def, final MessagePlaceholders messagePlaceholders){
+    public void sendMessageId(Level level, Object player, String messageId, String def, final MessagePlaceholders messagePlaceholders){
 
             if (player == null)
                 return;
-            if (!player.isOnline() || player.getPlayer() == null)
+
+            CommandSender sender = null;
+            if(player instanceof CommandSender commandSender){
+                sender = commandSender;
+            }
+
+            if(sender == null)
                 return;
 
             if (!messagesSection.contains(messageId)) {
                 String newdef = messageId + "|" + String.join(", ", messagePlaceholders.keySet()).replace("%", "") + ":" + def;
 
-                player.getPlayer().sendMessage(translateColor(level, newdef, messagePlaceholders));
+                sender.sendMessage(translateColor(level, newdef, messagePlaceholders));
                 return;
             }
             List<?> messages = messagesSection.getList(messageId);
@@ -40,7 +49,7 @@ public class ChatMessage extends MessageBase {
             boolean hasSound = false;
             for (Object message : messages) {
                 if (message instanceof String stringMessage) {
-                    player.getPlayer().sendMessage(translateColor(level, stringMessage, messagePlaceholders));
+                    sender.sendMessage(translateColor(level, stringMessage, messagePlaceholders));
                 } else {
                     if (message instanceof HashMap<?, ?> map) {
                         for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -60,13 +69,18 @@ public class ChatMessage extends MessageBase {
                                 switch (type.toLowerCase()) {
                                     case "sound": {
                                         SoundInfo info = new SoundInfo(section);
-                                        info.play(player);
+                                        if(sender instanceof Player p) {
+                                            info.play(p);
+                                        }
                                         hasSound = true;
                                         break;
                                     }
                                     case "particle": {
                                         ParticlesInfo info = new ParticlesInfo(section);
-                                        info.play(player);
+                                        if(sender instanceof Player p) {
+                                            info.play(p);
+                                        }
+
                                         break;
                                     }
                                     case "component": {
@@ -112,7 +126,7 @@ public class ChatMessage extends MessageBase {
                                                 component = component.append(builder.asComponent());
                                             }
                                         }
-                                        player.getPlayer().sendMessage(component);
+                                        sender.sendMessage(component);
                                     }
                                 }
                             }
@@ -124,14 +138,16 @@ public class ChatMessage extends MessageBase {
             if (!hasSound) {
                 MessageBase.Style style = YcoordCore.getInstance().getChatMessage().getStyle();
                 if (style != null) {
-                    style.playSound(level, player);
+                    if(sender instanceof Player p) {
+                        style.playSound(level, p);
+                    }
                 }
             }
 
     }
 
     @Override
-    public CompletableFuture<Void> sendMessageIdAsync(Level level, OfflinePlayer player, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
+    public CompletableFuture<Void> sendMessageIdAsync(Level level, Object player, String idWithPlace, String def, MessagePlaceholders messagePlaceholders) {
 
 
         if (messagePlaceholders == null) {
@@ -161,7 +177,7 @@ public class ChatMessage extends MessageBase {
     }
 
     @Override
-    public void displayMessage(Level level, OfflinePlayer player, String messages) {
+    public void displayMessage(Level level, Object player, String messages) {
 
     }
 }

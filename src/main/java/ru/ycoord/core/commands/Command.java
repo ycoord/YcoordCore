@@ -2,6 +2,7 @@ package ru.ycoord.core.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import ru.ycoord.YcoordCore;
 import ru.ycoord.core.commands.requirements.Requirement;
 import ru.ycoord.core.messages.MessageBase;
@@ -103,7 +104,7 @@ public abstract class Command {
         }
 
         if (!canPlayerExecute() && (sender instanceof Player player)) {
-            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.player-cant");
+            YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.player-cant");
 
             return false;
         }
@@ -166,8 +167,8 @@ public abstract class Command {
     protected Object hasNextParam(boolean noParamOk) {
         if (params.size() <= paramCounter) {
             if (sender instanceof Player player) {
-                if (noParamOk)
-                    YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.need-param");
+                if (!noParamOk)
+                    YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.need-param");
             }
 
             return null;
@@ -224,4 +225,17 @@ public abstract class Command {
     }
 
     public abstract String getDescription(CommandSender sender);
+
+    public ItemStack getHandItem(CommandSender sender) {
+        if (sender instanceof Player player) {
+            ItemStack stack = player.getInventory().getItemInMainHand();
+            if (stack.getType().isAir()) {
+                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR, player, "messages.no-hand-item");
+                return null;
+            }
+
+            return stack;
+        }
+        return null;
+    }
 }

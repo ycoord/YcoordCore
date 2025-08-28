@@ -92,7 +92,7 @@ public class SubcommandRequirement extends Requirement {
                 MessagePlaceholders placeholders = new MessagePlaceholders(player);
                 placeholders.put("%command%", c.getName());
                 placeholders.put("%description%", c.getDescription(sender));
-                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.ERROR,player, "messages.help-item-info", placeholders);
+                YcoordCore.getInstance().getChatMessage().sendMessageIdAsync(MessageBase.Level.INFO,player, "messages.help-item-info", placeholders);
             }
         }
     }
